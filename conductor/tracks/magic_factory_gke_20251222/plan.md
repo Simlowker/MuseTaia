@@ -6,7 +6,7 @@
     - **Files:** `Dockerfile`, `.dockerignore`
     - **Tech:** Docker, Multi-stage builds.
     - **Tests:** Build image and run basic "ping" test inside container.
-- [~] Task: Define Local Orchestration with Docker Compose
+- [x] Task: Define Local Orchestration with Docker Compose
     - **Goal:** Verify the stack (App + Redis) works in containers.
     - **Files:** `docker-compose.yml`
     - **Tech:** Docker Compose.

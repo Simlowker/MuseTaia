@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smos-agents
+  labels:
+    app: smos
+    component: agents
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: smos
+      component: agents
+  template:
+    metadata:
+      labels:
+        app: smos
+        component: agents
+    spec:
+      runtimeClassName: gvisor # Secure isolation for untrusted workloads
+      containers:
+      - name: smos-agents
+        image: gcr.io/PROJECT_ID/smos-agents:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: PROJECT_ID
+          valueFrom:
+            secretKeyRef:
+              name: smos-secrets
+              key: project-id
+        - name: REDIS_HOST
+          value: "redis-master"
+        - name: GCS_BUCKET_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: smos-config
+              key: bucket-name
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8000
+          initialDelaySeconds: 5
+          periodSeconds: 10

@@ -14,12 +14,12 @@
 - [x] Task: Conductor - User Manual Verification 'Containerization' (Protocol in workflow.md) 8c59437
 
 ## Phase 2: Kubernetes Manifests (The Factory Floor)
-- [ ] Task: Define GKE Deployment Manifests
+- [x] Task: Define GKE Deployment Manifests
     - **Goal:** Create K8s configurations for deploying the Swarm.
     - **Files:** `infrastructure/k8s/deployment.yaml`, `infrastructure/k8s/service.yaml`
     - **Tech:** Kubernetes, YAML.
     - **Settings:** Replicas=3, Resources limits.
-- [ ] Task: Configure gVisor Sandbox
+- [x] Task: Configure gVisor Sandbox
     - **Goal:** Enable secure isolation for the agents using gVisor (RuntimeClass).
     - **Files:** `infrastructure/k8s/runtime-class.yaml` (or update deployment).
     - **Tech:** gVisor (gvisor.io).

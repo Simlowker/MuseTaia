@@ -26,11 +26,11 @@
 - [ ] Task: Conductor - User Manual Verification 'Kubernetes Manifests' (Protocol in workflow.md)
 
 ## Phase 3: High-Performance Go Dispatcher
-- [ ] Task: Initialize Go Module for Dispatcher
+- [x] Task: Initialize Go Module for Dispatcher
     - **Goal:** Set up the Go project structure for the high-concurrency scheduler.
     - **Files:** `infrastructure/dispatcher/go.mod`, `infrastructure/dispatcher/main.go`
     - **Tech:** Go (Golang).
-- [ ] Task: Implement gRPC/HTTP Interface for Job Dispatching
+- [~] Task: Implement gRPC/HTTP Interface for Job Dispatching
     - **Goal:** Create a Go service that receives high-volume trigger requests and dispatches them to the Python Swarm pods.
     - **Files:** `infrastructure/dispatcher/server.go`, `infrastructure/dispatcher/worker_pool.go`
     - **Tech:** Goroutines, Channels.

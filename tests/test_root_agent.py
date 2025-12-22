@@ -16,7 +16,7 @@ def test_root_agent_initialization(mock_genai):
     mock_client = mock_genai.Client.return_value
     mock_chat = mock_client.chats.create.return_value
     
-    agent = RootAgent(model_name="gemini-3.0-flash")
+    agent = RootAgent(model_name="gemini-3.0-flash-preview")
     
     # Check that the GenAI client was initialized
     mock_genai.Client.assert_called_once()

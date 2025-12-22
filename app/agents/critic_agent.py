@@ -9,7 +9,7 @@ from app.core.schemas.qa import ConsistencyReport
 class CriticAgent:
     """The 'Critic' agent responsible for maintaining visual and brand identity."""
 
-    def __init__(self, model_name: str = "gemini-2.0-flash"):
+    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
         """Initializes The Critic.
 
         Args:

@@ -8,7 +8,7 @@ from app.core.config import settings
 class RootAgent:
     """The central nervous system of the SMOS swarm."""
 
-    def __init__(self, model_name: str = "gemini-3.0-flash"):
+    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
         """Initializes the RootAgent.
 
         Args:

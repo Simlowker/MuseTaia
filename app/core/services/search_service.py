@@ -8,7 +8,7 @@ from app.core.config import settings
 class SearchService:
     """Wrapper for Google Search capabilities."""
 
-    def __init__(self, model_name: str = "gemini-2.0-flash"):
+    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
         """Initializes the SearchService.
 
         Args:

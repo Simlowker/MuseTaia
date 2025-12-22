@@ -12,7 +12,7 @@
     - **Files:** `app/matrix/assets_manager.py`
     - **Tech:** Google Cloud Storage Client
     - **Tests:** Test upload, retrieval, versioning, and metadata access.
-- [~] Task: Implement Vertex AI Context Caching Layer
+- [x] Task: Implement Vertex AI Context Caching Layer 9db6833
     - **Goal:** Create the interface for managing long-context memory (Backstory, Voice).
     - **Files:** `app/matrix/context_cache.py`
     - **Tech:** Vertex AI SDK

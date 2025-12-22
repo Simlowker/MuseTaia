@@ -6,23 +6,11 @@
 - [x] Task: Set up Redis Infrastructure (StateDB) 6740299
 - [x] Task: Conductor - User Manual Verification 'Infrastructure Setup & Project Skeleton' (Protocol in workflow.md) 484c1db
 
-## Phase 2: "The Matrix" Memory Implementation
+## Phase 2: "The Matrix" Memory Implementation [checkpoint: 07021e9]
 - [x] Task: Implement Signature Assets Manager (GCS) 4867fb1
-    - **Goal:** Create a module to upload, retrieve, and version "Signature Assets" (images, seeds).
-    - **Files:** `app/matrix/assets_manager.py`
-    - **Tech:** Google Cloud Storage Client
-    - **Tests:** Test upload, retrieval, versioning, and metadata access.
 - [x] Task: Implement Vertex AI Context Caching Layer 9db6833
-    - **Goal:** Create the interface for managing long-context memory (Backstory, Voice).
-    - **Files:** `app/matrix/context_cache.py`
-    - **Tech:** Vertex AI SDK
-    - **Tests:** Test cache creation, retrieval, and expiration handling.
 - [x] Task: Define "Genesis DNA" Schema & Loader 4cbfba6
-    - **Goal:** Define the JSON schema for the Muse's identity and create a loader to populate the Context Cache.
-    - **Files:** `app/matrix/models.py`, `app/matrix/dna_loader.py`
-    - **Tech:** Pydantic
-    - **Tests:** Validate schema integrity and successful data loading.
-- [ ] Task: Conductor - User Manual Verification '"The Matrix" Memory Implementation' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification '"The Matrix" Memory Implementation' (Protocol in workflow.md) 07021e9
 
 ## Phase 3: RootAgent & ADK Orchestration
 - [ ] Task: Initialize RootAgent with Google ADK

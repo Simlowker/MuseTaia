@@ -1,7 +1,7 @@
 # Track Plan: Perception & Grounding (TrendScanner & Search)
 
 ## Phase 1: Search Infrastructure (The Sensors)
-- [ ] Task: Implement Search Service Wrapper
+- [x] Task: Implement Search Service Wrapper
     - **Goal:** Create a unified interface for agents to perform web searches using Google Search.
     - **Files:** `app/core/services/search_service.py`
     - **Tech:** Google GenAI Tooling (Google Search).

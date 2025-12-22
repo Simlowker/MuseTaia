@@ -13,12 +13,12 @@
     - **Tests:** Verify API calls include reference image config.
 
 ## Phase 2: Director's Chair (Veo 3.1)
-- [ ] Task: Implement Cinematic Camera Controls
+- [x] Task: Implement Cinematic Camera Controls
     - **Goal:** Map the `Screenplay` schema's camera movements to Veo 3.1 prompt structures.
     - **Files:** `app/agents/director_agent.py`
     - **Tech:** Prompt engineering for camera control (Pan, Tilt, Zoom).
     - **Tests:** Verify prompt construction includes camera directives.
-- [ ] Task: Implement Ingredients-to-Video (Persistence)
+- [x] Task: Implement Ingredients-to-Video (Persistence)
     - **Goal:** Pass multiple reference images (Subject + Style) to Veo to ensure character persistence.
     - **Files:** `app/agents/director_agent.py`
     - **Tech:** Veo 3.1 Multi-image input.

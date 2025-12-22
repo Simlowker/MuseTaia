@@ -27,12 +27,12 @@
 - [x] Task: Conductor - User Manual Verification 'Visual Virtuoso' (Protocol in workflow.md) f6fe9e9
 
 ## Phase 3: The Cinematographer (The Director)
-- [ ] Task: Implement Director Agent (Veo 3.1)
+- [x] Task: Implement Director Agent (Veo 3.1)
     - **Goal:** Generate consistent video clips from keyframes and motion descriptions.
     - **Files:** `app/agents/director_agent.py`
     - **Tech:** Veo 3.1 API, Image-to-Video.
     - **Tests:** Verify API calls for video generation (mocked for cost).
-- [ ] Task: Integration Test: Text -> Image -> Video Pipeline
+- [x] Task: Integration Test: Text -> Image -> Video Pipeline
     - **Goal:** Verify the full production chain from a text concept to a final video asset.
     - **Files:** `tests/test_production_pipeline.py`
     - **Tech:** Pytest, Integration testing.

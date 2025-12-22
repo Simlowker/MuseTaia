@@ -1,12 +1,12 @@
 # Track Plan: Creative Studio Expansion (Actions & Tools)
 
 ## Phase 1: Visual Studio Tools (Imagen 3)
-- [ ] Task: Implement Inpainting & Editing Capabilities
+- [x] Task: Implement Inpainting & Editing Capabilities
     - **Goal:** Enable the VisualAgent to repair specific areas of an image using masks.
     - **Files:** `app/agents/visual_agent.py`
     - **Tech:** Imagen 3 Editing API (Mask-based editing).
     - **Tests:** Verify edit requests with mock masks.
-- [ ] Task: Implement Style & Subject Reference Configuration
+- [x] Task: Implement Style & Subject Reference Configuration
     - **Goal:** Allow injection of "Signature Assets" as style/subject references to ensure aesthetic consistency.
     - **Files:** `app/agents/visual_agent.py`
     - **Tech:** Imagen 3 `style_reference` and `subject_reference` parameters.

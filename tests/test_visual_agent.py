@@ -40,8 +40,75 @@ def test_generate_image_basic(mock_genai, mock_assets_manager):
     mock_assets_instance.download_asset.assert_called()
 
 def test_initialization(mock_genai, mock_assets_manager):
+
     """Test initialization of VisualAgent."""
+
     agent = VisualAgent(model_name="imagen-3.0-generate-001")
+
     assert agent.model_name == "imagen-3.0-generate-001"
+
     mock_genai.Client.assert_called_once()
+
     mock_assets_manager.assert_called_once()
+
+
+
+def test_edit_image(mock_genai, mock_assets_manager):
+
+
+
+    """Test image editing with inpainting."""
+
+
+
+    mock_client = mock_genai.Client.return_value
+
+
+
+    mock_response = MagicMock()
+
+    mock_response.generated_images = [MagicMock(image_bytes=b"edited_image")]
+
+    mock_client.models.edit_image.return_value = mock_response
+
+    
+
+    agent = VisualAgent()
+
+    
+
+    base_img = b"base_image"
+
+    mask_img = b"mask_image"
+
+    
+
+    edited_bytes = agent.edit_image(
+
+        prompt="Add sunglasses",
+
+        base_image_bytes=base_img,
+
+        mask_image_bytes=mask_img
+
+    )
+
+    
+
+    assert edited_bytes == b"edited_image"
+
+    mock_client.models.edit_image.assert_called_once()
+
+    
+
+    # Check args
+
+    call_args = mock_client.models.edit_image.call_args
+
+    assert call_args.kwargs["prompt"] == "Add sunglasses"
+
+    refs = call_args.kwargs["reference_images"]
+
+    assert len(refs) == 2 # Raw + Mask
+
+

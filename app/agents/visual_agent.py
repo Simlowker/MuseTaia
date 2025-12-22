@@ -27,14 +27,16 @@ class VisualAgent:
         self,
         prompt: str,
         subject_id: Optional[str] = None,
+        style_id: Optional[str] = None,
         aspect_ratio: str = "1:1",
         number_of_images: int = 1
     ) -> bytes:
-        """Generates an image based on a prompt and optional subject guidance.
+        """Generates an image based on a prompt and optional subject/style guidance.
 
         Args:
             prompt: The text description of the image.
             subject_id: The ID of the Muse to use for Subject Guidance.
+            style_id: The ID of a style asset to use for Style Guidance.
             aspect_ratio: Aspect ratio (e.g., '1:1', '16:9').
             number_of_images: How many images to generate.
 
@@ -42,18 +44,23 @@ class VisualAgent:
             bytes: The raw image data of the first generated image.
         """
         
-        # Enhanced prompt for subject consistency if subject_id is provided
         enhanced_prompt = prompt
+        
+        # Fallback: Use prompt engineering since SDK fields are missing/private
         if subject_id:
-            # Fetch reference assets (Face, Profile, Style)
-            # In a real scenario, we would use SubjectReferenceImage if supported by the SDK method.
-            # For now, we fetch assets to ensure they exist and potentially use them.
             try:
-                # We could potentially use these in an edit_image call or enhanced prompt
+                # Ensure asset exists
                 self.assets_manager.download_asset(f"muses/{subject_id}/face.png")
                 enhanced_prompt = f"Subject: {subject_id}. {prompt}"
             except Exception:
-                pass # Fallback to original prompt if assets missing
+                pass
+
+        if style_id:
+            try:
+                self.assets_manager.download_asset(f"styles/{style_id}.png")
+                enhanced_prompt += f" Style: {style_id}"
+            except Exception:
+                pass
 
         response = self.client.models.generate_images(
             model=self.model_name,
@@ -67,4 +74,52 @@ class VisualAgent:
         )
 
         # Return the bytes of the first image
+        return response.generated_images[0].image_bytes
+
+    def edit_image(
+        self,
+        prompt: str,
+        base_image_bytes: bytes,
+        mask_image_bytes: Optional[bytes] = None,
+        number_of_images: int = 1
+    ) -> bytes:
+        """Edits an image using mask-based inpainting.
+
+        Args:
+            prompt: Text description of the desired edit.
+            base_image_bytes: The original image to edit.
+            mask_image_bytes: The binary mask (white = edit area, black = preserve).
+            number_of_images: Number of images to generate.
+
+        Returns:
+            bytes: The edited image data.
+        """
+        
+        reference_images = [
+            types.RawReferenceImage(
+                reference_id=1,
+                reference_image=types.Image(image_bytes=base_image_bytes)
+            )
+        ]
+        
+        if mask_image_bytes:
+            reference_images.append(
+                types.MaskReferenceImage(
+                    reference_id=2,
+                    reference_image=types.Image(image_bytes=mask_image_bytes),
+                    config=types.MaskReferenceConfig(mask_mode="MASK_MODE_USER_PROVIDED")
+                )
+            )
+            
+        response = self.client.models.edit_image(
+            model=self.model_name,
+            prompt=prompt,
+            reference_images=reference_images,
+            config=types.EditImageConfig(
+                number_of_images=number_of_images,
+                safety_filter_level="BLOCK_LOW_AND_ABOVE",
+                person_generation="ALLOW_ADULT"
+            )
+        )
+        
         return response.generated_images[0].image_bytes

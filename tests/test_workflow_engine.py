@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import MagicMock, patch
 from app.core.workflow_engine import WorkflowEngine
 from app.state.models import Mood
-from app.agents.critic_agent import ConsistencyReport
+from app.core.schemas.qa import ConsistencyReport, FeedbackItem
 
 @pytest.fixture
 def mock_agents():
@@ -25,6 +25,46 @@ def mock_agents():
             "optimizer": m_optimizer.return_value,
             "assets": m_assets.return_value
         }
+
+def test_workflow_repair_loop(mock_agents):
+    """Verifies the inpainting repair loop logic."""
+    engine = WorkflowEngine()
+    
+    # Setup mocks for a repair flow
+    mock_agents["narrative"].generate_content.return_value = MagicMock(title="T", script="S", caption="C")
+    mock_agents["optimizer"].optimize.return_value = "P"
+    mock_agents["assets"].download_asset.return_value = b"ref"
+    
+    # Visual: 1. Initial Gen (Bad), 2. Inpainted (Good)
+    mock_agents["visual"].generate_image.return_value = b"bad_image" # Initial call
+    mock_agents["visual"].edit_image.return_value = b"repaired_image" # Repair call
+    
+    # Critic: 1. Reject with Feedback, 2. Accept
+    feedback = FeedbackItem(
+        category="identity", description="Fix face", severity=0.8, 
+        action_type="inpaint", target_area="face"
+    )
+    mock_agents["critic"].verify_consistency.side_effect = [
+        ConsistencyReport(is_consistent=False, score=0.5, feedback=[feedback]),
+        ConsistencyReport(is_consistent=True, score=0.95)
+    ]
+    
+    # Critic Detect Mask
+    mock_agents["critic"].detect_mask_area.return_value = [100, 100, 200, 200]
+    
+    # Mock Mask Creation
+    with patch("PIL.Image.open") as mock_img_open:
+        mock_img = MagicMock()
+        mock_img.size = (1000, 1000)
+        mock_img_open.return_value.__enter__.return_value = mock_img
+        
+        mood = Mood(valence=0.5)
+        result = engine.produce_video_content("test", mood, "gen")
+        
+        assert result["poster_image_bytes"] == b"repaired_image"
+        mock_agents["visual"].generate_image.assert_called_once()
+        mock_agents["critic"].detect_mask_area.assert_called_with(b"bad_image", "face")
+        mock_agents["visual"].edit_image.assert_called_once()
 
 def test_workflow_critic_rejection_loop(mock_agents):
     """Verifies that the engine retries generation if the Critic rejects the asset."""
@@ -69,7 +109,7 @@ def test_workflow_critic_rejection_loop(mock_agents):
     assert mock_agents["eic"].stage_for_review.called
 
 def test_workflow_max_retries_failure(mock_agents):
-    """Verifies that the engine fails after max retries if Critic keeps rejecting."""
+    """Verifies that the engine proceeds with best effort after max retries."""
     engine = WorkflowEngine()
     
     mock_agents["narrative"].generate_content.return_value = MagicMock(
@@ -78,6 +118,8 @@ def test_workflow_max_retries_failure(mock_agents):
     mock_agents["optimizer"].optimize.return_value = "Prompt"
     mock_agents["assets"].download_asset.return_value = b"ref"
     mock_agents["visual"].generate_image.return_value = b"bad"
+    mock_agents["director"].generate_video.return_value = b"video"
+    mock_agents["eic"].stage_for_review.return_value = "path"
     
     # Always reject
     mock_agents["critic"].verify_consistency.return_value = ConsistencyReport(
@@ -85,5 +127,10 @@ def test_workflow_max_retries_failure(mock_agents):
     )
     
     mood = Mood(valence=0.5)
-    with pytest.raises(RuntimeError, match="Failed to produce consistent visual after 3 attempts"):
-        engine.produce_video_content("test", mood, "genesis", max_retries=3)
+    
+    # Should NOT raise RuntimeError anymore, just proceed
+    result = engine.produce_video_content("test", mood, "genesis", max_retries=3)
+    
+    assert result["video_bytes"] == b"video"
+    # verify retries happened
+    assert mock_agents["visual"].generate_image.call_count >= 3

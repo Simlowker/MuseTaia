@@ -5,6 +5,12 @@ from typing import Optional, Dict, Any
 from app.agents.narrative_agent import NarrativeAgent
 from app.agents.visual_agent import VisualAgent
 from app.agents.critic_agent import CriticAgent
+from typing import Optional, Dict, Any, List
+import io
+from PIL import Image, ImageDraw
+from app.agents.narrative_agent import NarrativeAgent
+from app.agents.visual_agent import VisualAgent
+from app.agents.critic_agent import CriticAgent
 from app.agents.director_agent import DirectorAgent
 from app.agents.eic_agent import EICAgent
 from app.core.utils.prompt_optimizer import PromptOptimizer
@@ -25,6 +31,30 @@ class WorkflowEngine:
         self.eic_agent = EICAgent()
         self.optimizer = PromptOptimizer()
         self.assets_manager = SignatureAssetsManager(bucket_name=settings.GCS_BUCKET_NAME)
+
+    def _create_mask_from_bbox(self, base_image_bytes: bytes, bbox_2d: List[int]) -> bytes:
+        """Creates a binary mask image from a bounding box."""
+        with Image.open(io.BytesIO(base_image_bytes)) as img:
+            mask = Image.new("L", img.size, 0) # Black background
+            draw = ImageDraw.Draw(mask)
+            
+            # bbox_2d is [ymin, xmin, ymax, xmax] normalized 0-1000
+            width, height = img.size
+            ymin, xmin, ymax, xmax = bbox_2d
+            
+            # Convert normalized coords to pixels
+            coords = [
+                xmin * width / 1000,
+                ymin * height / 1000,
+                xmax * width / 1000,
+                ymax * height / 1000
+            ]
+            
+            draw.rectangle(coords, fill=255) # White target area
+            
+            output = io.BytesIO()
+            mask.save(output, format="PNG")
+            return output.getvalue()
 
     def produce_video_content(
         self, 
@@ -50,22 +80,43 @@ class WorkflowEngine:
         logger.info("Starting Visual & QA Loop...")
         reference_image = self.assets_manager.download_asset(f"muses/{subject_id}/face.png")
         
-        final_image = None
+        current_image = self.visual_agent.generate_image(optimized_prompt, subject_id=subject_id)
+        
         for attempt in range(max_retries):
-            logger.info(f"Visual generation attempt {attempt + 1}")
-            candidate_image = self.visual_agent.generate_image(optimized_prompt, subject_id=subject_id)
-            
             # QA check
-            report = self.critic_agent.verify_consistency(reference_image, candidate_image)
+            report = self.critic_agent.verify_consistency(reference_image, current_image)
+            
             if report.is_consistent:
                 logger.info("Visual consistency verified by The Critic.")
-                final_image = candidate_image
                 break
-            else:
-                logger.warning(f"The Critic rejected asset: {report.issues}")
+            
+            logger.warning(f"The Critic rejected asset. Attempt {attempt+1}/{max_retries}")
+            
+            # Check for actionable feedback (Repair vs Regenerate)
+            repaired = False
+            if report.feedback:
+                item = report.feedback[0] # Handle highest priority
+                if item.action_type == "inpaint" and item.target_area:
+                    logger.info(f"Attempting repair: Inpainting {item.target_area}")
+                    
+                    # 1. Detect Mask
+                    bbox = self.critic_agent.detect_mask_area(current_image, item.target_area)
+                    if bbox:
+                        mask_bytes = self._create_mask_from_bbox(current_image, bbox)
+                        # 2. Inpaint
+                        current_image = self.visual_agent.edit_image(
+                            prompt=f"Fix {item.target_area}. {item.description}",
+                            base_image_bytes=current_image,
+                            mask_image_bytes=mask_bytes
+                        )
+                        repaired = True
+            
+            if not repaired:
+                # Fallback to full regeneration if no specific repair possible
+                logger.info("Fallback: Full regeneration.")
+                current_image = self.visual_agent.generate_image(optimized_prompt, subject_id=subject_id)
         
-        if not final_image:
-            raise RuntimeError(f"Failed to produce consistent visual after {max_retries} attempts.")
+        final_image = current_image
             
         # 4. Production Phase
         logger.info("Starting Cinematography Phase...")

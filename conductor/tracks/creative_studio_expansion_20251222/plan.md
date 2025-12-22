@@ -37,7 +37,7 @@
     - **Tests:** Verify return of bounding box coordinates for specific features.
 
 ## Phase 4: Advanced Orchestration (Feedback Loop)
-- [ ] Task: Implement Iterative Repair Loop
+- [x] Task: Implement Iterative Repair Loop
     - **Goal:** Update WorkflowEngine to use Critic's feedback to trigger specific "Repair" actions (Inpainting) instead of full regeneration.
     - **Files:** `app/core/workflow_engine.py`
     - **Tech:** Python, State Machine logic.

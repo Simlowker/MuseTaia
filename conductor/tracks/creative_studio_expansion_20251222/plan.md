@@ -36,10 +36,10 @@
     - **Tech:** Gemini 3 Vision (Bounding Box detection).
     - **Tests:** Verify return of bounding box coordinates for specific features.
 
-## Phase 4: Advanced Orchestration (Feedback Loop)
+## Phase 4: Advanced Orchestration (Feedback Loop) [checkpoint: de98bd8]
 - [x] Task: Implement Iterative Repair Loop
     - **Goal:** Update WorkflowEngine to use Critic's feedback to trigger specific "Repair" actions (Inpainting) instead of full regeneration.
     - **Files:** `app/core/workflow_engine.py`
     - **Tech:** Python, State Machine logic.
     - **Tests:** Simulate a flow: Generate -> Critic Reject (Face) -> Inpaint Face -> Critic Accept.
-- [x] Task: Conductor - User Manual Verification 'Creative Studio Expansion' (Protocol in workflow.md) [checkpoint: PENDING]
+- [x] Task: Conductor - User Manual Verification 'Creative Studio Expansion' (Protocol in workflow.md) de98bd8

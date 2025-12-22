@@ -2,6 +2,7 @@
 
 from typing import Optional
 import google.genai as genai
+from google.genai import types
 from app.core.config import settings
 
 class RootAgent:
@@ -18,9 +19,11 @@ class RootAgent:
             project=settings.PROJECT_ID,
             location=settings.LOCATION
         )
-        self.agent_instance = self.client.agents.create(
+        self.chat_session = self.client.chats.create(
             model=model_name,
-            instruction="You are the RootAgent of the Sovereign Muse OS."
+            config=types.GenerateContentConfig(
+                system_instruction="You are the RootAgent of the Sovereign Muse OS."
+            )
         )
 
     def ping(self) -> str:
@@ -29,6 +32,5 @@ class RootAgent:
         Returns:
             str: The agent's response.
         """
-        chat = self.agent_instance.chat()
-        response = chat.send_message("Ping")
+        response = self.chat_session.send_message("Ping")
         return response.text

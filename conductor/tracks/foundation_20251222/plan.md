@@ -1,5 +1,6 @@
 # Track Plan: Build the Phase 1 Foundation: Socle ADK & Matrix Identity
 
+
 ## Phase 1: Infrastructure Setup & Project Skeleton [checkpoint: 484c1db]
 - [x] Task: Initialize Project Structure & Dependency Management 5b0afc0
 - [x] Task: Configure Google Cloud & Vertex AI Environment 77cb3d5
@@ -28,10 +29,10 @@
     - **Files:** `app/agents/orchestrator.py`
     - **Tech:** Google ADK, Python
     - **Tests:** Verify that complex tasks are correctly broken down into sub-task definitions.
-- [ ] Task: Conductor - User Manual Verification 'RootAgent & ADK Orchestration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'RootAgent & ADK Orchestration' (Protocol in workflow.md)
 
 ## Phase 4: Shared State & The Critic v1
-- [ ] Task: Implement StateDB Access Layer (Mood & Wallet)
+- [x] Task: Implement StateDB Access Layer (Mood & Wallet)
     - **Goal:** Create a structured API for agents to read/write the Muse's real-time state.
     - **Files:** `app/state/db_access.py`, `app/state/models.py`
     - **Tech:** Redis, Pydantic

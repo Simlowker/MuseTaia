@@ -1,7 +1,7 @@
 # Track Plan: Build the Phase 1 Foundation: Socle ADK & Matrix Identity
 
 ## Phase 1: Infrastructure Setup & Project Skeleton
-- [ ] Task: Initialize Project Structure & Dependency Management
+- [~] Task: Initialize Project Structure & Dependency Management
     - **Goal:** Create the standard Python project layout and install core dependencies.
     - **Files:** `pyproject.toml`, `requirements.txt`, `app/`, `tests/`
     - **Tech:** Python, Poetry/Pip

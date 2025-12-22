@@ -11,7 +11,7 @@
     - **Files:** `app/core/config.py`, `.env` (template)
     - **Tech:** Google Cloud SDK, Pydantic
     - **Tests:** Verify successful authentication and API connectivity.
-- [~] Task: Set up Redis Infrastructure (StateDB)
+- [x] Task: Set up Redis Infrastructure (StateDB) 6740299
     - **Goal:** Configure Redis connection for real-time state management.
     - **Files:** `app/core/redis_client.py`
     - **Tech:** Redis, redis-py

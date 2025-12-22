@@ -1,7 +1,7 @@
 # Track Plan: Build the Creative Swarm (Narrative, Visual, & Director)
 
 ## Phase 1: Narrative Engine (The Screenwriter)
-- [ ] Task: Implement Narrative Agent (Gemini 3 Pro)
+- [x] Task: Implement Narrative Agent (Gemini 3 Pro)
     - **Goal:** Create the agent responsible for writing scripts, captions, and story arcs consistent with the Muse's persona.
     - **Files:** `app/agents/narrative_agent.py`, `app/agents/prompts/narrative.py`
     - **Tech:** Gemini 3 Pro, Vertex AI Context Caching.

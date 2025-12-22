@@ -29,7 +29,7 @@
 - [ ] Task: Conductor - User Manual Verification 'Proactive Triggering' (Protocol in workflow.md)
 
 ## Phase 4: Cultural Grounding (Narrative Enhancement)
-- [ ] Task: Update Narrative Agent with Search Grounding
+- [x] Task: Update Narrative Agent with Search Grounding
     - **Goal:** Allow the Narrative Agent to verify slang and references before finalizing a script.
     - **Files:** `app/agents/narrative_agent.py`
     - **Tech:** Gemini Tool Use (Search).

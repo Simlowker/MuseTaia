@@ -29,6 +29,9 @@ class NarrativeAgent:
             location=settings.LOCATION
         )
         self.model_name = model_name
+        self.search_tool = types.Tool(
+            google_search=types.GoogleSearch()
+        )
 
     def generate_content(self, topic: str, mood: Mood) -> ScriptOutput:
         """Generates a script and caption based on a topic and current mood.
@@ -48,6 +51,8 @@ class NarrativeAgent:
         - Valence: {mood.valence}
         - Arousal: {mood.arousal}
         - Current Thought: {mood.current_thought}
+        
+        IMPORTANT: Use Google Search to verify any specific cultural references, dates, or slang terms to ensure authenticity and accuracy before writing the script.
         """
 
         response = self.client.models.generate_content(
@@ -63,7 +68,8 @@ class NarrativeAgent:
             config=types.GenerateContentConfig(
                 system_instruction=NARRATIVE_SYSTEM_INSTRUCTION,
                 response_mime_type="application/json",
-                response_schema=ScriptOutput
+                response_schema=ScriptOutput,
+                tools=[self.search_tool]
             )
         )
 

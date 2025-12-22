@@ -39,6 +39,10 @@ def test_generate_script(mock_genai):
     call_args = mock_client.models.generate_content.call_args
     prompt_text = call_args.kwargs["contents"][0].parts[0].text
     assert "Excited about the show" in prompt_text
+    
+    # Verify search tool integration
+    assert call_args.kwargs["config"].tools is not None
+    assert len(call_args.kwargs["config"].tools) == 1
 
 def test_initialization(mock_genai):
     """Test agent initialization."""

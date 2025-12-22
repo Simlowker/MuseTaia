@@ -42,4 +42,4 @@
     - **Files:** `app/agents/critic_agent.py`
     - **Tech:** Gemini 3 Vision API
     - **Tests:** Test image comparison logic (mocked images) and drift reporting.
-- [ ] Task: Conductor - User Manual Verification 'Shared State & The Critic v1' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Shared State & The Critic v1' (Protocol in workflow.md)

@@ -23,7 +23,7 @@
     - **Files:** `app/agents/protocols/master_sync.py`
     - **Tech:** Gemini 3 Flash (Mocked for now or live)
     - **Tests:** Test parsing of various command structures and master identification.
-- [ ] Task: Implement Parallel Function Calling Mechanism
+- [~] Task: Implement Parallel Function Calling Mechanism
     - **Goal:** Configure the RootAgent to decompose tasks and prepare structured orders for sub-agents.
     - **Files:** `app/agents/orchestrator.py`
     - **Tech:** Google ADK, Python

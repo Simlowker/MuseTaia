@@ -18,7 +18,7 @@
     - **Files:** `app/agents/root_agent.py`
     - **Tech:** Google ADK
     - **Tests:** Verify agent initialization and basic "ping" response.
-- [~] Task: Implement Single-Master Protocol (Intent Parsing)
+- [x] Task: Implement Single-Master Protocol (Intent Parsing) abfc265
     - **Goal:** Enable the RootAgent to parse high-level user commands and identify the "Master" source (Human vs. Community).
     - **Files:** `app/agents/protocols/master_sync.py`
     - **Tech:** Gemini 3 Flash (Mocked for now or live)

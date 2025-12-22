@@ -9,11 +9,11 @@
 - [ ] Task: Conductor - User Manual Verification 'Search Infrastructure' (Protocol in workflow.md)
 
 ## Phase 2: TrendScanner Agent (The Analyst)
-- [ ] Task: Define TrendReport Schema
+- [x] Task: Define TrendReport Schema
     - **Goal:** Standardize the output for analyzed trends.
     - **Files:** `app/core/schemas/trend.py`
     - **Tech:** Pydantic.
-- [ ] Task: Implement TrendScanner Agent
+- [x] Task: Implement TrendScanner Agent
     - **Goal:** Create an agent that takes a topic, searches for real-time context, and evaluates it against the Muse's "Moral Graph" and Persona.
     - **Files:** `app/agents/trend_scanner.py`
     - **Tech:** Gemini 3 Flash (for speed/analysis), Search Service.

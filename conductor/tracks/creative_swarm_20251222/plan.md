@@ -11,7 +11,7 @@
     - **Files:** `app/core/schemas/screenplay.py`
     - **Tech:** Pydantic.
     - **Tests:** Validate sample scripts against the schema.
-- [ ] Task: Conductor - User Manual Verification 'Narrative Engine' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Narrative Engine' (Protocol in workflow.md) [checkpoint: PENDING]
 
 ## Phase 2: Visual Virtuoso (The Photographer)
 - [ ] Task: Implement Visual Agent (Imagen 3)

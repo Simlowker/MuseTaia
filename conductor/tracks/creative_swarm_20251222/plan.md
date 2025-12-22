@@ -14,12 +14,12 @@
 - [x] Task: Conductor - User Manual Verification 'Narrative Engine' (Protocol in workflow.md) 54e5af8
 
 ## Phase 2: Visual Virtuoso (The Photographer)
-- [ ] Task: Implement Visual Agent (Imagen 3)
+- [x] Task: Implement Visual Agent (Imagen 3)
     - **Goal:** Generate high-fidelity keyframes using Subject Guidance to maintain identity.
     - **Files:** `app/agents/visual_agent.py`
     - **Tech:** Imagen 3 API (via Vertex AI), Signature Assets Manager.
     - **Tests:** Verify image generation requests include correct reference assets.
-- [ ] Task: Implement Prompt Engineering Layer
+- [x] Task: Implement Prompt Engineering Layer
     - **Goal:** Automatically convert high-level screenplay scene descriptions into optimized technical prompts for Imagen.
     - **Files:** `app/core/utils/prompt_optimizer.py`
     - **Tech:** Gemini 3 Flash (for rewriting).

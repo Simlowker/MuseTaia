@@ -65,3 +65,15 @@ class SignatureAssetsManager:
         """
         blobs = self.client.list_blobs(self.bucket_name, prefix=prefix)
         return [blob.name for blob in blobs]
+
+    def download_asset(self, asset_name: str) -> bytes:
+        """Downloads the binary data of an asset.
+
+        Args:
+            asset_name: The name/path of the asset in the bucket.
+
+        Returns:
+            bytes: The binary data of the asset.
+        """
+        blob = self.bucket.blob(asset_name)
+        return blob.download_as_bytes()

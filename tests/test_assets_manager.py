@@ -48,3 +48,12 @@ def test_upload_asset_failure(mock_storage_client):
 
     result = manager.upload_asset("fail.png", b"data")
     assert result is False
+
+def test_download_asset(mock_storage_client):
+    manager = SignatureAssetsManager(bucket_name="test-bucket")
+    mock_blob = mock_storage_client.return_value.bucket.return_value.blob.return_value
+    mock_blob.download_as_bytes.return_value = b"downloaded-content"
+
+    content = manager.download_asset("asset.png")
+    assert content == b"downloaded-content"
+    mock_blob.download_as_bytes.assert_called_once()

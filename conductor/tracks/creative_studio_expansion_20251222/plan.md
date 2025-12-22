@@ -25,12 +25,12 @@
     - **Tests:** Verify API calls with multiple image references.
 
 ## Phase 3: The Critic's Eye (Surgical QA)
-- [ ] Task: Implement Drift Vector Feedback
+- [x] Task: Implement Drift Vector Feedback
     - **Goal:** Update The Critic to return specific actionable feedback (e.g., "Lighting too dark") instead of just boolean.
     - **Files:** `app/agents/critic_agent.py`, `app/core/schemas/qa.py`
     - **Tech:** Gemini 3 Vision, Structured Output.
     - **Tests:** Verify generation of detailed feedback objects.
-- [ ] Task: Implement Automatic Mask Generation (Conceptual)
+- [x] Task: Implement Automatic Mask Generation (Conceptual)
     - **Goal:** Allow The Critic to identify coordinates/areas for repair (e.g., "Face area").
     - **Files:** `app/agents/critic_agent.py`
     - **Tech:** Gemini 3 Vision (Bounding Box detection).

@@ -26,7 +26,7 @@
     - **Tests:** Test conversion of "She walks on the beach" to "Cinematic wide shot, golden hour...".
 - [x] Task: Conductor - User Manual Verification 'Visual Virtuoso' (Protocol in workflow.md) f6fe9e9
 
-## Phase 3: The Cinematographer (The Director)
+## Phase 3: The Cinematographer (The Director) [checkpoint: 01ef499]
 - [x] Task: Implement Director Agent (Veo 3.1)
     - **Goal:** Generate consistent video clips from keyframes and motion descriptions.
     - **Files:** `app/agents/director_agent.py`
@@ -37,7 +37,7 @@
     - **Files:** `tests/test_production_pipeline.py`
     - **Tech:** Pytest, Integration testing.
     - **Tests:** End-to-end flow execution.
-- [ ] Task: Conductor - User Manual Verification 'The Cinematographer' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'The Cinematographer' (Protocol in workflow.md) 01ef499
 
 ## Phase 4: Swarm Orchestration & Review
 - [ ] Task: Integrate "The Critic" into the Production Loop

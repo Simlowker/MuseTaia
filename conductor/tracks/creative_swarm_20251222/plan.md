@@ -39,7 +39,7 @@
     - **Tests:** End-to-end flow execution.
 - [x] Task: Conductor - User Manual Verification 'The Cinematographer' (Protocol in workflow.md) 01ef499
 
-## Phase 4: Swarm Orchestration & Review [checkpoint: 0f0bd78]
+## Phase 4: Swarm Orchestration & Review [checkpoint: c3fb6ba]
 - [x] Task: Integrate "The Critic" into the Production Loop
     - **Goal:** Automate the rejection and regeneration of assets that fail visual consistency checks.
     - **Files:** `app/agents/orchestrator.py` (update), `app/core/workflow_engine.py`
@@ -50,4 +50,4 @@
     - **Files:** `app/agents/eic_agent.py`
     - **Tech:** Google Cloud Storage, Task Routing.
     - **Tests:** Verify final assets are correctly staged.
-- [x] Task: Conductor - User Manual Verification 'Swarm Orchestration' (Protocol in workflow.md) 0f0bd78
+- [x] Task: Conductor - User Manual Verification 'Swarm Orchestration' (Protocol in workflow.md) c3fb6ba

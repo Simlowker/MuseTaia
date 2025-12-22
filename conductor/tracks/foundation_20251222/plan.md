@@ -6,7 +6,7 @@
     - **Files:** `pyproject.toml`, `requirements.txt`, `app/`, `tests/`
     - **Tech:** Python, Poetry/Pip
     - **Tests:** Verify environment setup and import capabilities.
-- [~] Task: Configure Google Cloud & Vertex AI Environment
+- [x] Task: Configure Google Cloud & Vertex AI Environment 77cb3d5
     - **Goal:** Set up authentication and connection to Google Cloud Platform (Vertex AI, GCS).
     - **Files:** `app/core/config.py`, `.env` (template)
     - **Tech:** Google Cloud SDK, Pydantic

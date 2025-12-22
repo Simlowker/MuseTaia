@@ -6,7 +6,7 @@
     - **Files:** `app/agents/narrative_agent.py`, `app/agents/prompts/narrative.py`
     - **Tech:** Gemini 3 Pro, Vertex AI Context Caching.
     - **Tests:** Verify script generation adheres to persona constraints (tone, forbidden topics).
-- [ ] Task: Define Screenplay JSON Schema
+- [x] Task: Define Screenplay JSON Schema
     - **Goal:** Standardize the output format for downstream agents (Visual/Director).
     - **Files:** `app/core/schemas/screenplay.py`
     - **Tech:** Pydantic.

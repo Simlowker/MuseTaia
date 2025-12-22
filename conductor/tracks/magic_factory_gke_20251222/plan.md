@@ -30,7 +30,7 @@
     - **Goal:** Set up the Go project structure for the high-concurrency scheduler.
     - **Files:** `infrastructure/dispatcher/go.mod`, `infrastructure/dispatcher/main.go`
     - **Tech:** Go (Golang).
-- [~] Task: Implement gRPC/HTTP Interface for Job Dispatching
+- [x] Task: Implement gRPC/HTTP Interface for Job Dispatching
     - **Goal:** Create a Go service that receives high-volume trigger requests and dispatches them to the Python Swarm pods.
     - **Files:** `infrastructure/dispatcher/server.go`, `infrastructure/dispatcher/worker_pool.go`
     - **Tech:** Goroutines, Channels.
@@ -38,7 +38,7 @@
 - [ ] Task: Conductor - User Manual Verification 'Go Dispatcher' (Protocol in workflow.md)
 
 ## Phase 4: CI/CD & Optimization
-- [ ] Task: Define Cloud Build Configuration
+- [x] Task: Define Cloud Build Configuration
     - **Goal:** Automate the build and deploy process.
     - **Files:** `cloudbuild.yaml`
     - **Tech:** Google Cloud Build.

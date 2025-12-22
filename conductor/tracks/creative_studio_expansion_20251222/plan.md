@@ -42,4 +42,4 @@
     - **Files:** `app/core/workflow_engine.py`
     - **Tech:** Python, State Machine logic.
     - **Tests:** Simulate a flow: Generate -> Critic Reject (Face) -> Inpaint Face -> Critic Accept.
-- [ ] Task: Conductor - User Manual Verification 'Creative Studio Expansion' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Creative Studio Expansion' (Protocol in workflow.md) [checkpoint: PENDING]

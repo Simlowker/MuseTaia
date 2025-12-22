@@ -1,12 +1,12 @@
 # Track Plan: Magic Factory GKE (Industrial Deployment & Scaling)
 
 ## Phase 1: Containerization of the Swarm
-- [ ] Task: Create Optimized Dockerfile for Python Agents
+- [x] Task: Create Optimized Dockerfile for Python Agents
     - **Goal:** Package the entire Python app (Agents, Core, State) into a deployable container.
     - **Files:** `Dockerfile`, `.dockerignore`
     - **Tech:** Docker, Multi-stage builds.
     - **Tests:** Build image and run basic "ping" test inside container.
-- [ ] Task: Define Local Orchestration with Docker Compose
+- [~] Task: Define Local Orchestration with Docker Compose
     - **Goal:** Verify the stack (App + Redis) works in containers.
     - **Files:** `docker-compose.yml`
     - **Tech:** Docker Compose.

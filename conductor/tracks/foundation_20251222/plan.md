@@ -17,7 +17,7 @@
     - **Files:** `app/matrix/context_cache.py`
     - **Tech:** Vertex AI SDK
     - **Tests:** Test cache creation, retrieval, and expiration handling.
-- [~] Task: Define "Genesis DNA" Schema & Loader
+- [x] Task: Define "Genesis DNA" Schema & Loader 4cbfba6
     - **Goal:** Define the JSON schema for the Muse's identity and create a loader to populate the Context Cache.
     - **Files:** `app/matrix/models.py`, `app/matrix/dna_loader.py`
     - **Tech:** Pydantic

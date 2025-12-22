@@ -13,7 +13,7 @@
     - **Tests:** Validate sample scripts against the schema.
 - [x] Task: Conductor - User Manual Verification 'Narrative Engine' (Protocol in workflow.md) 54e5af8
 
-## Phase 2: Visual Virtuoso (The Photographer)
+## Phase 2: Visual Virtuoso (The Photographer) [checkpoint: f6fe9e9]
 - [x] Task: Implement Visual Agent (Imagen 3)
     - **Goal:** Generate high-fidelity keyframes using Subject Guidance to maintain identity.
     - **Files:** `app/agents/visual_agent.py`
@@ -24,7 +24,7 @@
     - **Files:** `app/core/utils/prompt_optimizer.py`
     - **Tech:** Gemini 3 Flash (for rewriting).
     - **Tests:** Test conversion of "She walks on the beach" to "Cinematic wide shot, golden hour...".
-- [ ] Task: Conductor - User Manual Verification 'Visual Virtuoso' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Visual Virtuoso' (Protocol in workflow.md) f6fe9e9
 
 ## Phase 3: The Cinematographer (The Director)
 - [ ] Task: Implement Director Agent (Veo 3.1)

@@ -10,5 +10,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 ## [x] Track: Build the Creative Swarm (Narrative, Visual, & Director)
 *Link: [./conductor/tracks/creative_swarm_20251222/](./conductor/tracks/creative_swarm_20251222/)*
 
-## [~] Track: Creative Studio Expansion (Actions & Tools)
+## [x] Track: Creative Studio Expansion (Actions & Tools)
 *Link: [./conductor/tracks/creative_studio_expansion_20251222/](./conductor/tracks/creative_studio_expansion_20251222/)*
+
+## [~] Track: Perception & Grounding (TrendScanner & Search)
+*Link: [./conductor/tracks/perception_grounding_20251222/](./conductor/tracks/perception_grounding_20251222/)*

@@ -40,14 +40,14 @@
 - [x] Task: Conductor - User Manual Verification 'The Cinematographer' (Protocol in workflow.md) 01ef499
 
 ## Phase 4: Swarm Orchestration & Review
-- [ ] Task: Integrate "The Critic" into the Production Loop
+- [x] Task: Integrate "The Critic" into the Production Loop
     - **Goal:** Automate the rejection and regeneration of assets that fail visual consistency checks.
     - **Files:** `app/agents/orchestrator.py` (update), `app/core/workflow_engine.py`
     - **Tech:** Python, CriticAgent.
     - **Tests:** Simulate bad assets and verify the loop triggers regeneration.
-- [ ] Task: Implement EIC (Editor-in-Chief) Routing
+- [x] Task: Implement EIC (Editor-in-Chief) Routing
     - **Goal:** Route approved assets to a "Ready for Review" state/folder for the user.
     - **Files:** `app/agents/eic_agent.py`
     - **Tech:** Google Cloud Storage, Task Routing.
     - **Tests:** Verify final assets are correctly staged.
-- [ ] Task: Conductor - User Manual Verification 'Swarm Orchestration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Swarm Orchestration' (Protocol in workflow.md) [checkpoint: PENDING]

@@ -16,5 +16,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 ## [x] Track: Perception & Grounding (TrendScanner & Search)
 *Link: [./conductor/tracks/perception_grounding_20251222/](./conductor/tracks/perception_grounding_20251222/)*
 
-## [~] Track: Magic Factory GKE (Industrial Deployment & Scaling)
+## [x] Track: Magic Factory GKE (Industrial Deployment & Scaling)
 *Link: [./conductor/tracks/magic_factory_gke_20251222/](./conductor/tracks/magic_factory_gke_20251222/)*
+
+## [~] Track: The World Engine (ArchitectAgent)
+*Link: [./conductor/tracks/world_engine_20251222/](./conductor/tracks/world_engine_20251222/)*

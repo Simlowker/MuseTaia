@@ -1,6 +1,6 @@
 # Track Plan: Build the Creative Swarm (Narrative, Visual, & Director)
 
-## Phase 1: Narrative Engine (The Screenwriter)
+## Phase 1: Narrative Engine (The Screenwriter) [checkpoint: 54e5af8]
 - [x] Task: Implement Narrative Agent (Gemini 3 Pro)
     - **Goal:** Create the agent responsible for writing scripts, captions, and story arcs consistent with the Muse's persona.
     - **Files:** `app/agents/narrative_agent.py`, `app/agents/prompts/narrative.py`
@@ -11,7 +11,7 @@
     - **Files:** `app/core/schemas/screenplay.py`
     - **Tech:** Pydantic.
     - **Tests:** Validate sample scripts against the schema.
-- [x] Task: Conductor - User Manual Verification 'Narrative Engine' (Protocol in workflow.md) [checkpoint: PENDING]
+- [x] Task: Conductor - User Manual Verification 'Narrative Engine' (Protocol in workflow.md) 54e5af8
 
 ## Phase 2: Visual Virtuoso (The Photographer)
 - [ ] Task: Implement Visual Agent (Imagen 3)

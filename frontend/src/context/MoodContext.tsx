@@ -25,7 +25,7 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       const state = await smosApi.getMood();
       setRawMood(state);
-      
+
       // Dynamic Mood Logic: Map backend valence/arousal to UI labels
       // High Dominance -> Authority
       // High Valence + High Arousal -> Creativity
@@ -43,8 +43,9 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   useEffect(() => {
-    fetchMood(); // Initial fetch
+    // Initial fetch handled by state default or separate async
     const interval = setInterval(fetchMood, 5000); // Poll every 5s
+    fetchMood();
     return () => clearInterval(interval);
   }, []);
 

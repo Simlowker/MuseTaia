@@ -15,23 +15,20 @@ export default function NeuralWaveform() {
         <span className="small text-secondary tracking-widest fw-light" style={{ fontSize: '0.65rem' }}>NEURAL HEARTBEAT | ROOTAGENT_V3</span>
         <span className="text-secondary small fw-light font-monospace" style={{ fontSize: '0.6rem' }}>LATENCY: 0.042s</span>
       </div>
-      
+
       <div className="d-flex align-items-center justify-content-center gap-1" style={{ height: '40px' }}>
         {bars.map((_, i) => (
           <motion.div
             key={i}
             animate={{
-              height: [
-                Math.random() * 15 + 2,
-                Math.random() * 30 + 5,
-                Math.random() * 15 + 2
-              ],
+              height: [10, 20, 10],
               opacity: [0.3, 0.6, 0.3]
             }}
             transition={{
-              duration: 1 + Math.random() * 1,
+              duration: 1.5,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
+              delay: i * 0.1
             }}
             style={{
               width: '1px', // Thinner, more precise
@@ -41,7 +38,7 @@ export default function NeuralWaveform() {
           />
         ))}
       </div>
-      
+
       <div className="mt-3 text-center">
         <span className="text-secondary small fw-light italic opacity-50" style={{ fontSize: '0.65rem' }}>"Deep scanning cognitive patterns..."</span>
       </div>

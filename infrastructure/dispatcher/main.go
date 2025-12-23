@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -19,6 +20,10 @@ func main() {
 	http.HandleFunc("/health", server.HandleHealth)
 	http.HandleFunc("/dispatch", server.HandleDispatch)
 
-	port := "8080"
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
 	fmt.Printf("DISPATCHER: High-concurrency listener active on :%s\n", port)
-	log.Fatal(http.ListenAndServe(":
+	log.Fatal(http.ListenAndServe(":"+port, nil))
+}

@@ -1,51 +1,78 @@
-/* Sovereign Aesthetic for SMOS v2 */
-.sovereign-container {
-  background: radial-gradient(circle at center, #050a05 0%, #000000 100%);
-  color: #00ff41;
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+/* Luxe Souverain Aesthetic for SMOS v2 */
+
+.luxe-container {
+  background: radial-gradient(circle at center, #1a1a1a 0%, var(--deep-onyx) 100%);
+  color: #e0e0e0;
+  min-height: 100vh;
 }
 
-.neural-card {
-  background: rgba(0, 20, 0, 0.4);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 255, 65, 0.2);
-  box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
-  transition: all 0.3s ease;
+/* Glass Components */
+.luxe-glass-card {
+  background: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 1px;
 }
 
-.neural-card:hover {
-  border-color: rgba(0, 255, 65, 0.5);
-  box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+.luxe-glass-panel {
+  background: rgba(255, 255, 255, 0.01);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
 }
 
-.glitch-text {
-  text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9;
-  animation: glitch 2s infinite;
+.custom-glass-inset {
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-@keyframes glitch {
-  0% { transform: translate(0); }
-  20% { transform: translate(-2px, 2px); }
-  40% { transform: translate(-2px, -2px); }
-  60% { transform: translate(2px, 2px); }
-  80% { transform: translate(2px, -2px); }
-  100% { transform: translate(0); }
+.luxe-glass-card:hover {
+  border-color: rgba(212, 175, 55, 0.4);
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.1);
+  background: var(--glass-surface-highlight);
 }
 
-.ledger-ticker {
-  background: #000;
-  border-top: 1px solid #004d00;
-  overflow: hidden;
-  white-space: nowrap;
+/* Typography Enhancements */
+.text-gold {
+  color: var(--sovereign-gold);
 }
 
-.ticker-item {
-  display: inline-block;
-  padding: 0 20px;
-  animation: scroll-left 20s linear infinite;
+.text-gold-gradient {
+  background: linear-gradient(135deg, #fff 0%, var(--sovereign-gold) 60%, var(--sovereign-gold-dim) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-@keyframes scroll-left {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+/* Animations */
+@keyframes pulse-gold {
+  0% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0);
+  }
+}
+
+.pulse-gold {
+  animation: pulse-gold 2s infinite;
+}
+
+/* Utilities */
+.thin-border-gold {
+  border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.glow-text {
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
 }

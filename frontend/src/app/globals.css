@@ -1,11 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Core Palette */
+  --deep-onyx: #050505;
+  --sovereign-gold: #D4AF37;
+  --sovereign-gold-dim: #AA8C2C;
+  --subliminal-blue: #1A1A2E;
+  --subliminal-amber: #3E2723;
+
+  /* Glassmorphism */
+  --glass-surface: rgba(255, 255, 255, 0.03);
+  --glass-surface-highlight: rgba(212, 175, 55, 0.05);
+  --glass-border: rgba(212, 175, 55, 0.15);
+  --glass-blur: 12px;
+
+  /* Typography */
+  --font-luxe: 'Inter', system-ui, sans-serif;
+  /* Pure sans-serif for cinematic feel */
+
+  --background: var(--deep-onyx);
+  --foreground: #ededed;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: var(--deep-onyx);
     --foreground: #ededed;
   }
 }
@@ -19,7 +40,7 @@ body {
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-luxe);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -31,8 +52,13 @@ body {
 }
 
 a {
-  color: inherit;
+  color: var(--sovereign-gold);
   text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #fff;
 }
 
 @media (prefers-color-scheme: dark) {

@@ -1,46 +1,37 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: smos-agents-deployment
-  labels:
-    app: smos
+  name: smos-backend
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
-      app: smos
+      app: smos-backend
   template:
     metadata:
       labels:
-        app: smos
-      annotations:
-        # GCS FUSE Sidecar configuration for instant model access
-        gke-gcsview.io/volumes: '[{"bucket":"smos-assets","mountPath":"/models"}]'
+        app: smos-backend
     spec:
-      runtimeClassName: smos-criu-runtime
       containers:
-      - name: smos-agent
-        image: gcr.io/votre-projet-id/smos-agent:latest
+      - name: smos-backend
+        image: gcr.io/GEN_LANG_CLIENT_ID_PLACEHOLDER/smos-backend:latest
         ports:
         - containerPort: 8000
-        env:
-        - name: PROJECT_ID
-          valueFrom:
-            configMapKeyRef:
-              name: smos-config
-              key: project_id
-        resources:
-          limits:
-            nvidia.com/gpu: 1
-            memory: "16Gi"
-            cpu: "4"
-          requests:
-            nvidia.com/gpu: 1
-            memory: "8Gi"
-            cpu: "2"
-        volumeMounts:
-        - name: gcs-fuse-models
-          mountPath: /models
-      volumes:
-      - name: gcs-fuse-models
-        emptyDir: {}
+        envFrom:
+        - configMapRef:
+            name: smos-config
+        - secretRef:
+            name: smos-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smos-backend-service
+spec:
+  selector:
+    app: smos-backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+  type: LoadBalancer

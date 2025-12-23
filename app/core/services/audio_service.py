@@ -1,42 +1,56 @@
-"""Sovereign Audio Service for high-fidelity voice cloning."""
+"""Sovereign Audio Service using Google Cloud Text-to-Speech (Studio Voices)."""
 
 import logging
-import requests
 from typing import Optional
+from google.cloud import texttospeech
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
 class SovereignAudioService:
-    """Service for generating the Muse's unique voice.
+    """Service for generating the Muse's unique voice using Google Cloud TTS.
     
-    Integrates ElevenLabs or similar high-fidelity TTS APIs.
+    Utilizes high-fidelity 'Studio' voices which provide natural prosody 
+    and emotional depth comparable to ElevenLabs.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or getattr(settings, "ELEVENLABS_API_KEY", None)
-        self.base_url = "https://api.elevenlabs.io/v1/text-to-speech"
+    def __init__(self):
+        try:
+            self.client = texttospeech.TextToSpeechClient()
+        except Exception as e:
+            logger.error(f"AUDIO: Failed to initialize Google TTS Client: {e}")
+            self.client = None
 
-    def generate_voice(self, text: str, voice_id: str = "muse_vocal_anchor_01") -> bytes:
-        """Transforms text into the Muse's unique vocal timbre."""
-        logger.info(f"AUDIO: Synthesizing voice for Muse ID: {voice_id}")
+    def generate_voice(self, text: str, voice_name: str = "en-US-Studio-O") -> bytes:
+        """Transforms text into the Muse's unique vocal timbre using Google Studio Voices."""
+        logger.info(f"AUDIO: Synthesizing voice using Google Studio: {voice_name}")
         
-        if not self.api_key:
-            logger.warning("AUDIO: No API key found. Returning silent placeholder.")
+        if not self.client:
+            logger.warning("AUDIO: TTS Client not available. Returning silent placeholder.")
             return b"silent_audio_data"
 
-        url = f"{self.base_url}/{voice_id}"
-        headers = {"xi-api-key": self.api_key, "Content-Type": "application/json"}
-        data = {
-            "text": text,
-            "model_id": "eleven_multilingual_v2",
-            "voice_settings": {"stability": 0.75, "similarity_boost": 0.8}
-        }
+        # Set the text input to be synthesized
+        synthesis_input = texttospeech.SynthesisInput(text=text)
+
+        # Build the voice request, select the language code and the studio voice name
+        voice = texttospeech.VoiceSelectionParams(
+            language_code="en-US",
+            name=voice_name
+        )
+
+        # Select the type of audio file you want returned
+        audio_config = texttospeech.AudioConfig(
+            audio_encoding=texttospeech.AudioEncoding.MP3,
+            effects_profile_id=["small-bluetooth-speaker-class-device"],
+            pitch=0,
+            speaking_rate=1.0
+        )
 
         try:
-            response = requests.post(url, json=data, headers=headers)
-            response.raise_for_status()
-            return response.content
+            response = self.client.synthesize_speech(
+                input=synthesis_input, voice=voice, audio_config=audio_config
+            )
+            return response.audio_content
         except Exception as e:
-            logger.error(f"AUDIO: TTS Synthesis failed: {e}")
+            logger.error(f"AUDIO: Google TTS Synthesis failed: {e}")
             return b"error_audio_data"

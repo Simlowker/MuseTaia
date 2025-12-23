@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: smos-secrets
+type: Opaque
+stringData:
+  # Remplacer par vos valeurs réelles lors du déploiement
+  GOOGLE_API_KEY: "AIzaSyDt8gv6wlQWnQbeUJVxri-9DtS0ISZLKew"
+  GOOGLE_OAUTH_CLIENT_ID: "945488165750-87lj17fndqe5np03sv6r6m9d0m0tl333.apps.googleusercontent.com"
+  GOOGLE_OAUTH_CLIENT_SECRET: "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"
+  APIFY_TOKEN: "VOTRE_TOKEN_APIFY"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: smos-config
+data:
+  PROJECT_ID: "gen-lang-client-0865631950"
+  PROJECT_NUMBER: "289248039846"
+  LOCATION: "us-central1"
+  GCS_BUCKET_NAME: "smos-assets"
+  REDIS_HOST: "redis-service"
+  REDIS_PORT: "6379"
+  COMFYUI_SERVER_ADDRESS: "comfyui-service:8188"

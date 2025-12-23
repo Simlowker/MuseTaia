@@ -30,10 +30,10 @@ steps:
     args:
       - run
       - --filename=infrastructure/k8s/deployment.yaml
-      - --image=gcr.io/$PROJECT_ID/smos-agents:$COMMIT_SHA
-      - --location=us-central1-a
-      - --cluster=smos-cluster
+      - --image=gcr.io/$PROJECT_ID/smos-backend:$COMMIT_SHA
+      - --location=us-central1
+      - --cluster=smos-cpu-cluster
 
 images:
-  - 'gcr.io/$PROJECT_ID/smos-agents:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/smos-agents:latest'
+  - 'gcr.io/$PROJECT_ID/smos-backend:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/smos-backend:latest'

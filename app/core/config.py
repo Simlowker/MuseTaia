@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     GCS_BUCKET_NAME: str = "smos-assets"
     APIFY_TOKEN: Optional[str] = None
     GOOGLE_API_KEY: Optional[str] = None
+    GOOGLE_OAUTH_CLIENT_ID: Optional[str] = None
+    GOOGLE_OAUTH_CLIENT_SECRET: Optional[str] = None
 
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379

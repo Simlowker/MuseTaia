@@ -1,6 +1,6 @@
 # Track Plan: Stylist & Continuity Agent
 
-## Phase 1: Wardrobe & Prop DNA
+## Phase 1: Wardrobe & Prop DNA [checkpoint: ff12deb]
 - [x] Task: Define Wardrobe & Prop Schemas
     - **Goal:** Standardize descriptions for outfits (e.g., "Neon Mesh Jacket") and persistent props.
     - **Files:** `app/matrix/models.py` (update), `app/matrix/wardrobe_dna.py`
@@ -11,9 +11,9 @@
     - **Files:** `app/matrix/wardrobe_assets.py`
     - **Tech:** Google Cloud Storage.
     - **Tests:** Verify upload/retrieval of wardrobe assets.
-- [ ] Task: Conductor - User Manual Verification 'Wardrobe DNA' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Wardrobe DNA' (Protocol in workflow.md) ff12deb
 
-## Phase 2: StylistAgent - The Guardian of Look
+## Phase 2: StylistAgent - The Guardian of Look [checkpoint: 74b5071]
 - [x] Task: Implement StylistAgent (Gemini 3 Pro)
     - **Goal:** Select the appropriate outfit and props for a scene based on the script, location, and Muse's mood.
     - **Files:** `app/agents/stylist_agent.py`
@@ -25,18 +25,18 @@
     - **Tech:** Imagen 3 (Reference images).
     - **Tests:** Verify API calls include wardrobe references.
 
-## Phase 3: Visual Continuity QA
+## Phase 3: Visual Continuity QA [checkpoint: df98a3f]
 - [x] Task: Update The Critic for Outfit Consistency
     - **Goal:** Teach The Critic to verify if the generated outfit and props match the selected references.
     - **Files:** `app/agents/critic_agent.py` (update)
     - **Tech:** Gemini 3 Vision.
     - **Tests:** Verify detection of "Wrong outfit" or "Missing prop".
-- [ ] Task: Conductor - User Manual Verification 'Visual Continuity' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Visual Continuity' (Protocol in workflow.md) df98a3f
 
-## Phase 4: Full Swarm Integration
+## Phase 4: Full Swarm Integration [checkpoint: df3d279]
 - [x] Task: Integrate Stylist into WorkflowEngine
     - **Goal:** Orchestrate Narrative -> Stylist -> Architect -> Visual -> Critic to ensure complete identity, look, and environment consistency.
     - **Files:** `app/core/workflow_engine.py` (update)
     - **Tech:** Python.
     - **Tests:** End-to-end integration test with specific outfit and location.
-- [ ] Task: Conductor - User Manual Verification 'Full Swarm Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Full Swarm Integration' (Protocol in workflow.md) df3d279

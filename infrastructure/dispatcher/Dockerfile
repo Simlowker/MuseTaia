@@ -6,10 +6,13 @@ WORKDIR /app
 # Install system dependencies
 RUN apk add --no-cache git
 
-# Copy go mod and sum
+# Copy go mod and attempt to copy go.sum (ignore error if missing)
 COPY go.mod ./
-# Note: go.sum will be generated if missing
-RUN go mod tidy
+COPY go.sum* ./
+
+# Ensure dependencies are tidy and downloaded
+# Note: In Cloud Build, ensure the project has internet access
+RUN go mod tidy && go mod download
 
 # Copy source code
 COPY . .

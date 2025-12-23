@@ -27,6 +27,13 @@ class Transaction(BaseModel):
     description: str
     metadata: Optional[dict] = Field(default_factory=dict)
 
+class SolvencyCheck(BaseModel):
+    """Result of the imperative solvency verification."""
+    is_authorized: bool = Field(..., description="Is the action financially authorized?")
+    projected_balance: float
+    reasoning: str = Field(..., description="Justification based on Hard Constraints")
+    circuit_breaker_active: bool = False
+
 class LedgerHistory(BaseModel):
     """Represents the financial history of the Muse."""
     transactions: List[Transaction] = Field(default_factory=list)

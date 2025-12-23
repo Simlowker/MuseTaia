@@ -12,6 +12,7 @@ from app.agents.director_agent import DirectorAgent
 from app.agents.eic_agent import EICAgent
 from app.agents.architect_agent import ArchitectAgent
 from app.agents.stylist_agent import StylistAgent
+from app.agents.finance_agent import CFOAgent
 from app.core.utils.prompt_optimizer import PromptOptimizer
 from app.state.models import Mood
 from app.matrix.world_dna import WorldRegistry
@@ -38,6 +39,7 @@ class WorkflowEngine:
         self.eic_agent = EICAgent()
         self.architect_agent = ArchitectAgent()
         self.stylist_agent = StylistAgent()
+        self.cfo_agent = CFOAgent()
         
         self.optimizer = PromptOptimizer()
         self.world_registry = WorldRegistry()
@@ -141,13 +143,21 @@ class WorkflowEngine:
         if mode_data:
             is_sovereign = mode_data.decode('utf-8') == "true"
 
-        # 0. Budget Check
-        logger.info("Checking production budget...")
+        # 0. Budget & Solvency Check (Governance v2)
+        logger.info("CFO_AUDIT: Performing pre-production solvency check...")
+        est_cost = self.cost_calculator.estimate_image_cost("imagen-3.0-generate-002", 1) + \
+                   self.cost_calculator.estimate_video_cost("veo-3.1", 5.0)
+        
         wallet = self.ledger_service.state_manager.get_wallet(subject_id)
-        MIN_PRODUCTION_COST = 0.15
-        if not wallet or wallet.internal_usd_balance < MIN_PRODUCTION_COST:
-            current_bal = wallet.internal_usd_balance if wallet else 0
-            raise RuntimeError(f"Insufficient budget for production. Required: {MIN_PRODUCTION_COST}, Current: {current_bal}")
+        history = self.ledger_service.get_transaction_history(subject_id)
+        
+        solvency = self.cfo_agent.verify_solvency(wallet, history, est_cost)
+        
+        if not solvency.is_authorized:
+            logger.error(f"CFO_GATE: Production REJECTED by CFO. Reason: {solvency.reasoning}")
+            raise RuntimeError(f"Financial blockade: {solvency.reasoning}")
+
+        logger.info(f"CFO_GATE: Production AUTHORIZED. Projected balance: {solvency.projected_balance}")
 
         # Task ID for HITL tracking
         import uuid

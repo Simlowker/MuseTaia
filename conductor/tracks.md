@@ -31,5 +31,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 ## [x] Track: Sovereign Wallet (FinancialAccountant)
 *Link: [./conductor/tracks/sovereign_wallet_20251222/](./conductor/tracks/sovereign_wallet_20251222/)*
 
-## [~] Track: Visual Regression Suite (Identity Anchors)
+## [x] Track: Visual Regression Suite (Identity Anchors)
 *Link: [./conductor/tracks/visual_regression_20251222/](./conductor/tracks/visual_regression_20251222/)*
+
+## [~] Track: Stylist & Continuity Agent
+*Link: [./conductor/tracks/stylist_agent_20251222/](./conductor/tracks/stylist_agent_20251222/)*

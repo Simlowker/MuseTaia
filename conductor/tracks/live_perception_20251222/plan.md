@@ -1,7 +1,7 @@
 # Track Plan: Live Perception (Multimodal Live API)
 
 ## Phase 1: Live API Foundation (The Nervous System)
-- [ ] Task: Implement Live API Service Wrapper
+- [x] Task: Implement Live API Service Wrapper
     - **Goal:** Create a service to manage WebSocket connections to the Gemini Multimodal Live API.
     - **Files:** `app/core/services/live_api.py`
     - **Tech:** WebSockets, Gemini Multimodal Live API.

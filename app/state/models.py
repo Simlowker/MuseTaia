@@ -15,6 +15,7 @@ class Mood(BaseModel):
 class Wallet(BaseModel):
     """Represents the financial state of the Muse."""
     address: str = Field(..., description="Wallet address")
-    balance: float = Field(0.0, ge=0.0, description="Current balance")
+    balance: float = Field(0.0, ge=0.0, description="Current balance in primary currency (e.g. SOL)")
     currency: str = Field("SOL", description="Currency symbol")
+    internal_usd_balance: float = Field(0.0, ge=0.0, description="Internal balance for API cost tracking")
     last_updated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))

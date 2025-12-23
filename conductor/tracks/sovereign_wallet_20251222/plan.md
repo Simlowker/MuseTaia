@@ -1,12 +1,12 @@
 # Track Plan: Sovereign Wallet (FinancialAccountant)
 
 ## Phase 1: Ledger & Economy DNA
-- [ ] Task: Define Wallet & Transaction Schemas
+- [x] Task: Define Wallet & Transaction Schemas
     - **Goal:** Standardize how the Muse's balance and financial history are stored.
     - **Files:** `app/state/models.py` (update), `app/core/schemas/finance.py`
     - **Tech:** Pydantic.
     - **Tests:** Validate transaction objects and balance updates.
-- [ ] Task: Implement Ledger Service
+- [x] Task: Implement Ledger Service
     - **Goal:** Create a service to record every financial event (Income/Expense).
     - **Files:** `app/core/services/ledger_service.py`
     - **Tech:** Redis (StateDB).

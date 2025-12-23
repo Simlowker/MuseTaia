@@ -26,13 +26,14 @@
 - [ ] Task: Conductor - User Manual Verification 'Similarity Analysis' (Protocol in workflow.md)
 
 ## Phase 3: Regression Test Runner
-- [ ] Task: Create Automated Regression Script
+- [x] Task: Create Automated Regression Script
     - **Goal:** A CLI tool that triggers a sample generation and runs the comparison.
     - **Files:** `scripts/run_visual_regression.py`
     - **Tech:** Python.
-- [ ] Task: Implement Pass/Fail Threshold Logic
+- [x] Task: Implement Pass/Fail Threshold Logic
     - **Goal:** Enforce the "2% Deviation" rule from the workflow guidelines.
     - **Files:** `scripts/run_visual_regression.py`
+    - **Tests:** Verify CLI exit codes for pass/fail scenarios.
 - [ ] Task: Conductor - User Manual Verification 'Regression Test Runner' (Protocol in workflow.md)
 
 ## Phase 4: CI/CD Integration

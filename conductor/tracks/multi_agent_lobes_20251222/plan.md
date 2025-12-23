@@ -34,9 +34,9 @@
 - [x] Task: Conductor - User Manual Verification 'Creative Studio' (Protocol in workflow.md) 56c367b
 
 ## Phase 4: Governance Lobe (Forge Control)
-- [ ] Task: Finalize The Critic & Financial Accountant
+- [x] Task: Finalize The Critic & Financial Accountant f277563
     - **Goal:** Ensure 2% deviation rule enforcement and real-time ledger settlement.
     - **Files:** `app/agents/critic_agent.py`, `app/agents/finance_agent.py`
-- [ ] Task: End-to-End CLI System Test
+- [x] Task: End-to-End CLI System Test f277563
     - **Goal:** Run `smos produce --intent ...` and verify full lobe orchestration.
 - [ ] Task: Conductor - User Manual Verification 'System Completion' (Protocol in workflow.md)

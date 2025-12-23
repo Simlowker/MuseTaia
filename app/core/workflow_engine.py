@@ -22,6 +22,7 @@ from app.core.config import settings
 from app.core.services.ledger_service import LedgerService
 from app.core.finance.cost_calculator import CostCalculator
 from app.core.schemas.finance import TransactionType, TransactionCategory
+from app.core.services.comfy_api import ComfyUIClient
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +47,19 @@ class WorkflowEngine:
         
         self.ledger_service = LedgerService()
         self.cost_calculator = CostCalculator()
+        self.comfy_client = ComfyUIClient()
+
+    def _render_via_comfy(self, prompt: str, reference_images: List[bytes]) -> bytes:
+        """Executes a high-fidelity render via ComfyUI nodal workflow."""
+        logger.info("COMFY_UI: Triggering nodal workflow render...")
+        # Conceptual workflow JSON
+        workflow = {
+            "3": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": "sd_xl_base_1.0.safetensors"}},
+            "6": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt, "clip": ["3", 1]}},
+            # ... more nodes for Imagen 3 / Veo 3.1 wrappers ...
+        }
+        prompt_id = self.comfy_client.queue_prompt(workflow)
+        return self.comfy_client.get_output_data(prompt_id) or b""
 
     def _create_mask_from_bbox(self, base_image_bytes: bytes, bbox_2d: List[int]) -> bytes:
         """Creates a binary mask image from a bounding box."""
@@ -150,33 +164,35 @@ class WorkflowEngine:
             # Surgical QA check (Identity + World + Look)
             report = self.critic_agent.verify_consistency(current_image, references)
             
-            if report.is_consistent:
-                logger.info("Visual consistency verified by The Critic.")
+            # IDENTITY ANCHOR REGRESSION: 2% Deviation Rule (Score >= 0.98)
+            IF_DEVIATION_LIMIT = 0.98
+            
+            if report.is_consistent and report.score >= IF_DEVIATION_LIMIT:
+                logger.info(f"Visual consistency PASSED ({report.score*100}%).")
                 break
             
-            logger.warning(f"The Critic rejected asset. Attempt {attempt+1}/{max_retries}")
+            logger.warning(f"CRITIC REJECTED: Consistency score {report.score*100}% is below the 98% threshold.")
             
             # Check for actionable feedback (Repair vs Regenerate)
             repaired = False
             if report.feedback:
-                item = report.feedback[0] # Handle highest priority
+                item = report.feedback[0]
                 if item.action_type == "inpaint" and item.target_area:
-                    logger.info(f"Attempting repair: Inpainting {item.target_area}")
+                    logger.info(f"AUTO_CORRECT: Triggering Nano Banana (Surgical Repair) on {item.target_area}")
                     
-                    # Detect Mask
                     bbox = self.critic_agent.detect_mask_area(current_image, item.target_area)
                     if bbox:
                         mask_bytes = self._create_mask_from_bbox(current_image, bbox)
-                        # Inpaint
+                        # Surgical Repair
                         current_image = self.visual_agent.edit_image(
-                            prompt=f"Fix {item.target_area}. {item.description}",
+                            prompt=f"Surgical correction: {item.target_area}. Fix {item.description}. Maintain identity.",
                             base_image_bytes=current_image,
                             mask_image_bytes=mask_bytes
                         )
                         repaired = True
             
             if not repaired:
-                logger.info("Fallback: Full regeneration.")
+                logger.info("AUTO_CORRECT: Full regeneration required.")
                 current_image = self.visual_agent.generate_image(
                     optimized_prompt, 
                     subject_id=subject_id,

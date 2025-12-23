@@ -31,11 +31,10 @@ class TrendScanner:
             persona_constraints: Guidelines for what fits the Muse's identity.
 
         Returns:
-            TrendReport: Structured analysis.
+            TrendReport: Structured analysis including a proactive IntentObject.
         """
         
         # 1. Gather Context via Search
-        # We perform a search to get the latest info on the topic
         search_summary = self.search_service.search(f"What is the current sentiment and context for: {topic}?")
         
         # 2. Evaluate using Gemini
@@ -47,8 +46,20 @@ class TrendScanner:
         
         Persona Constraints: {persona_constraints}
         
-        Determine the relevance, sentiment, and provide a reasoning.
-        If the topic violates constraints or is negative/controversial in a way that risks the brand, mark relevance as BLOCKED.
+        Your goal is to transform this external signal into a proactive system INTENT.
+        
+        Determine:
+        1. Relevance and Sentiment.
+        2. If relevance is HIGH, generate an 'intent' object that acts as a CLI command.
+        
+        The intent MUST include:
+        - command: 'produce_content'
+        - trend_type: 'fashion', 'tech', 'art', 'culture', or 'lifestyle'
+        - urgency: 'low', 'medium', or 'high'
+        - target_audience: 'gen-z', 'luxury-segment', 'creatives', etc.
+        - parameters: Any additional flags (e.g. '--style', '--mood_modifier').
+        
+        If the topic violates constraints or is negative/controversial, mark relevance as BLOCKED and do not generate an intent.
         """
 
         response = self.client.models.generate_content(
@@ -65,9 +76,4 @@ class TrendScanner:
             )
         )
 
-        report = response.parsed
-        # Manually attach grounding metadata source links if available in future SDK versions
-        # For now we rely on the model filling the list if it used internal knowledge, 
-        # but ideally we would merge `search_service` sources here.
-        
-        return report
+        return response.parsed

@@ -72,3 +72,19 @@ class LedgerService:
             history.append(Transaction(**json.loads(r.decode('utf-8'))))
             
         return history
+
+    def allocate_proactive_budget(self, topic: str, estimated_roi: float) -> bool:
+        """Dynamically allocates credits for a proactive trend based on ROI.
+        
+        Returns:
+            bool: True if budget is allocated, False if ROI is too low.
+        """
+        MIN_ROI_THRESHOLD = 1.5 # 50% profit margin required
+        
+        if estimated_roi < MIN_ROI_THRESHOLD:
+            logger.warning(f"FINANCE: Budget denied for '{topic}'. Estimated ROI {estimated_roi} is below threshold.")
+            return False
+            
+        logger.info(f"FINANCE: Budget allocated for '{topic}'. Proceeding with autonomous production.")
+        return True
+

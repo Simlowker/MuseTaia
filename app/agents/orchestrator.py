@@ -1,67 +1,78 @@
-"""Orchestrator for decomposing intents into parallel subtasks."""
+"""Orchestrator using ADK concepts for complex task pipelines."""
 
-from typing import List, Dict, Any
+import logging
+from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
+from app.state.db_access import StateManager
 
+logger = logging.getLogger(__name__)
 
-class SubTask(BaseModel):
-    """Represents a single unit of work for a specific agent."""
-    task_id: str
-    agent_type: str  # e.g., 'cso', 'narrative', 'visual'
+class ADKAgent(BaseModel):
+    """Base class for ADK-style agents."""
+    agent_id: str
+    agent_type: str
     instruction: str
-    dependencies: List[str] = []  # IDs of tasks that must complete first
 
+class SequentialAgent(ADKAgent):
+    """Executes sub-agents in a strict sequence (The Pipe)."""
+    pipeline: List[ADKAgent]
 
-class TaskPlan(BaseModel):
-    """Represents the full execution plan for an intent."""
-    original_intent: str
-    subtasks: List[SubTask]
+class ParallelAgent(ADKAgent):
+    """Executes sub-agents simultaneously (The Swarm)."""
+    swarm: List[ADKAgent]
 
+class TaskGraph(BaseModel):
+    """Full execution graph for a proactive intent."""
+    root_intent: Any # IntentObject
+    nodes: List[ADKAgent]
 
 class Orchestrator:
-    """Manages the decomposition and execution of tasks."""
+    """Manages proactive task decomposition and ADK-style orchestration."""
 
-    def decompose_intent(self, intent_description: str) -> TaskPlan:
-        """Decomposes a high-level intent into a structured TaskPlan.
+    def __init__(self):
+        self.state_manager = StateManager()
+
+    def plan_execution(self, intent: Any) -> TaskGraph:
+        """Decomposes a standardized IntentObject into an ADK TaskGraph.
 
         Args:
-            intent_description: The user's high-level goal.
+            intent: The structured IntentObject from TrendScanner.
 
         Returns:
-            TaskPlan: A plan containing subtasks for the swarm.
+            TaskGraph: A pipeline of sequential and parallel agents.
         """
-        # In a real implementation, this would use Gemini's function calling
-        # or a structured prompt to generate the plan dynamically.
+        logger.info(f"Decomposing proactive intent: {intent.command} (--{intent.trend_type})")
         
-        # Heuristic implementation for the MVP foundation
-        subtasks = []
-        intent_lower = intent_description.lower()
-        
-        # 1. Strategy Layer (Always needed for complex tasks)
-        if "campaign" in intent_lower or "launch" in intent_lower:
-            subtasks.append(SubTask(
-                task_id="task_1",
-                agent_type="cso",
-                instruction="Define campaign strategy and key messaging."
-            ))
-        
-        # 2. Narrative Layer
-        subtasks.append(SubTask(
-            task_id="task_2",
-            agent_type="narrative",
-            instruction=f"Write script/copy for: {intent_description}",
-            dependencies=["task_1"] if len(subtasks) > 0 else []
-        ))
-        
-        # 3. Visual Layer
-        subtasks.append(SubTask(
-            task_id="task_3",
-            agent_type="visual",
-            instruction="Generate key visuals/frames.",
-            dependencies=["task_2"]
-        ))
-        
-        return TaskPlan(
-            original_intent=intent_description,
-            subtasks=subtasks
+        # 1. Strategy Layer (CSO) - Always first
+        cso = ADKAgent(
+            agent_id="cso_01",
+            agent_type="cso",
+            instruction=f"Define strategy for {intent.trend_type} trend: {intent.raw_intent}"
+        )
+
+        # 2. Creative Swarm (Narrative + Visual) - Parallel
+        creative_swarm = ParallelAgent(
+            agent_id="swarm_01",
+            agent_type="creative_swarm",
+            instruction="Execute creative assets in parallel.",
+            swarm=[
+                ADKAgent(agent_id="narrative_01", agent_type="narrative", instruction="Generate script."),
+                ADKAgent(agent_id="visual_01", agent_type="visual", instruction="Generate keyframes.")
+            ]
+        )
+
+        # 3. Final Production (Motion + EIC) - Sequential
+        production_pipe = SequentialAgent(
+            agent_id="pipe_01",
+            agent_type="production_pipe",
+            instruction="Finalize motion and stage for review.",
+            pipeline=[
+                ADKAgent(agent_id="director_01", agent_type="director", instruction="Render video."),
+                ADKAgent(agent_id="eic_01", agent_type="eic", instruction="Stage for review.")
+            ]
+        )
+
+        return TaskGraph(
+            root_intent=intent,
+            nodes=[cso, creative_swarm, production_pipe]
         )

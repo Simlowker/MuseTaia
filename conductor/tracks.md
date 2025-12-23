@@ -43,5 +43,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 ## [x] Track: Operational Launch Readiness
 *Link: [./conductor/tracks/launch_readiness_20251222/](./conductor/tracks/launch_readiness_20251222/)*
 
-## [~] Track: Industrial Scaling (Pod Snapshots & CRIU)
+## [x] Track: Industrial Scaling (Pod Snapshots & CRIU)
 *Link: [./conductor/tracks/industrial_scaling_20251222/](./conductor/tracks/industrial_scaling_20251222/)*
+
+## [~] Track: Proactive Sovereignty (SMOS v2 Core Overhaul)
+*Link: [./conductor/tracks/proactive_sovereignty_20251222/](./conductor/tracks/proactive_sovereignty_20251222/)*

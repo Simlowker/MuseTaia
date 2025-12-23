@@ -1,34 +1,48 @@
-"""Tests for the Orchestrator (Parallel Function Calling)."""
+"""Tests for the ADK Orchestrator."""
 
 import pytest
 from unittest.mock import MagicMock
-from app.agents.orchestrator import Orchestrator, TaskPlan, SubTask
+from app.agents.orchestrator import Orchestrator, TaskGraph, SequentialAgent, ParallelAgent
+from app.core.schemas.trend import IntentObject, TrendType
 
-def test_decompose_task_simple():
-    """Tests decomposing a simple task into subtasks."""
+@pytest.fixture
+def mock_intent():
+    return IntentObject(
+        command="produce_content",
+        trend_type=TrendType.FASHION,
+        urgency="high",
+        target_audience="luxury",
+        raw_intent="Create fashion asset",
+        parameters={"--style": "minimalist"}
+    )
+
+def test_plan_execution_structure(mock_intent):
+    """Tests the TaskGraph structure generation."""
     orchestrator = Orchestrator()
     
-    # Mock Gemini response
-    # In a real system, the orchestrator would prompt Gemini 3
-    # Here we mock the parsing logic
+    graph = orchestrator.plan_execution(mock_intent)
     
-    intent_description = "Create a viral post about coffee."
+    assert isinstance(graph, TaskGraph)
+    assert len(graph.nodes) == 3
     
-    plan = orchestrator.decompose_intent(intent_description)
+    # 1. Strategy Node
+    assert graph.nodes[0].agent_type == "cso"
     
-    assert isinstance(plan, TaskPlan)
-    assert len(plan.subtasks) > 0
-    # Check if we have at least a strategy task and a creation task
-    task_types = [t.agent_type for t in plan.subtasks]
-    assert "cso" in task_types or "narrative" in task_types
-    assert "creative" in task_types or "visual" in task_types
+    # 2. Parallel Swarm Node
+    assert isinstance(graph.nodes[1], ParallelAgent)
+    assert len(graph.nodes[1].swarm) == 2
+    
+    # 3. Sequential Pipe Node
+    assert isinstance(graph.nodes[2], SequentialAgent)
+    assert len(graph.nodes[2].pipeline) == 2
 
-def test_decompose_task_complex():
-    """Tests decomposing a complex task."""
+def test_adk_pipeline_logic(mock_intent):
+    """Tests that the plan includes specific ADK components."""
     orchestrator = Orchestrator()
-    intent_description = "Launch a full campaign for a new sneaker drop."
+    graph = orchestrator.plan_execution(mock_intent)
     
-    plan = orchestrator.decompose_intent(intent_description)
-    
-    assert len(plan.subtasks) >= 3 # Strategy, Visuals, Copy, maybe Social
-    assert plan.original_intent == intent_description
+    agent_types = [n.agent_type for n in graph.nodes]
+    assert "cso" in agent_types
+    assert "creative_swarm" in agent_types
+    assert "production_pipe" in agent_types
+

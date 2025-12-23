@@ -22,5 +22,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 ## [x] Track: The World Engine (ArchitectAgent)
 *Link: [./conductor/tracks/world_engine_20251222/](./conductor/tracks/world_engine_20251222/)*
 
-## [~] Track: Live Perception (Multimodal Live API)
+## [x] Track: Live Perception (Multimodal Live API)
 *Link: [./conductor/tracks/live_perception_20251222/](./conductor/tracks/live_perception_20251222/)*
+
+## [~] Track: Sovereign Talk (Interactive Orchestration)
+*Link: [./conductor/tracks/sovereign_talk_20251222/](./conductor/tracks/sovereign_talk_20251222/)*

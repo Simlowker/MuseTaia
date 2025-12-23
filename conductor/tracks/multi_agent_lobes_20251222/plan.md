@@ -23,11 +23,11 @@
 - [x] Task: Conductor - User Manual Verification 'Brain Lobe' (Protocol in workflow.md) db582eb
 
 ## Phase 3: Creative Studio Lobe (Production)
-- [ ] Task: Implement Narrative Architect & Visual Virtuoso Integration
+- [x] Task: Implement Narrative Architect & Visual Virtuoso Integration 2f6d5d0
     - **Goal:** Refine script-to-image pipeline with ComfyUI Nodal API.
     - **Files:** `app/agents/narrative_architect.py`, `app/agents/visual_virtuoso.py`
     - **Tech:** Imagen 3, ComfyUI.
-- [ ] Task: Implement Motion Engineer (Veo 3.1)
+- [x] Task: Implement Motion Engineer (Veo 3.1) 2f6d5d0
     - **Goal:** Complete the lip-sync and cinematic animation hand-off.
     - **Files:** `app/agents/motion_engineer.py`
     - **Tech:** Veo 3.1.

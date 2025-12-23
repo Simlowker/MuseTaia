@@ -83,7 +83,7 @@ Switch to your Google Cloud Shell window:
 
 2. **Trigger Build & Deploy**:
    ```bash
-   gcloud builds submit --config=cloudbuild.yaml .
+   gcloud builds submit --config=cloudbuild.yaml --substitutions=COMMIT_SHA=$(git rev-parse --short HEAD) .
    ```
 
 ## 6. Architecture Confirmation

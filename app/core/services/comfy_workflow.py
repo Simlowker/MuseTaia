@@ -20,15 +20,24 @@ class IdentityLockedWorkflow:
         face_master_path: str,
         pose_ref_path: Optional[str] = None,
         pulid_weight: float = 0.8,
-        faceid_weight: float = 0.5
+        faceid_weight: float = 0.5,
+        parameters: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Builds the nodal graph for ComfyUI API."""
+        """Builds the nodal graph for ComfyUI API with dynamic parameters."""
         
+        # Inject dynamic look and lighting into prompt
+        enhanced_prompt = prompt
+        if parameters:
+            look = parameters.get("look", "")
+            lighting = parameters.get("lighting", "")
+            if look: enhanced_prompt += f", {look} style"
+            if lighting: enhanced_prompt += f", {lighting} lighting"
+
         # This is a conceptual mapping of the Python-based ComfyScript 
-        # to the JSON format required by the ComfyUI /prompt endpoint.
         workflow = {
             "1": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": self.checkpoint}},
-            "2": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt, "clip": ["1", 1]}},
+            "2": {"class_type": "CLIPTextEncode", "inputs": {"text": enhanced_prompt, "clip": ["1", 1]}},
+
             "3": {"class_type": "CLIPTextEncode", "inputs": {"text": "low quality, blurry, distorted", "clip": ["1", 1]}},
             
             # Identity Anchoring (PuLID)

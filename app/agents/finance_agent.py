@@ -109,21 +109,24 @@ class CFOAgent:
         return decision
 
     def settle_production_cost(self, cost_estimate: float, task_id: str) -> Transaction:
-        """Records a production expense in the ledger.
-        
-        Args:
-            cost_estimate: The cost to deduct.
-            task_id: Reference for the production task.
-            
-        Returns:
-            Transaction: The recorded financial event.
-        """
+        """Records a production expense in the ledger."""
         return self.ledger_service.record_transaction(
             amount=cost_estimate,
             tx_type=TransactionType.EXPENSE,
             category=TransactionCategory.API_COST,
             description=f"Production cost settlement for task: {task_id}"
         )
+
+    def rollback_production_cost(self, amount: float, task_id: str) -> Transaction:
+        """Refunds the wallet if a production task fails (Financial Safety)."""
+        logger.warning(f"FINANCE_ROLLBACK: Refunding {amount} USD for failed task {task_id}.")
+        return self.ledger_service.record_transaction(
+            amount=amount,
+            tx_type=TransactionType.INCOME, # Refund is income/re-credit
+            category=TransactionCategory.OTHER,
+            description=f"REFUND: Failed production rollback for {task_id}"
+        )
+
 
     def summarize_health(self, wallet: Wallet, history: List[Transaction]) -> FinancialSummary:
         """Analyzes wallet and history to provide a strategic financial summary."""

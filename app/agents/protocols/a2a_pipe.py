@@ -1,33 +1,37 @@
-"""A2A (Agent-to-Agent) Pipe protocol for secure context passing."""
+"""Agent-to-Agent (A2A) Context Pipe for secure data flow."""
 
+from typing import Dict, Any, List
 import logging
-from typing import Any, Dict
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
 class A2AContext(BaseModel):
-    """The secure context package passed between agents."""
-    source_agent: str
-    target_agent: str
-    payload: Dict[str, Any]
-    metadata: Dict[str, Any] = {}
+    """The payload that circulates through the ADK TaskGraph."""
+    task_id: str
+    muse_id: str
+    current_step: str
+    data: Dict[str, Any] = Field(default_factory=dict)
+    assets: List[str] = Field(default_factory=list) # GCS paths
 
-class A2APipe:
-    """Implements the secure context 'Pipe' between swarm agents."""
+class A2AContextPipe:
+    """Manages the lifecycle of context during task execution."""
 
-    @staticmethod
-    def wrap(source: str, target: str, data: Any) -> A2AContext:
-        """Wraps agent output into a secure A2A context."""
-        logger.info(f"A2A_PIPE: Wrapping context from {source} to {target}")
+    def __init__(self, muse_id: str):
+        self.muse_id = muse_id
+
+    def create_initial_context(self, task_id: str, intent: str) -> A2AContext:
+        """Initializes the pipe."""
         return A2AContext(
-            source_agent=source,
-            target_agent=target,
-            payload=data if isinstance(data, dict) else {"data": data}
+            task_id=task_id,
+            muse_id=self.muse_id,
+            current_step="perception",
+            data={"intent": intent}
         )
 
-    @staticmethod
-    def unwrap(context: A2AContext) -> Dict[str, Any]:
-        """Unwraps the context for the target agent."""
-        logger.info(f"A2A_PIPE: Unwrapping context for {context.target_agent}")
-        return context.payload
+    def transition(self, context: A2AContext, next_step: str, update_data: Dict[str, Any]) -> A2AContext:
+        """Updates and validates the context during a transition."""
+        logger.info(f"A2A_PIPE: Transitioning from {context.current_step} to {next_step}.")
+        context.current_step = next_step
+        context.data.update(update_data)
+        return context

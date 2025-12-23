@@ -70,6 +70,45 @@ async def checkpoint_ready():
     # In a real scenario, we would check if memory usage is stable and DNA is indexed.
     return {"ready": True, "process_id": os.getpid(), "timestamp": datetime.now(timezone.utc)}
 
+# --- AUTONOMOUS DAEMONS ---
+
+async def trend_scout_daemon():
+    """Background task that periodically scans for high-VVS trends."""
+    from app.agents.trend_scout import TrendScout
+    from app.core.workflow_engine import WorkflowEngine
+    
+    scout = TrendScout()
+    engine = WorkflowEngine()
+    
+    logger.info("DAEMON: TrendScout sentinel active.")
+    
+    while True:
+        try:
+            # 1. Scan Niche (e.g. Virtual Fashion)
+            insights = await scout.scan_niche(["digital couture", "virtual fashion"])
+            
+            # 2. Filter by threshold (VVS > 50.0)
+            for insight in insights:
+                if insight.vvs_score > scout.vvs_threshold:
+                    logger.info(f"DAEMON: High-VVS Trend detected ({insight.vvs_score}): {insight.topic}")
+                    # 3. Trigger Production Loop
+                    await engine.produce_video_content_async(
+                        intent=insight.suggested_intent,
+                        mood=Mood(), # Default neutral mood
+                        subject_id="muse-01"
+                    )
+                    
+        except Exception as e:
+            logger.error(f"DAEMON: TrendScout loop failed: {e}")
+            
+        await asyncio.sleep(3600) # Scan every hour
+
+@app.on_event("startup")
+async def startup_event():
+    """Starts autonomous daemons on server startup."""
+    asyncio.create_task(trend_scout_daemon())
+
+
 
 # --- CLI LOGIC ---
 

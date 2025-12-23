@@ -1,21 +1,20 @@
 """Core engine for executing multi-agent workflows with QA loops."""
 
 import logging
-from typing import Optional, Dict, Any
-from app.agents.narrative_agent import NarrativeAgent
-from app.agents.visual_agent import VisualAgent
-from app.agents.critic_agent import CriticAgent
-from typing import Optional, Dict, Any, List
 import io
+from typing import Optional, Dict, Any, List
 from PIL import Image, ImageDraw
+
 from app.agents.narrative_agent import NarrativeAgent
 from app.agents.visual_agent import VisualAgent
 from app.agents.critic_agent import CriticAgent
 from app.agents.director_agent import DirectorAgent
 from app.agents.eic_agent import EICAgent
+from app.agents.architect_agent import ArchitectAgent
 from app.core.utils.prompt_optimizer import PromptOptimizer
 from app.state.models import Mood
-from app.matrix.assets_manager import SignatureAssetsManager
+from app.matrix.world_dna import WorldRegistry
+from app.matrix.world_assets import WorldAssetsManager
 from app.core.config import settings
 
 logger = logging.getLogger(__name__)
@@ -29,8 +28,11 @@ class WorkflowEngine:
         self.critic_agent = CriticAgent()
         self.director_agent = DirectorAgent()
         self.eic_agent = EICAgent()
+        self.architect_agent = ArchitectAgent()
+        
         self.optimizer = PromptOptimizer()
-        self.assets_manager = SignatureAssetsManager(bucket_name=settings.GCS_BUCKET_NAME)
+        self.world_registry = WorldRegistry()
+        self.world_assets = WorldAssetsManager(bucket_name=settings.GCS_BUCKET_NAME)
 
     def _create_mask_from_bbox(self, base_image_bytes: bytes, bbox_2d: List[int]) -> bytes:
         """Creates a binary mask image from a bounding box."""
@@ -63,28 +65,57 @@ class WorkflowEngine:
         subject_id: str,
         max_retries: int = 3
     ) -> Dict[str, Any]:
-        """Runs the full production pipeline with visual QA.
+        """Runs the full production pipeline with visual and spatial QA.
         
-        Sequence: Narrative -> Optimize -> Visual -> Critic (Loop) -> Director -> EIC (Staging).
+        Sequence: Narrative -> Architect -> Optimize -> Visual -> Critic (Loop) -> Director -> EIC.
         """
         
         # 1. Narrative Phase
         logger.info("Starting Narrative Phase...")
         script_data = self.narrative_agent.generate_content(intent, mood)
         
-        # 2. Optimization Phase
+        # 2. Architectural Phase (World Engine)
+        logger.info("Planning scene layout...")
+        layout = self.architect_agent.plan_scene_layout(script_data.script, self.world_registry)
+        
+        # 3. Optimization Phase
         logger.info("Optimizing prompt...")
-        optimized_prompt = self.optimizer.optimize(script_data.script)
+        optimized_prompt = self.optimizer.optimize(f"{script_data.script}. Setting: {layout.scene_description}")
         
-        # 3. Visual & QA Loop
+        # 4. Visual & QA Loop
         logger.info("Starting Visual & QA Loop...")
-        reference_image = self.assets_manager.download_asset(f"muses/{subject_id}/face.png")
         
-        current_image = self.visual_agent.generate_image(optimized_prompt, subject_id=subject_id)
+        # Collect all reference assets
+        references = []
+        # Identity ref
+        subject_face = self.world_assets.download_asset(f"muses/{subject_id}/face.png")
+        references.append(subject_face)
+        
+        # Location ref
+        try:
+            location_ref = self.world_assets.download_asset(f"world/locations/{layout.location_id}/reference.png")
+            references.append(location_ref)
+        except Exception:
+            logger.warning(f"Reference image for location {layout.location_id} not found.")
+
+        # Object refs
+        for obj_id in layout.selected_objects:
+            try:
+                obj_ref = self.world_assets.download_asset(f"world/objects/{obj_id}/reference.png")
+                references.append(obj_ref)
+            except Exception:
+                pass
+
+        current_image = self.visual_agent.generate_image(
+            optimized_prompt, 
+            subject_id=subject_id,
+            location_id=layout.location_id,
+            object_ids=layout.selected_objects
+        )
         
         for attempt in range(max_retries):
-            # QA check
-            report = self.critic_agent.verify_consistency(reference_image, current_image)
+            # Surgical QA check (Identity + World)
+            report = self.critic_agent.verify_consistency(current_image, references)
             
             if report.is_consistent:
                 logger.info("Visual consistency verified by The Critic.")
@@ -99,11 +130,11 @@ class WorkflowEngine:
                 if item.action_type == "inpaint" and item.target_area:
                     logger.info(f"Attempting repair: Inpainting {item.target_area}")
                     
-                    # 1. Detect Mask
+                    # Detect Mask
                     bbox = self.critic_agent.detect_mask_area(current_image, item.target_area)
                     if bbox:
                         mask_bytes = self._create_mask_from_bbox(current_image, bbox)
-                        # 2. Inpaint
+                        # Inpaint
                         current_image = self.visual_agent.edit_image(
                             prompt=f"Fix {item.target_area}. {item.description}",
                             base_image_bytes=current_image,
@@ -112,13 +143,17 @@ class WorkflowEngine:
                         repaired = True
             
             if not repaired:
-                # Fallback to full regeneration if no specific repair possible
                 logger.info("Fallback: Full regeneration.")
-                current_image = self.visual_agent.generate_image(optimized_prompt, subject_id=subject_id)
+                current_image = self.visual_agent.generate_image(
+                    optimized_prompt, 
+                    subject_id=subject_id,
+                    location_id=layout.location_id,
+                    object_ids=layout.selected_objects
+                )
         
         final_image = current_image
             
-        # 4. Production Phase
+        # 5. Production Phase
         logger.info("Starting Cinematography Phase...")
         video_data = self.director_agent.generate_video(optimized_prompt, image_bytes=final_image)
         
@@ -126,10 +161,11 @@ class WorkflowEngine:
             "title": script_data.title,
             "caption": script_data.caption,
             "video_bytes": video_data,
-            "poster_image_bytes": final_image
+            "poster_image_bytes": final_image,
+            "layout": layout.model_dump()
         }
 
-        # 5. Staging Phase (EIC)
+        # 6. Staging Phase (EIC)
         logger.info("Staging for review...")
         review_path = self.eic_agent.stage_for_review(production_data, subject_id)
         

@@ -34,7 +34,7 @@
 - [ ] Task: Conductor - User Manual Verification 'Spatial QA & Continuity' (Protocol in workflow.md)
 
 ## Phase 4: Full Reality Persistence
-- [ ] Task: Integrate World Engine into WorkflowEngine
+- [x] Task: Integrate World Engine into WorkflowEngine
     - **Goal:** Orchestrate the Narrative -> Architect -> Visual -> Critic loop to ensure Muse + Environment consistency.
     - **Files:** `app/core/workflow_engine.py` (update)
     - **Tech:** Python.

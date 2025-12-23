@@ -13,8 +13,9 @@ def mock_agents():
          patch("app.core.workflow_engine.CriticAgent") as m_critic, \
          patch("app.core.workflow_engine.DirectorAgent") as m_director, \
          patch("app.core.workflow_engine.EICAgent") as m_eic, \
+         patch("app.core.workflow_engine.ArchitectAgent") as m_architect, \
          patch("app.core.workflow_engine.PromptOptimizer") as m_optimizer, \
-         patch("app.core.workflow_engine.SignatureAssetsManager") as m_assets:
+         patch("app.core.workflow_engine.WorldAssetsManager") as m_assets:
         
         yield {
             "narrative": m_narrative.return_value,
@@ -22,6 +23,7 @@ def mock_agents():
             "critic": m_critic.return_value,
             "director": m_director.return_value,
             "eic": m_eic.return_value,
+            "architect": m_architect.return_value,
             "optimizer": m_optimizer.return_value,
             "assets": m_assets.return_value
         }
@@ -34,6 +36,12 @@ def test_workflow_repair_loop(mock_agents):
     mock_agents["narrative"].generate_content.return_value = MagicMock(title="T", script="S", caption="C")
     mock_agents["optimizer"].optimize.return_value = "P"
     mock_agents["assets"].download_asset.return_value = b"ref"
+    
+    # Architect Mock
+    from app.core.schemas.world import SceneLayout
+    mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(
+        location_id="loc", selected_objects=["obj"], scene_description="desc"
+    )
     
     # Visual: 1. Initial Gen (Bad), 2. Inpainted (Good)
     mock_agents["visual"].generate_image.return_value = b"bad_image" # Initial call
@@ -75,25 +83,31 @@ def test_workflow_critic_rejection_loop(mock_agents):
         title="Test", script="Test script", caption="Test"
     )
     
-    # 2. Mock Optimizer
+    # 2. Mock Architect
+    from app.core.schemas.world import SceneLayout
+    mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(
+        location_id="loc", selected_objects=[], scene_description="desc"
+    )
+    
+    # 3. Mock Optimizer
     mock_agents["optimizer"].optimize.return_value = "Optimized prompt"
     
-    # 3. Mock Assets
+    # 4. Mock Assets
     mock_agents["assets"].download_asset.return_value = b"ref_image"
     
-    # 4. Mock Visual - will be called twice
+    # 5. Mock Visual - will be called twice
     mock_agents["visual"].generate_image.side_effect = [b"bad_image", b"good_image"]
     
-    # 5. Mock Critic - first reject, then accept
+    # 6. Mock Critic - first reject, then accept
     mock_agents["critic"].verify_consistency.side_effect = [
         ConsistencyReport(is_consistent=False, score=0.4, issues=["Bad eyes"]),
         ConsistencyReport(is_consistent=True, score=0.9, issues=[])
     ]
     
-    # 6. Mock Director
+    # 7. Mock Director
     mock_agents["director"].generate_video.return_value = b"video_data"
 
-    # 7. Mock EIC
+    # 8. Mock EIC
     mock_agents["eic"].stage_for_review.return_value = "reviews/gen/123"
     
     # Run engine
@@ -114,6 +128,10 @@ def test_workflow_max_retries_failure(mock_agents):
     
     mock_agents["narrative"].generate_content.return_value = MagicMock(
         title="Test", script="Test script", caption="Test"
+    )
+    from app.core.schemas.world import SceneLayout
+    mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(
+        location_id="loc", selected_objects=[], scene_description="desc"
     )
     mock_agents["optimizer"].optimize.return_value = "Prompt"
     mock_agents["assets"].download_asset.return_value = b"ref"

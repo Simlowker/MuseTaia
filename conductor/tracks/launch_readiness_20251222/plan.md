@@ -1,10 +1,10 @@
 # Track Plan: Operational Launch Readiness
 
 ## Phase 1: Environment & Secrets Configuration
-- [ ] Task: Finalize Environment Variables
+- [x] Task: Finalize Environment Variables
     - **Goal:** Ensure `.env` and `frontend/.env.local` are correctly structured for production/dev.
     - **Files:** `.env.example`, `frontend/.env.local.example`
-- [ ] Task: Implement Bootstrap Script
+- [~] Task: Implement Bootstrap Script
     - **Goal:** Create a script to initialize the first MoodState and verify GCP API access.
     - **Files:** `scripts/bootstrap_system.py`
 - [ ] Task: Conductor - User Manual Verification 'Configuration' (Protocol in workflow.md)

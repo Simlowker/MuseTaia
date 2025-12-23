@@ -3,7 +3,7 @@
 import subprocess
 import os
 from app.agents.critic_agent import CriticAgent
-from app.agents.finance_agent import FinanceAgent
+from app.agents.finance_agent import CFOAgent
 from app.state.models import Wallet
 
 def verify_governance_lobe():
@@ -11,21 +11,22 @@ def verify_governance_lobe():
     critic = CriticAgent()
     try:
         # Mocking small images for prompt validation
-        report = critic.verify_consistency(b"fake_target", [b"fake_ref"])
-        print(f"Consistency Score: {report.score}")
-        print(f"Is Consistent (>=0.98): {report.is_consistent}")
+        # Adjusting signature to match current verify_consistency(gen_bytes, ref_bytes)
+        report = critic.verify_consistency(b"fake_target", b"fake_ref")
+        print(f"Drift Score: {report.identity_drift_score}")
+        print(f"Decision: {report.final_decision}")
     except Exception as e:
         print(f"CriticAgent verification failed: {e}")
 
-    print("\n--- Verifying FinanceAgent ---")
-    finance = FinanceAgent()
+    print("\n--- Verifying CFOAgent ---")
+    finance = CFOAgent()
     try:
         wallet = Wallet(balance=1000.0, internal_usd_balance=100.0)
         summary = finance.summarize_health(wallet, [])
         print(f"Financial Status: {summary.status}")
         print(f"Strategic Advice: {summary.advice}")
     except Exception as e:
-        print(f"FinanceAgent verification failed: {e}")
+        print(f"CFOAgent verification failed: {e}")
 
     print("\n--- Verifying Full System CLI ---")
     try:

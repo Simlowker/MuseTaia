@@ -22,7 +22,7 @@
     - **Tests:** Verify modal opens with correct data when trend is clicked.
 - [x] Task: Conductor - User Manual Verification 'Hybrid UI' (Protocol in workflow.md) c3e4803
 
-## Phase 3: Validation Gates & Previews
+## Phase 3: Validation Gates & Previews [checkpoint: 2eae1ce]
 - [x] Task: Implement Pipeline Pausing in WorkflowEngine
     - **Goal:** Update the production loop to suspend execution and wait for human signal when in "Collaborative" mode.
     - **Files:** `app/core/workflow_engine.py` (update).
@@ -32,10 +32,12 @@
     - **Goal:** Display intermediate render results from ComfyUI before the final 4K render.
     - **Files:** `frontend/src/app/page.tsx` (update), `app/main.py` (update), `frontend/src/services/api.ts` (update).
     - **Tests:** Verify 'Awaiting Approval' state shows buttons and clears on resolution.
-- [ ] Task: Conductor - User Manual Verification 'Validation Gates' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Validation Gates' (Protocol in workflow.md) 2eae1ce
 
-## Phase 4: Full Hybrid Loop
-- [ ] Task: End-to-End Collaborative Production Test
+## Phase 4: Full Hybrid Loop [checkpoint: be6709b]
+- [x] Task: End-to-End Collaborative Production Test
     - **Goal:** Verify: Muse Proposes -> User Edits -> Muse Renders -> Critic Check -> Success.
     - **Files:** `tests/test_hitl_workflow.py`
-- [ ] Task: Conductor - User Manual Verification 'Hybrid Completion' (Protocol in workflow.md)
+    - **Tech:** Pytest Integration Test.
+- [x] Task: Conductor - User Manual Verification 'Hybrid Completion' (Protocol in workflow.md) 42b3aaa
+

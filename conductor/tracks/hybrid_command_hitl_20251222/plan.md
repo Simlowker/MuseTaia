@@ -1,10 +1,11 @@
 # Track Plan: Hybrid Command & HITL Integration
 
 ## Phase 1: HITL Backend Infrastructure
-- [ ] Task: Update StateManager for Task Persistence
+- [x] Task: Update StateManager for Task Persistence
     - **Goal:** Allow storing and retrieving "Pending Tasks" and "Proposals" in Redis.
     - **Files:** `app/state/db_access.py` (update), `app/core/schemas/swarm.py` (New)
     - **Tech:** Redis, Pydantic.
+    - **Tests:** Verify proposal and pending task storage in Redis.
 - [ ] Task: Implement Proposal Endpoints
     - **Goal:** Create `/swarm/proposals` (GET) and `/swarm/approve` (POST) endpoints.
     - **Files:** `app/main.py` (update).

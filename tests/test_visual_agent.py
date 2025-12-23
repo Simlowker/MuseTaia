@@ -29,15 +29,21 @@ def test_generate_image_basic(mock_genai, mock_assets_manager):
     
     image_bytes = agent.generate_image(
         prompt="A muse standing in a digital garden",
-        subject_id="genesis"
+        subject_id="genesis",
+        location_id="paris_studio",
+        object_ids=["blue_sofa"]
     )
     
     assert image_bytes == b"output_image"
     mock_client.models.generate_images.assert_called_once()
-    assert "genesis" in mock_client.models.generate_images.call_args.kwargs["prompt"]
+    prompt_used = mock_client.models.generate_images.call_args.kwargs["prompt"]
+    assert "genesis" in prompt_used
+    assert "paris_studio" in prompt_used
+    assert "blue_sofa" in prompt_used
     
     # Verify assets were fetched
-    mock_assets_instance.download_asset.assert_called()
+    # Should be called for subject face, location ref, and object ref
+    assert mock_assets_instance.download_asset.call_count >= 3
 
 def test_initialization(mock_genai, mock_assets_manager):
 

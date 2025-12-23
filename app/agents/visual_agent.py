@@ -28,15 +28,19 @@ class VisualAgent:
         prompt: str,
         subject_id: Optional[str] = None,
         style_id: Optional[str] = None,
+        location_id: Optional[str] = None,
+        object_ids: Optional[List[str]] = None,
         aspect_ratio: str = "1:1",
         number_of_images: int = 1
     ) -> bytes:
-        """Generates an image based on a prompt and optional subject/style guidance.
+        """Generates an image based on a prompt and optional subject/style/world guidance.
 
         Args:
             prompt: The text description of the image.
             subject_id: The ID of the Muse to use for Subject Guidance.
             style_id: The ID of a style asset to use for Style Guidance.
+            location_id: The ID of the persistent location.
+            object_ids: List of IDs of persistent objects to include.
             aspect_ratio: Aspect ratio (e.g., '1:1', '16:9').
             number_of_images: How many images to generate.
 
@@ -46,21 +50,38 @@ class VisualAgent:
         
         enhanced_prompt = prompt
         
-        # Fallback: Use prompt engineering since SDK fields are missing/private
+        # 1. Subject Guidance
         if subject_id:
             try:
-                # Ensure asset exists
                 self.assets_manager.download_asset(f"muses/{subject_id}/face.png")
-                enhanced_prompt = f"Subject: {subject_id}. {prompt}"
+                enhanced_prompt = f"Subject: {subject_id}. {enhanced_prompt}"
             except Exception:
                 pass
 
+        # 2. Style Guidance
         if style_id:
             try:
                 self.assets_manager.download_asset(f"styles/{style_id}.png")
                 enhanced_prompt += f" Style: {style_id}"
             except Exception:
                 pass
+
+        # 3. World Guidance (Locations & Objects)
+        if location_id:
+            try:
+                # Ensure location asset exists
+                self.assets_manager.download_asset(f"world/locations/{location_id}/reference.png")
+                enhanced_prompt += f" Location: {location_id}"
+            except Exception:
+                pass
+        
+        if object_ids:
+            for obj_id in object_ids:
+                try:
+                    self.assets_manager.download_asset(f"world/objects/{obj_id}/reference.png")
+                    enhanced_prompt += f" Including Object: {obj_id}"
+                except Exception:
+                    pass
 
         response = self.client.models.generate_images(
             model=self.model_name,

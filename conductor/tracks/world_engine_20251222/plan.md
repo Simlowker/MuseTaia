@@ -14,12 +14,12 @@
 - [ ] Task: Conductor - User Manual Verification 'Environmental Anchors' (Protocol in workflow.md)
 
 ## Phase 2: ArchitectAgent - The Space Guardian
-- [ ] Task: Implement ArchitectAgent (Gemini 3 Pro)
+- [x] Task: Implement ArchitectAgent (Gemini 3 Pro)
     - **Goal:** Create the agent responsible for selecting and maintaining the scene's environment based on the narrative.
     - **Files:** `app/agents/architect_agent.py`
     - **Tech:** Gemini 3 Pro, Context Caching.
     - **Tests:** Verify agent selects correct recurring locations for a given script.
-- [ ] Task: Implement Environment Reference Injection
+- [x] Task: Implement Environment Reference Injection
     - **Goal:** Update the VisualAgent to accept and use environmental reference images in addition to subject references.
     - **Files:** `app/agents/visual_agent.py` (update)
     - **Tech:** Imagen 3 (Reference images).

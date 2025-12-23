@@ -81,3 +81,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: High Compute Burst & Skill Sandboxing (Scale v1)
 *Link: [./conductor/tracks/high_compute_burst_20251223/](./conductor/tracks/high_compute_burst_20251223/)*
+
+## [x] Track: Ultra-Realistic Vitrine (The Nerve Center)
+*Link: [./conductor/tracks/ultra_realistic_vitrine_20251223/](./conductor/tracks/ultra_realistic_vitrine_20251223/)*

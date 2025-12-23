@@ -26,15 +26,16 @@
     - **Goal:** Replace mock ledger data with actual transaction history from `LedgerService`.
     - **Files:** `frontend/src/app/ledger/page.tsx` (update).
     - **Tests:** Verify ledger table displays real backend records.
-- [~] Task: Wire Critic Feedback to DriftVisualizer
+- [x] Task: Wire Critic Feedback to DriftVisualizer
     - **Goal:** Ensure the Drift Visualizer displays real consistency scores from the production loop.
     - **Files:** `frontend/src/app/forge/page.tsx` (update).
-- [ ] Task: Conductor - User Manual Verification 'Data Flow' (Protocol in workflow.md)
+    - **Tests:** Verify visualizer reacts to score changes (Pass/Fail colors).
+- [x] Task: Conductor - User Manual Verification 'Data Flow' (Protocol in workflow.md) [checkpoint: PENDING]
 
 ## Phase 4: Final Documentation & Launch
-- [ ] Task: Create Launch Guide (README Update)
+- [x] Task: Create Launch Guide (README Update)
     - **Goal:** Provide clear instructions for launching the full stack (Infrastructure, Backend, Frontend).
     - **Files:** `README.md`
-- [ ] Task: Final End-to-End System Smoke Test
+- [x] Task: Final End-to-End System Smoke Test
     - **Goal:** Verify that a user interaction leads to a real GCS asset generation and a ledger update.
-- [ ] Task: Conductor - User Manual Verification 'Launch Readiness' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Launch Readiness' (Protocol in workflow.md) [checkpoint: PENDING]

@@ -47,10 +47,10 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getAccentColor = (currentMood: Mood) => {
     switch (currentMood) {
-      case 'authority': return '#FFD700'; // Gold
-      case 'reflection': return '#0047AB'; // Deep Blue
-      case 'creativity': return '#FF00FF'; // Magenta
-      default: return '#0047AB';
+      case 'authority': return '#D4AF37'; // Authority Gold
+      case 'reflection': return '#1A2B48'; // Analytical Blue
+      case 'creativity': return '#E0E0E0'; // Swiss Silver (Muted Luxe)
+      default: return '#1A2B48';
     }
   };
 

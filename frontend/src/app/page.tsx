@@ -17,7 +17,6 @@ export default function Home() {
     try {
       const result = await smosApi.triggerProduction(intent);
       console.log('Production triggered:', result.task_id);
-      alert(`Production started: ${result.task_id}`);
     } catch (error) {
       console.error('Trigger failed:', error);
     } finally {
@@ -29,14 +28,17 @@ export default function Home() {
     <div className="row g-4">
       {/* 1. Zone Centrale: L'Entité */}
       <div className="col-lg-6 order-lg-2">
-        <div className="glass-card accent-border h-100" style={{ borderTop: '4px solid' }}>
-          <h2 className="fw-bold mb-4 accent-text">THE ENTITY</h2>
+        <div className="glass-card h-100" style={{ borderTop: `0.5px solid ${accentColor}` }}>
+          <h2 className="fw-light mb-4 tracking-widest small opacity-75">THE ENTITY | SOVEREIGN HEART</h2>
           
-          <VisualVortex />
+          <div style={{ height: '400px' }}>
+            <VisualVortex />
+          </div>
           <NeuralWaveform />
 
           {/* Real-time monologue from StateDB */}
-          <div className="mt-4 p-3 bg-dark bg-opacity-50 rounded italic small text-secondary">
+          <div className="mt-4 p-4 bg-white bg-opacity-5 rounded-1 italic small text-secondary fw-light border border-white border-opacity-5" style={{ lineHeight: '1.6' }}>
+            <span className="text-white-50 font-monospace me-2" style={{ fontSize: '0.65rem' }}>INTERNAL_MONOLOGUE:</span>
             {rawMood?.current_thought || "Initialising consciousness..."}
           </div>
           
@@ -46,31 +48,35 @@ export default function Home() {
       {/* 2. Zone Gauche: Cognition & Perception */}
       <div className="col-lg-3 order-lg-1">
         <div className="glass-card mb-4">
-          <h4 className="fw-bold mb-3">COGNITION</h4>
-          <div className="mb-3">
-            <label className="form-label small text-secondary">MOOD VECTORED</label>
-            <div className="d-flex gap-2">
+          <h4 className="fw-light mb-4 tracking-widest small">COGNITION_MATRIX</h4>
+          <div className="mb-4">
+            <label className="form-label small text-secondary tracking-widest" style={{ fontSize: '0.6rem' }}>MOOD VECTORED</label>
+            <div className="d-flex flex-column gap-2">
               <button 
-                className={`btn btn-sm btn-outline-secondary ${mood === 'authority' ? 'active' : ''}`}
+                className={`btn btn-sm text-start py-2 px-3 border border-white border-opacity-10 fw-light small tracking-wide ${mood === 'authority' ? 'bg-white bg-opacity-10 text-white' : 'text-secondary'}`}
                 onClick={() => setMood('authority')}
-              >Authority</button>
+                style={{ borderLeft: mood === 'authority' ? `2px solid ${accentColor}` : '1px solid transparent' }}
+              >AUTHORITY</button>
               <button 
-                className={`btn btn-sm btn-outline-secondary ${mood === 'reflection' ? 'active' : ''}`}
+                className={`btn btn-sm text-start py-2 px-3 border border-white border-opacity-10 fw-light small tracking-wide ${mood === 'reflection' ? 'bg-white bg-opacity-10 text-white' : 'text-secondary'}`}
                 onClick={() => setMood('reflection')}
-              >Reflection</button>
+                style={{ borderLeft: mood === 'reflection' ? `2px solid ${accentColor}` : '1px solid transparent' }}
+              >REFLECTION</button>
               <button 
-                className={`btn btn-sm btn-outline-secondary ${mood === 'creativity' ? 'active' : ''}`}
+                className={`btn btn-sm text-start py-2 px-3 border border-white border-opacity-10 fw-light small tracking-wide ${mood === 'creativity' ? 'bg-white bg-opacity-10 text-white' : 'text-secondary'}`}
                 onClick={() => setMood('creativity')}
-              >Creativity</button>
+                style={{ borderLeft: mood === 'creativity' ? `2px solid ${accentColor}` : '1px solid transparent' }}
+              >CREATIVITY</button>
             </div>
           </div>
-          <div className="p-3 border border-secondary rounded text-center small text-secondary">
-            VALENCE: {rawMood?.valence.toFixed(2) || "0.00"} | AROUSAL: {rawMood?.arousal.toFixed(2) || "0.00"}
+          <div className="p-3 bg-white bg-opacity-5 rounded-1 border border-white border-opacity-5 text-center">
+            <div className="text-secondary small font-monospace tracking-tighter" style={{ fontSize: '0.65rem' }}>
+              V: {rawMood?.valence.toFixed(4) || "0.0000"} | A: {rawMood?.arousal.toFixed(4) || "0.0000"}
+            </div>
           </div>
         </div>
 
-        {/* Note: Pass production trigger to TrendFeed in a real app */}
-        <div onClick={() => handleTriggerProduction("Trending Topic Interaction")}>
+        <div onClick={() => handleTriggerProduction("Adaptive Narrative Sync")}>
           <TrendFeed />
         </div>
       </div>
@@ -80,16 +86,16 @@ export default function Home() {
         <SwarmStatus />
 
         <div className="glass-card">
-          <h4 className="fw-bold mb-3">INSTANT CANVAS</h4>
-          <div className="bg-dark rounded-3 ratio ratio-1x1 d-flex align-items-center justify-content-center text-secondary overflow-hidden text-center">
+          <h4 className="fw-light mb-4 tracking-widest small">INSTANT CANVAS</h4>
+          <div className="bg-black rounded-1 ratio ratio-1x1 border border-white border-opacity-5 d-flex align-items-center justify-content-center text-secondary overflow-hidden text-center shadow-inner">
             {isTriggering ? (
               <div className="p-4">
-                <div className="spinner-border accent-text mb-2" role="status"></div>
-                <br/><span className="small">COMMUNICATING WITH SWARM...</span>
+                <div className="spinner-border text-white-50 border-1 mb-3" style={{ width: '1.5rem', height: '1.5rem' }} role="status"></div>
+                <br/><span className="text-white-50 small tracking-widest font-monospace" style={{ fontSize: '0.6rem' }}>DISPATCHING_SWARM...</span>
               </div>
             ) : (
               <div className="p-4">
-                <span className="small">WAITING FOR CRITIC APPROVAL...</span>
+                <span className="text-white-50 small tracking-widest font-monospace opacity-50" style={{ fontSize: '0.6rem' }}>AWAITING_RENDER_SIGNAL</span>
               </div>
             )}
           </div>

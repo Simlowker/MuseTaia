@@ -20,26 +20,26 @@ const trends: Trend[] = [
 export default function TrendFeed() {
   return (
     <div className="glass-card">
-      <h4 className="fw-bold mb-3 d-flex justify-content-between align-items-center">
+      <h4 className="fw-light mb-4 tracking-widest small d-flex justify-content-between align-items-center">
         NICHE TRENDS
-        <span className="badge bg-dark border border-secondary small" style={{ fontSize: '0.6rem' }}>LIVE</span>
+        <span className="text-secondary small font-monospace" style={{ fontSize: '0.6rem' }}>GROUNDING_ACTIVE</span>
       </h4>
-      <div className="d-flex flex-column gap-3">
+      <div className="d-flex flex-column gap-4">
         {trends.map((trend, index) => (
           <motion.div 
             key={trend.id}
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="p-2 border-bottom border-secondary"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1, ease: "easeOut" }}
+            className="pb-3 border-bottom border-white border-opacity-5"
           >
-            <div className="d-flex justify-content-between align-items-start mb-1">
-              <span className="small fw-bold text-white">{trend.topic}</span>
-              <span className={`small ${trend.score > 85 ? 'text-success' : 'text-warning'}`}>{trend.score}%</span>
+            <div className="d-flex justify-content-between align-items-start mb-2">
+              <span className="small text-white-50 tracking-wide">{trend.topic}</span>
+              <span className={`small font-monospace ${trend.score > 85 ? 'text-white' : 'text-secondary'}`} style={{ fontSize: '0.75rem' }}>{trend.score}.00</span>
             </div>
             <div className="d-flex justify-content-between align-items-center">
-              <span className="text-secondary" style={{ fontSize: '0.7rem' }}>{trend.category.toUpperCase()}</span>
-              <button className="btn btn-link p-0 text-decoration-none accent-text small" style={{ fontSize: '0.7rem' }}>DISCUSS</button>
+              <span className="text-secondary tracking-widest" style={{ fontSize: '0.6rem' }}>{trend.category.toUpperCase()}</span>
+              <button className="btn btn-link p-0 text-decoration-none text-white small fw-light" style={{ fontSize: '0.65rem', letterSpacing: '0.1em' }}>[ DISCUSS ]</button>
             </div>
           </motion.div>
         ))}

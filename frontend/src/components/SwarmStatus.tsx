@@ -23,22 +23,22 @@ export default function SwarmStatus() {
 
   return (
     <div className="glass-card mb-4">
-      <h4 className="fw-bold mb-3">SWARM STATUS</h4>
-      <div className="d-flex flex-column gap-3">
+      <h4 className="fw-light mb-4 tracking-widest small">SWARM ORCHESTRATION</h4>
+      <div className="d-flex flex-column gap-4">
         {agents.map((agent) => (
           <div key={agent.name} className="small">
-            <div className="d-flex justify-content-between mb-1">
-              <span className={agent.active ? 'text-white fw-bold' : 'text-secondary'}>{agent.name}</span>
-              <span className="text-secondary" style={{ fontSize: '0.7rem' }}>{agent.status}</span>
+            <div className="d-flex justify-content-between mb-2">
+              <span className={`tracking-wide ${agent.active ? 'text-white' : 'text-secondary'}`} style={{ fontSize: '0.75rem' }}>{agent.name.toUpperCase()}</span>
+              <span className="text-white-50 font-monospace" style={{ fontSize: '0.6rem' }}>{agent.status}</span>
             </div>
-            <div className="progress bg-dark" style={{ height: '4px' }}>
+            <div className="progress bg-white bg-opacity-5" style={{ height: '1px', borderRadius: 0 }}>
               <motion.div 
                 className="progress-bar"
                 initial={{ width: 0 }}
                 animate={{ width: `${agent.progress}%` }}
                 style={{ 
                   backgroundColor: accentColor,
-                  boxShadow: agent.active ? `0 0 10px ${accentColor}` : 'none'
+                  opacity: agent.active ? 1 : 0.3
                 }}
               />
             </div>

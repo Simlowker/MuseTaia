@@ -37,3 +37,25 @@ def test_root_agent_ping(mock_genai):
     
     assert response == "Pong"
     mock_chat.send_message.assert_called_with("Ping")
+
+def test_root_agent_sensory_reaction(mock_genai):
+    """Test that RootAgent reacts to sensory input and updates state."""
+    mock_chat = mock_genai.Client.return_value.chats.create.return_value
+    mock_response = MagicMock()
+    mock_response.text = "I should look into that fashion trend."
+    mock_chat.send_message.return_value = mock_response
+    
+    with patch("app.agents.root_agent.StateManager") as mock_sm:
+        mock_manager = mock_sm.return_value
+        from app.state.models import Mood
+        mock_manager.get_mood.return_value = Mood()
+        
+        agent = RootAgent()
+        reaction = agent.process_sensory_input("New digital couture on runway")
+        
+        assert reaction == "I should look into that fashion trend."
+        mock_chat.send_message.assert_called()
+        assert "New digital couture" in mock_chat.send_message.call_args.args[0]
+        # Verify state update
+        mock_manager.update_mood.assert_called_once()
+        assert mock_manager.update_mood.call_args.args[0].current_thought == reaction

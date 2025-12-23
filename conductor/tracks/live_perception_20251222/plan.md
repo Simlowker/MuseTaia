@@ -9,19 +9,19 @@
 - [ ] Task: Conductor - User Manual Verification 'Live API Foundation' (Protocol in workflow.md)
 
 ## Phase 2: Sensory Handlers (Vision & Audio)
-- [ ] Task: Implement Video Stream Handler
+- [x] Task: Implement Video Stream Handler
     - **Goal:** Process real-time video frames and extract visual descriptions.
     - **Files:** `app/agents/handlers/visual_stream.py`
     - **Tech:** Gemini 3 Flash.
     - **Tests:** Mock video stream and verify visual summary generation.
-- [ ] Task: Implement Audio/Voice Handler
+- [x] Task: Implement Audio/Voice Handler
     - **Goal:** Process real-time audio for speech-to-text and intent parsing.
     - **Files:** `app/agents/handlers/audio_stream.py`
     - **Tech:** Gemini Multimodal Live (Audio).
 - [ ] Task: Conductor - User Manual Verification 'Sensory Handlers' (Protocol in workflow.md)
 
 ## Phase 3: Proactive Reaction Loop (The Reflex)
-- [ ] Task: Integrate Live Perception with RootAgent
+- [x] Task: Integrate Live Perception with RootAgent
     - **Goal:** Enable the RootAgent to receive sensory alerts and update the Muse's "Current Thought" in real-time.
     - **Files:** `app/agents/root_agent.py` (update), `app/core/scheduler.py` (update).
     - **Tech:** Asyncio, StateDB.

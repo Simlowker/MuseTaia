@@ -66,3 +66,22 @@ class IdentityAnchor(BaseModel):
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 
+class WardrobeItem(BaseModel):
+    """Represents a persistent outfit or clothing item."""
+    item_id: str
+    name: str
+    description: str
+    visual_reference_path: str  # GCS path
+    tags: List[str] = Field(default_factory=list) # e.g., 'cyberpunk', 'formal'
+
+
+class SceneProp(BaseModel):
+    """Represents a persistent visual prop."""
+    prop_id: str
+    name: str
+    description: str
+    visual_reference_path: str  # GCS path
+    is_recurring: bool = True
+
+
+

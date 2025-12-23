@@ -1,7 +1,7 @@
 # Track Plan: Stylist & Continuity Agent
 
 ## Phase 1: Wardrobe & Prop DNA
-- [ ] Task: Define Wardrobe & Prop Schemas
+- [x] Task: Define Wardrobe & Prop Schemas
     - **Goal:** Standardize descriptions for outfits (e.g., "Neon Mesh Jacket") and persistent props.
     - **Files:** `app/matrix/models.py` (update), `app/matrix/wardrobe_dna.py`
     - **Tech:** Pydantic.

@@ -65,10 +65,7 @@ class WorkflowEngine:
         subject_id: str,
         max_retries: int = 3
     ) -> Dict[str, Any]:
-        """Runs the full production pipeline with visual and spatial QA.
-        
-        Sequence: Narrative -> Architect -> Optimize -> Visual -> Critic (Loop) -> Director -> EIC.
-        """
+        """Runs the full production pipeline with visual and spatial QA."""
         
         # 1. Narrative Phase
         logger.info("Starting Narrative Phase...")
@@ -171,3 +168,27 @@ class WorkflowEngine:
         
         production_data["review_path"] = review_path
         return production_data
+
+    async def produce_video_content_async(
+        self,
+        intent: str,
+        mood: Mood,
+        subject_id: str
+    ) -> str:
+        """Starts the production pipeline in the background and returns a task ID."""
+        import asyncio
+        import uuid
+        task_id = str(uuid.uuid4())[:8]
+        
+        # Fire and forget the production
+        asyncio.create_task(
+            asyncio.to_thread(
+                self.produce_video_content, 
+                intent, 
+                mood, 
+                subject_id
+            )
+        )
+        
+        logger.info(f"Background production task {task_id} started for intent: {intent}")
+        return task_id

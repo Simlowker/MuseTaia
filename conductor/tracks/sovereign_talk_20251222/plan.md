@@ -23,13 +23,14 @@
 - [ ] Task: Conductor - User Manual Verification 'Live Persona' (Protocol in workflow.md)
 
 ## Phase 3: Real-time Brain (The RootAgent Loop)
-- [ ] Task: Implement Interactive RootAgent Handler
+- [x] Task: Implement Interactive RootAgent Handler
     - **Goal:** Manage the state of the conversation, updating Mood and Thoughts in Redis as the dialogue progresses.
     - **Files:** `app/agents/interactive_root.py`
     - **Tech:** Asyncio, StateDB.
-- [ ] Task: Implement Background Task Orchestration
+- [x] Task: Implement Background Task Orchestration
     - **Goal:** Allow the Muse to "hand off" heavy tasks (like video rendering) to the ACE factory without breaking the conversation flow.
     - **Files:** `app/core/workflow_engine.py` (update).
+    - **Tech:** Asyncio Tasks.
 - [ ] Task: Conductor - User Manual Verification 'Real-time Brain' (Protocol in workflow.md)
 
 ## Phase 4: Low-Latency Studio Interaction

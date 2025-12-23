@@ -5,7 +5,7 @@
     - **Goal:** Integrate social scraping and niche filtering.
     - **Files:** `app/agents/trend_scout.py`, `app/core/services/scraper.py`
     - **Tech:** Gemma 2 27B, Apify (Conceptual).
-- [ ] Task: Implement The Librarian (RAG Specialist)
+- [x] Task: Implement The Librarian (RAG Specialist) 666721f
     - **Goal:** Enable viral structure extraction and semantic retrieval.
     - **Files:** `app/agents/librarian.py`
     - **Tech:** Vertex AI Vector Search.

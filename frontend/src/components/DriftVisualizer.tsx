@@ -3,7 +3,13 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
-export default function DriftVisualizer() {
+interface DriftVisualizerProps {
+  score?: number;
+  issues?: string[];
+  recommendations?: string;
+}
+
+export default function DriftVisualizer({ score = 0.95, issues = [], recommendations }: DriftVisualizerProps) {
   const [opacity, setOpacity] = useState(0.5);
 
   return (
@@ -16,7 +22,7 @@ export default function DriftVisualizer() {
           className="position-absolute w-100 h-100 d-flex align-items-center justify-content-center text-secondary small"
           style={{ opacity: 1 - opacity }}
         >
-          [ SIGNATURE ASSET: GENESIS_V1_FACE ]
+          [ SIGNATURE ASSET ]
         </div>
         
         {/* Layer 2: New Render (Foreground with dynamic opacity) */}
@@ -28,19 +34,21 @@ export default function DriftVisualizer() {
             backdropFilter: 'blur(2px)'
           }}
         >
-          [ NEW RENDER: CANDIDATE_IMAGE_04 ]
+          [ NEW RENDER ]
         </div>
 
-        {/* Diff Markers Placeholder */}
-        <motion.div 
-          animate={{ opacity: [0, 1, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="position-absolute border border-danger rounded-circle"
-          style={{ width: '40px', height: '40px', top: '40%', left: '45%', borderWidth: '2px' }}
-        />
+        {/* Diff Markers Placeholder - only shown if score is low */}
+        {score < 0.9 && (
+          <motion.div 
+            animate={{ opacity: [0, 1, 0] }}
+            transition={{ duration: 2, repeat: Infinity }}
+            className="position-absolute border border-danger rounded-circle"
+            style={{ width: '40px', height: '40px', top: '40%', left: '45%', borderWidth: '2px' }}
+          />
+        )}
       </div>
 
-      <div className="px-2">
+      <div className="px-2 mb-4">
         <label className="form-label small text-secondary d-flex justify-content-between">
           <span>SIGNATURE</span>
           <span>COMPARE DRIFT</span>
@@ -57,9 +65,17 @@ export default function DriftVisualizer() {
         />
       </div>
 
-      <div className="mt-4 p-3 bg-dark rounded border border-danger border-opacity-25">
-        <div className="text-danger small fw-bold mb-1">ISSUE DETECTED: IDENTITY DRIFT</div>
-        <p className="text-secondary x-small m-0">"Bone structure in candidate image 04 deviates by 4.2% from Genesis Anchor. Reprocessing requested."</p>
+      <div className={`p-3 rounded border ${score < 0.9 ? 'border-danger bg-danger' : 'border-success bg-success'} bg-opacity-10`}>
+        <div className={`small fw-bold mb-1 ${score < 0.9 ? 'text-danger' : 'text-success'}`}>
+          {score < 0.9 ? 'IDENTITY DRIFT DETECTED' : 'VISUAL CONSISTENCY PASSED'}
+        </div>
+        <div className="h5 fw-bold mb-2">SCORE: {(score * 100).toFixed(1)}%</div>
+        {issues.length > 0 && (
+          <p className="text-secondary x-small m-0">"{issues[0]}"</p>
+        )}
+        {recommendations && (
+          <p className="text-white x-small mt-2 m-0 italic">{recommendations}</p>
+        )}
       </div>
     </div>
   );

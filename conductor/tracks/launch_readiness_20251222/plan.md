@@ -26,7 +26,7 @@
     - **Goal:** Replace mock ledger data with actual transaction history from `LedgerService`.
     - **Files:** `frontend/src/app/ledger/page.tsx` (update).
     - **Tests:** Verify ledger table displays real backend records.
-- [ ] Task: Wire Critic Feedback to DriftVisualizer
+- [~] Task: Wire Critic Feedback to DriftVisualizer
     - **Goal:** Ensure the Drift Visualizer displays real consistency scores from the production loop.
     - **Files:** `frontend/src/app/forge/page.tsx` (update).
 - [ ] Task: Conductor - User Manual Verification 'Data Flow' (Protocol in workflow.md)

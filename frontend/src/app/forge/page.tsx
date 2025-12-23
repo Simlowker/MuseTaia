@@ -1,17 +1,16 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import DriftVisualizer from '@/components/DriftVisualizer';
 import { useMood } from '@/context/MoodContext';
 
-const campaigns = [
-  { id: '1', title: 'Cyberpunk Awakening', status: 'In Production', progress: 75, date: '2025-12-23' },
-  { id: '2', title: 'Digital Couture Vlog', status: 'Verification', progress: 95, date: '2025-12-24' },
-  { id: '3', title: 'Metaverse Gallery Opening', status: 'Scheduled', progress: 0, date: '2025-12-26' },
-];
-
 export default function ForgePage() {
   const { accentColor } = useMood();
+  const [activeReport, setActiveReport] = useState({
+    score: 0.94,
+    issues: ["Minor lighting mismatch on left cheek"],
+    recommendations: "Increase soft light intensity in next prompt."
+  });
 
   return (
     <div className="row g-4">
@@ -23,7 +22,7 @@ export default function ForgePage() {
       {/* Production Timeline */}
       <div className="col-lg-8">
         <div className="glass-card mb-4 h-100">
-          <h4 className="fw-bold mb-4">PRODUCTION TIMELINE</h4>
+          <h4 className="fw-bold mb-4">PRODUCTION QUEUE</h4>
           <div className="table-responsive">
             <table className="table table-dark table-hover align-middle border-secondary">
               <thead>
@@ -35,26 +34,42 @@ export default function ForgePage() {
                 </tr>
               </thead>
               <tbody>
-                {campaigns.map((c) => (
-                  <tr key={c.id}>
-                    <td>
-                      <span className="text-white fw-bold">{c.title}</span><br/>
-                      <span className="x-small text-secondary">#campaign_{c.id}</span>
-                    </td>
-                    <td>
-                      <span className="badge bg-dark border border-secondary">{c.status}</span>
-                    </td>
-                    <td style={{ width: '200px' }}>
-                      <div className="progress bg-dark" style={{ height: '4px' }}>
-                        <div 
-                          className="progress-bar" 
-                          style={{ width: `${c.progress}%`, backgroundColor: accentColor }}
-                        />
-                      </div>
-                    </td>
-                    <td className="small text-secondary">{c.date}</td>
-                  </tr>
-                ))}
+                <tr>
+                  <td>
+                    <span className="text-white fw-bold">Cyberpunk Awakening</span><br/>
+                    <span className="x-small text-secondary">#campaign_01</span>
+                  </td>
+                  <td>
+                    <span className="badge bg-dark border border-secondary text-info">RENDERING</span>
+                  </td>
+                  <td style={{ width: '200px' }}>
+                    <div className="progress bg-dark" style={{ height: '4px' }}>
+                      <div 
+                        className="progress-bar progress-bar-striped progress-bar-animated" 
+                        style={{ width: '75%', backgroundColor: accentColor }}
+                      />
+                    </div>
+                  </td>
+                  <td className="small text-secondary">TODAY</td>
+                </tr>
+                <tr>
+                  <td>
+                    <span className="text-white fw-bold">Identity Sync Test</span><br/>
+                    <span className="x-small text-secondary">#regression_v12</span>
+                  </td>
+                  <td>
+                    <span className="badge bg-dark border border-success text-success">PASSED</span>
+                  </td>
+                  <td style={{ width: '200px' }}>
+                    <div className="progress bg-dark" style={{ height: '4px' }}>
+                      <div 
+                        className="progress-bar" 
+                        style={{ width: '100%', backgroundColor: accentColor }}
+                      />
+                    </div>
+                  </td>
+                  <td className="small text-secondary">2025-12-23</td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -63,7 +78,11 @@ export default function ForgePage() {
 
       {/* The Critic Dashboard Side */}
       <div className="col-lg-4">
-        <DriftVisualizer />
+        <DriftVisualizer 
+          score={activeReport.score}
+          issues={activeReport.issues}
+          recommendations={activeReport.recommendations}
+        />
       </div>
     </div>
   );

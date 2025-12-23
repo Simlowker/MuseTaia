@@ -30,27 +30,22 @@ class DirectorAgent:
         duration_seconds: int = 5,
         resolution: str = "1080p",
         shot_type: ShotType = ShotType.MEDIUM,
-        camera_movement: CameraMovement = CameraMovement.STATIC
+        camera_movement: CameraMovement = CameraMovement.STATIC,
+        temporal_segments: Optional[List[Dict[str, Any]]] = None
     ) -> bytes:
-        """Generates a video based on a prompt and optional reference images.
-
-        Args:
-            prompt: The text description of the motion and scene.
-            image_bytes: Optional starting frame (Image-to-Video).
-            reference_images: Optional list of (image_bytes, reference_type) tuples.
-                             Types are usually 'ASSET' or 'STYLE'.
-            duration_seconds: Target length of the clip.
-            resolution: Output resolution (e.g., '1080p', '720p').
-            shot_type: Standard cinematographic shot type.
-            camera_movement: Camera movement type.
-
-        Returns:
-            bytes: The raw video data of the first generated video.
-        """
+        """Generates a video with precise temporal orchestration."""
         
-        # Construct cinematic prompt
+        # 1. Construct Base Cinematic Prompt
         cinematic_directives = f"Shot type: {shot_type.value}. Camera movement: {camera_movement.value}."
-        full_prompt = f"{cinematic_directives} {prompt}"
+        
+        # 2. Add Temporal Segments (v2 Feature)
+        segment_directives = ""
+        if temporal_segments:
+            for seg in temporal_segments:
+                segment_directives += f" [{seg['start']}-{seg['end']}]: {seg['action']}."
+        
+        full_prompt = f"{cinematic_directives} {segment_directives} {prompt}"
+
         
         image = None
         if image_bytes:

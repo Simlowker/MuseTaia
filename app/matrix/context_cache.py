@@ -1,59 +1,54 @@
-"""Module for managing Vertex AI Context Caching."""
+"""Module for managing Vertex AI Context Caching via google-genai SDK."""
 
 import datetime
-from typing import Optional, Any
-from google.cloud import aiplatform
-# Note: As of late 2024/early 2025, context caching might be under specific beta namespaces
-# or require specific import paths. Adjusting to standard aiplatform usage for now.
-# Real implementation would depend on the exact SDK version support for Context Caching.
-
+from typing import Optional, Any, List
+import google.genai as genai
+from google.genai import types
+from app.core.config import settings
 
 class ContextCacheManager:
-    """Manages the lifecycle of context caches in Vertex AI."""
+    """Manages the lifecycle of explicit context caches in Vertex AI.
+    
+    Used for storing Style Bibles, few-shot examples, and the Matrix DNA
+    to reduce latency and costs for long-context interactions.
+    """
 
     def __init__(self):
-        """Initializes the context cache manager."""
-        # Ensure Vertex AI is initialized
-        pass
+        self.client = genai.Client(
+            vertexai=True,
+            project=settings.PROJECT_ID,
+            location=settings.LOCATION
+        )
 
-    def create_cache(self, content: str, ttl_seconds: int = 3600) -> str:
-        """Creates a new context cache with the provided content.
+    def create_explicit_cache(
+        self, 
+        model_name: str, 
+        contents: List[types.Content], 
+        ttl_minutes: int = 60
+    ) -> str:
+        """Creates a new explicit context cache.
 
         Args:
-            content: The text content to cache.
-            ttl_seconds: Time to live for the cache in seconds.
+            model_name: The Gemini model (e.g. 'gemini-1.5-pro-002').
+            contents: The data to be cached (System instructions + Examples).
+            ttl_minutes: Time to live.
 
         Returns:
-            str: The resource name of the created cache.
+            str: The cache resource name.
         """
-        # In a real implementation, we would construct the Content/Part objects
-        # properly for the Gemini API.
-        # This uses the SDK's high-level abstraction if available.
-        
-        # Example usage of what the SDK call might look like:
-        cache = aiplatform.CachedContent.create(
-            model_name="gemini-1.5-pro-001", # Example model supporting caching
-            contents=[content], # Simplified for this interface
-            ttl=datetime.timedelta(seconds=ttl_seconds),
+        cache = self.client.caches.create(
+            model=model_name,
+            config=types.CreateCacheConfig(
+                contents=contents,
+                ttl_seconds=ttl_minutes * 60
+            )
         )
         return cache.name
 
     def get_cache(self, cache_name: str) -> Any:
-        """Retrieves a cache object by name.
-
-        Args:
-            cache_name: The resource name of the cache.
-
-        Returns:
-            Any: The cached content object.
-        """
-        return aiplatform.CachedContent.get(cache_name)
+        """Retrieves a cache object by name."""
+        return self.client.caches.get(name=cache_name)
 
     def delete_cache(self, cache_name: str) -> None:
-        """Deletes a context cache.
-
-        Args:
-            cache_name: The resource name of the cache to delete.
-        """
-        cache = self.get_cache(cache_name)
-        cache.delete()
+        """Deletes a context cache."""
+        self.client.caches.delete(name=cache_name)

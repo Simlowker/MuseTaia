@@ -1,5 +1,6 @@
-"""NarrativeAgent implementation."""
+"""NarrativeAgent implementation with High-Fidelity Attention Dynamics."""
 
+from typing import List, Optional
 import google.genai as genai
 from google.genai import types
 from pydantic import BaseModel, Field
@@ -7,22 +8,25 @@ from app.core.config import settings
 from app.agents.prompts.narrative import NARRATIVE_SYSTEM_INSTRUCTION
 from app.state.models import Mood
 
+class AttentionDynamics(BaseModel):
+    """Dynamic markers to maintain viewer retention."""
+    hook_intensity: float = Field(..., ge=0.0, le=1.0, description="Strength of the initial 3 seconds")
+    pattern_interrupts: List[str] = Field(..., description="Visual/Audio shifts triggered every 8 seconds")
+    tempo_curve: List[float] = Field(..., description="Wavelength of energy throughout the script")
+
 class ScriptOutput(BaseModel):
-    """Structured output for a generated script."""
+    """High-Fidelity structured output for a generated script."""
     title: str = Field(description="The title of the content piece")
-    script: str = Field(description="The full script including visual and audio cues")
-    caption: str = Field(description="Social media caption with hashtags")
+    script: str = Field(description="Full script with [00:00] temporal tags and [VISUAL/AUDIO] cues")
+    caption: str = Field(description="Social media caption with conversion-optimized hashtags")
     estimated_duration: int = Field(description="Estimated duration in seconds")
+    attention_dynamics: AttentionDynamics = Field(description="Retention-focused technical metadata")
 
 class NarrativeAgent:
-    """The Screenwriter agent responsible for generating text-based content."""
+    """The Screenwriter agent responsible for high-fidelity narrative production."""
 
     def __init__(self, model_name: str = "gemini-3.0-pro"):
-        """Initializes the NarrativeAgent.
-
-        Args:
-            model_name: The name of the Gemini model to use.
-        """
+        """Initializes the NarrativeAgent."""
         self.client = genai.Client(
             vertexai=True,
             project=settings.PROJECT_ID,
@@ -34,25 +38,23 @@ class NarrativeAgent:
         )
 
     def generate_content(self, topic: str, mood: Mood) -> ScriptOutput:
-        """Generates a script and caption based on a topic and current mood.
-
-        Args:
-            topic: The subject matter or intent.
-            mood: The current emotional state of the Muse.
-
-        Returns:
-            ScriptOutput: The structured content.
-        """
+        """Generates a high-fidelity script with attention dynamics logic."""
         
         prompt = f"""
+        You are the Narrative Architect for the Muse.
         Topic: {topic}
         
         Current Mood:
-        - Valence: {mood.valence}
-        - Arousal: {mood.arousal}
+        - Valence: {mood.valence} / Arousal: {mood.arousal}
         - Current Thought: {mood.current_thought}
         
-        IMPORTANT: Use Google Search to verify any specific cultural references, dates, or slang terms to ensure authenticity and accuracy before writing the script.
+        TASK:
+        1. Use Google Search to verify cultural authenticity.
+        2. Implement 'Pattern Interruption': Force a drastic shift in tone or visual every 8 seconds.
+        3. Use temporal tags [00:00] throughout the script for precise Veo 3.1 synchronization.
+        4. Define the AttentionDynamics metadata for the Forge.
+        
+        Return a high-fidelity ScriptOutput JSON.
         """
 
         response = self.client.models.generate_content(
@@ -60,9 +62,7 @@ class NarrativeAgent:
             contents=[
                 types.Content(
                     role="user",
-                    parts=[
-                        types.Part.from_text(text=prompt)
-                    ]
+                    parts=[types.Part.from_text(text=prompt)]
                 )
             ],
             config=types.GenerateContentConfig(

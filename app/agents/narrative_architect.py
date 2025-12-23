@@ -13,37 +13,34 @@ class NarrativeArchitect(NarrativeAgent):
     """
 
     def plan_production_nodes(self, script: ScriptOutput) -> List[Dict[str, Any]]:
-        """Decomposes a script into specific technical nodes for the production pipeline.
-        
-        Args:
-            script: The structured script output.
-            
-        Returns:
-            List[Dict]: A sequence of production nodes (e.g., 'keyframe_gen', 'upscale', 'motion').
-        """
-        # Decompose the script into distinct scenes/nodes
-        # This is a simplified logic for the architectural task.
+        """Decomposes a script into nodes with retention-optimized pattern interrupts."""
         nodes = []
         
-        # 1. Image Generation Node
+        # 1. Base Visual Gen
         nodes.append({
             "type": "visual_gen",
             "prompt": script.title,
-            "params": {"aspect_ratio": "16:9", "fidelity": "high"}
+            "params": {"vvs_boost": script.attention_dynamics.hook_intensity}
         })
         
-        # 2. Upscaling Node
-        nodes.append({
-            "type": "upscale",
-            "method": "latent_bicubic",
-            "scale_factor": 2
-        })
+        # 2. Pattern Interrupt Nodes (Every 8s)
+        # We inject specific technical triggers based on attention_dynamics
+        for i, interrupt in enumerate(script.attention_dynamics.pattern_interrupts):
+            timestamp = (i + 1) * 8
+            if timestamp < script.estimated_duration:
+                nodes.append({
+                    "type": "pattern_interrupt",
+                    "trigger_time": timestamp,
+                    "action": interrupt,
+                    "severity": "high"
+                })
         
-        # 3. Motion Node (Veo)
+        # 3. Motion & Final Delivery
         nodes.append({
             "type": "motion_gen",
             "duration": script.estimated_duration,
-            "style": "cinematic"
+            "tempo_curve": script.attention_dynamics.tempo_curve
         })
         
         return nodes
+

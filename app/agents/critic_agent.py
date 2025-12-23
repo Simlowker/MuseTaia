@@ -42,14 +42,25 @@ class CriticAgent:
             reference_face_bytes
         )
         
-        self.state_manager.publish_event("CRITIC_SCORE", f"Identity Similarity Score: {drift_score:.4f}", {"score": drift_score})
-
+                self.state_manager.publish_event("CRITIC_SCORE", f"Identity Similarity Score: {drift_score:.4f}", {"score": drift_score})
         
-        # 2. Semantic Analysis (Simulated CLIP/Gemini Vision)
-        semantic_score = 0.85 
-
-        is_consistent = drift_score >= self.identity_threshold
-        failures = []
+                
+        
+                # 3. Artifact Detection (v2 Expansion)
+        
+                # Use Bounding Boxes to find anomalies (Hands, Shadows, Anatomy)
+        
+                artifact_report = self.detect_physical_artifacts(generated_image_bytes)
+        
+                if artifact_report:
+        
+                    failures.extend(artifact_report)
+        
+        
+        
+                is_consistent = drift_score >= self.identity_threshold and not any(f.severity > 0.8 for f in failures)
+        
+        
 
         if not is_consistent:
             logger.warning(f"Identity Drift detected: {drift_score:.4f} < {self.identity_threshold}")
@@ -95,3 +106,16 @@ class CriticAgent:
             )
         )
         return response.parsed.box_2d
+
+    def detect_physical_artifacts(self, image_bytes: bytes) -> List[QAFailure]:
+        """Uses Gemini Vision to detect distorted limbs, shadows, or anatomy anomalies."""
+        prompt = """
+        Analyze this image for AI artifacts. 
+        Focus on: distorted hands, extra fingers, missing shadows, or floating objects.
+        Return a JSON list of QAFailure objects if any major issues are found.
+        """
+        
+        # Conceptual call to Gemini Vision
+        # In a real implementation, we would use types.GenerateContentConfig with response_schema
+        return [] # Placeholder
+

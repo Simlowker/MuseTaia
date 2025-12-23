@@ -84,8 +84,30 @@ class IdentityLockedWorkflow:
             "7": {"class_type": "EmptyLatentImage", "inputs": {"width": 1024, "height": 1024, "batch_size": 1}},
             
             # VAE Decode
-            "8": {"class_type": "VAEDecode", "inputs": {"samples": ["6", 0], "vae": ["1", 2]}}
+            "8": {"class_type": "VAEDecode", "inputs": {"samples": ["6", 0], "vae": ["1", 2]}},
+
+            # Depth Analysis (Depth Anything V2)
+            "10": {
+                "class_type": "DepthAnythingV2_Estimator",
+                "inputs": {
+                    "image": ["8", 0],
+                    "model": "depth_anything_v2_vitl.safetensors"
+                }
+            },
+
+            # Bokeh / Cinematic Blur
+            "11": {
+                "class_type": "LensBokeh",
+                "inputs": {
+                    "image": ["8", 0],
+                    "depth_map": ["10", 0],
+                    "focus_distance": 0.5,
+                    "aperture": 2.8,
+                    "blur_radius": 15.0
+                }
+            }
         }
+
 
         if pose_ref_path:
             workflow["9"] = {

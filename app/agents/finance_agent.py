@@ -107,7 +107,24 @@ class CFOAgent:
             
         return decision
 
+    def allocate_compute_burst(self, vvs_score: float) -> int:
+        """Dynamically determines the N-sampling depth (Best-of-N) based on VVS.
+        
+        Governance Rule:
+        - VVS > 90: N=10 (Massive Burst)
+        - VVS > 80: N=5 (Strategic Burst)
+        - VVS > 60: N=2 (Confidence Check)
+        - Else: N=1 (Standard Production)
+        """
+        logger.info(f"CFO_BURST: Allocating compute for VVS {vvs_score:.2f}")
+        
+        if vvs_score > 90: return 10
+        if vvs_score > 80: return 5
+        if vvs_score > 60: return 2
+        return 1
+
     def settle_production_cost(self, cost_estimate: float, task_id: str) -> Transaction:
+
         """Records a production expense in the ledger."""
         tx = self.ledger_service.record_transaction(
             amount=cost_estimate,

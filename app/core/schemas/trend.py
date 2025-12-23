@@ -32,6 +32,12 @@ class IntentObject(BaseModel):
     parameters: dict = Field(default_factory=dict, description="Additional CLI-style flags and values")
     raw_intent: str = Field(..., description="Original descriptive intent")
 
+class ViralVelocity(BaseModel):
+    """Metrics for the Viral Velocity Score (VVS)."""
+    score: float = Field(..., ge=0.0, le=10.0, description="Overall velocity score (0-10)")
+    acceleration: str = Field(..., description="Rising, Peaking, or Stagnant")
+    engagement_rate: float = Field(..., description="Normalized engagement (likes/shares per hour)")
+
 class TrendReport(BaseModel):
     """Structured analysis of a specific trend or topic."""
     topic: str = Field(..., description="The main subject of the trend")
@@ -39,6 +45,8 @@ class TrendReport(BaseModel):
     sentiment: Sentiment = Field(..., description="General sentiment of the trend")
     relevance: RelevanceScore = Field(..., description="Relevance to the Muse's persona")
     reasoning: str = Field(..., description="Why this relevance score was assigned")
+    vvs: Optional[ViralVelocity] = Field(None, description="Viral Velocity Score metrics")
+    estimated_roi: float = Field(0.0, description="Estimated return on investment (Engagement potential / Cost)")
     intent: Optional[IntentObject] = Field(None, description="Standardized system intent if relevant")
     keywords: List[str] = Field(default_factory=list, description="Associated hashtags or keywords")
     source_links: List[str] = Field(default_factory=list, description="URLs used for grounding")

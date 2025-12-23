@@ -75,15 +75,23 @@ class StrategistAgent:
         except:
             return {"raw_strategy": response.text}
 
-    def evaluate_production_roi(self, trend_score: float, cost_estimate: int) -> bool:
-        """Evaluates if a production task is worth the investment.
+    def evaluate_production_roi(self, trend_report: Any, cost_estimate: float) -> bool:
+        """Evaluates if a production task is worth the investment based on VVS and ROI.
         
         Args:
-            trend_score: The virality/relevance score from TrendScout.
-            cost_estimate: The estimated credit cost.
+            trend_report: The full TrendReport from TrendScout.
+            cost_estimate: The estimated USD cost.
             
         Returns:
             bool: True if production is approved.
         """
-        # Heuristic: Approve if trend_score * 10 > cost_estimate
-        return (trend_score * 10) >= cost_estimate
+        # Improved Heuristic: Use the estimated ROI from TrendScout
+        # Approve if ROI > 1.2 (20% margin) or VVS is Peaking (> 7.0)
+        
+        vvs_score = trend_report.vvs.score if trend_report.vvs else 0.0
+        roi = trend_report.estimated_roi
+        
+        if trend_report.vvs and trend_report.vvs.acceleration == "Peaking":
+            return True # Always capture peaks
+            
+        return roi >= 1.2 or (vvs_score * 0.5) >= cost_estimate

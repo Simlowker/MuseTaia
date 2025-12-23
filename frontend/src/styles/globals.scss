@@ -1,0 +1,44 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+
+:root {
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-blur: blur(10px);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #050505;
+  color: #ffffff;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
+}
+
+.sovereign-shell {
+  min-height: 100vh;
+  position: relative;
+  background: radial-gradient(circle at center, #111 0%, #000 100%);
+  transition: border-color 0.5s ease;
+}
+
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.accent-border {
+  border-color: var(--accent-color) !important;
+}
+
+.accent-text {
+  color: var(--accent-color) !important;
+}
+
+.accent-bg {
+  background-color: var(--accent-color) !important;
+}

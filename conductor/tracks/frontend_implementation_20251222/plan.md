@@ -1,13 +1,13 @@
 # Track Plan: Sovereign Frontend (Sovereign Minimalism 2.0)
 
 ## Phase 1: Environment Setup & Core Shell
-- [ ] Task: Initialize Next.js Project
+- [x] Task: Initialize Next.js Project
     - **Goal:** Set up the frontend project structure with TypeScript and Bootstrap CSS.
     - **Files:** `frontend/`, `frontend/package.json`
     - **Tech:** Next.js, Bootstrap 5, Material Design components.
-- [ ] Task: Implement Glassmorphism Layout (Sovereign Shell)
+- [x] Task: Implement Glassmorphism Layout (Sovereign Shell)
     - **Goal:** Create the core layout with Z-index layers and the dynamic mood-based color provider.
-    - **Files:** `frontend/components/Layout.tsx`, `frontend/context/MoodContext.tsx`
+    - **Files:** `frontend/src/components/Layout.tsx`, `frontend/src/context/MoodContext.tsx`
     - **Tech:** CSS Modules, React Context.
 - [ ] Task: Conductor - User Manual Verification 'Core Shell' (Protocol in workflow.md)
 

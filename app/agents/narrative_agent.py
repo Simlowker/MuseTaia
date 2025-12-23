@@ -1,6 +1,7 @@
 """NarrativeAgent implementation with High-Fidelity Attention Dynamics."""
 
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
+import logging
 import google.genai as genai
 from google.genai import types
 from pydantic import BaseModel, Field
@@ -8,6 +9,9 @@ from app.core.config import settings
 from app.agents.prompts.narrative import NARRATIVE_SYSTEM_INSTRUCTION
 from app.state.models import Mood
 from app.core.vertex_init import get_genai_client
+from app.agents.base_worker import BaseWorker, WorkerOutput
+
+logger = logging.getLogger(__name__)
 
 class AttentionDynamics(BaseModel):
     """Dynamic markers to maintain viewer retention."""
@@ -23,16 +27,33 @@ class ScriptOutput(BaseModel):
     estimated_duration: int = Field(description="Estimated duration in seconds")
     attention_dynamics: AttentionDynamics = Field(description="Retention-focused technical metadata")
 
-class NarrativeAgent:
+class NarrativeAgent(BaseWorker):
     """The Screenwriter agent responsible for high-fidelity narrative production."""
 
-    def __init__(self, model_name: str = "gemini-3.0-pro"):
+    def __init__(self, agent_id: str = "narrative_01", model_name: str = "gemini-3.0-pro"):
         """Initializes the NarrativeAgent."""
+        super().__init__(agent_id=agent_id, agent_type="narrative")
         self.client = get_genai_client()
         self.model_name = model_name
         self.search_tool = types.Tool(
             google_search=types.GoogleSearch()
         )
+
+    async def execute_task(self, instruction: str, context: Dict[str, Any]) -> WorkerOutput:
+        """HLP/Worker contract: Executes narrative generation."""
+        logger.info(f"WORKER: NarrativeAgent {self.agent_id} executing task: {instruction}")
+        
+        mood = context.get("mood", Mood())
+        try:
+            result = self.generate_content(instruction, mood)
+            return WorkerOutput(
+                status="success",
+                data=result.model_dump(),
+                artifacts=[]
+            )
+        except Exception as e:
+            logger.error(f"WORKER: NarrativeAgent failed: {e}")
+            return WorkerOutput(status="failure", data={"error": str(e)})
 
     def generate_content(self, topic: str, mood: Mood) -> ScriptOutput:
         """Generates a high-fidelity script with attention dynamics logic."""
@@ -45,11 +66,11 @@ class NarrativeAgent:
         - Valence: {mood.valence} / Arousal: {mood.arousal}
         - Current Thought: {mood.current_thought}
         
-        TASK:
+        STRICT RETENTION RULES:
         1. Use Google Search to verify cultural authenticity.
-        2. Implement 'Pattern Interruption': Force a drastic shift in tone or visual every 8 seconds.
-        3. Use temporal tags [00:00] throughout the script for precise Veo 3.1 synchronization.
-        4. Define the AttentionDynamics metadata for the Forge.
+        2. PATTERN INTERRUPTION: You MUST insert a drastic shift (camera angle, lighting change, glitch, or sound effect) at exactly [00:08], [00:16], [00:24], etc.
+        3. TEMPORAL TAGGING: Use tags like [00:00-00:02] for EVERY shot description to sync with Veo 3.1.
+        4. DEFINITION: Populate the AttentionDynamics metadata with the specific timestamps and types of interrupts used.
         
         Return a high-fidelity ScriptOutput JSON.
         """

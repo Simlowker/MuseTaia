@@ -1,9 +1,14 @@
 """Librarian Agent for viral structure extraction and semantic retrieval."""
 
+import logging
+import json
 import google.genai as genai
 from google.genai import types
 from typing import List, Optional, Any, Dict
 from app.core.config import settings
+from app.core.vertex_init import get_genai_client
+
+logger = logging.getLogger(__name__)
 
 class Librarian:
     """Agent that manages the Muse's 'Experience Memory'.
@@ -19,11 +24,7 @@ class Librarian:
         Args:
             model_name: The name of the model to use for analysis.
         """
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
 
     def extract_viral_structure(self, content: str) -> Dict[str, Any]:
@@ -48,26 +49,27 @@ class Librarian:
         - viral_score: Estimated virality from 1-10.
         """
 
-        response = self.client.models.generate_content(
-            model=self.model_name,
-            contents=[
-                types.Content(
-                    role="user",
-                    parts=[types.Part.from_text(text=prompt)]
-                )
-            ],
-            config=types.GenerateContentConfig(
-                response_mime_type="application/json"
-            )
-        )
-
-        # The response.parsed might be a dict if response_mime_type is application/json
-        # and it can be parsed.
-        import json
         try:
+            response = self.client.models.generate_content(
+                model=self.model_name,
+                contents=[
+                    types.Content(
+                        role="user",
+                        parts=[types.Part.from_text(text=prompt)]
+                    )
+                ],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
+            )
+
             return json.loads(response.text)
-        except:
-            return {"raw_analysis": response.text}
+        except json.JSONDecodeError as e:
+            logger.warning(f"LIBRARIAN: Failed to parse JSON response: {e}. Raw: {response.text[:200]}")
+            return {"raw_analysis": response.text, "parse_error": str(e)}
+        except Exception as e:
+            logger.error(f"LIBRARIAN: Unexpected error during viral extraction: {e}")
+            raise
 
     def get_embeddings(self, text: str) -> List[float]:
         """Generates embeddings for the given text.

@@ -93,3 +93,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: System Repair & Stabilization (2025-12-23)
 *Link: [./conductor/tracks/system_repair_20251223/](./conductor/tracks/system_repair_20251223/)*
+
+## [x] Track: Scale & Cinematic Upgrade (2025-12-23)
+*Link: [./conductor/tracks/scale_cinematic_upgrade_20251223/](./conductor/tracks/scale_cinematic_upgrade_20251223/)*

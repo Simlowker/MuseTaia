@@ -3,6 +3,7 @@
 import json
 import logging
 import uuid
+import redis
 from typing import List, Optional
 from app.core.redis_client import get_redis_client
 from app.state.models import Wallet

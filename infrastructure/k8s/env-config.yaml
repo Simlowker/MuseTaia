@@ -4,11 +4,12 @@ metadata:
   name: smos-secrets
 type: Opaque
 stringData:
-  # Remplacer par vos valeurs réelles lors du déploiement
-  GOOGLE_API_KEY: "AIzaSyDt8gv6wlQWnQbeUJVxri-9DtS0ISZLKew"
-  GOOGLE_OAUTH_CLIENT_ID: "945488165750-87lj17fndqe5np03sv6r6m9d0m0tl333.apps.googleusercontent.com"
-  GOOGLE_OAUTH_CLIENT_SECRET: "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"
-  APIFY_TOKEN: "VOTRE_TOKEN_APIFY"
+  # IMPORTANT: These are placeholders. Use Google Secret Manager or K8s External Secrets for production.
+  # The keys previously here were compromised and must be revoked.
+  GOOGLE_API_KEY: "REPLACE_WITH_SECURE_KEY"
+  GOOGLE_OAUTH_CLIENT_ID: "REPLACE_WITH_CLIENT_ID"
+  GOOGLE_OAUTH_CLIENT_SECRET: "REPLACE_WITH_CLIENT_SECRET"
+  APIFY_TOKEN: "REPLACE_WITH_APIFY_TOKEN"
 ---
 apiVersion: v1
 kind: ConfigMap

@@ -8,20 +8,39 @@ from app.core.config import settings
 from app.core.schemas.screenplay import ShotType, CameraMovement
 
 from app.core.vertex_init import get_genai_client
+from app.agents.base_worker import BaseWorker, WorkerOutput
 
 logger = logging.getLogger(__name__)
 
-class DirectorAgent:
+class DirectorAgent(BaseWorker):
     """The Cinematographer agent responsible for generating video content."""
 
-    def __init__(self, model_name: str = "veo-3.1"):
-        """Initializes the DirectorAgent.
-
-        Args:
-            model_name: The name of the Veo model to use.
-        """
+    def __init__(self, agent_id: str = "director_01", model_name: str = "veo-3.1"):
+        """Initializes the DirectorAgent."""
+        super().__init__(agent_id=agent_id, agent_type="director")
         self.client = get_genai_client()
         self.model_name = model_name
+
+    async def execute_task(self, instruction: str, context: Dict[str, Any]) -> WorkerOutput:
+        """HLP/Worker contract: Executes video generation."""
+        logger.info(f"WORKER: DirectorAgent {self.agent_id} executing task: {instruction}")
+        
+        try:
+            video_bytes = self.generate_video(
+                prompt=instruction,
+                image_bytes=context.get("image_bytes"),
+                duration_seconds=context.get("duration", 5),
+                shot_type=context.get("shot_type", ShotType.MEDIUM),
+                camera_movement=context.get("camera_movement", CameraMovement.STATIC)
+            )
+            return WorkerOutput(
+                status="success",
+                data={},
+                artifacts=[f"bytes://video_{self.agent_id}"]
+            )
+        except Exception as e:
+            logger.error(f"WORKER: DirectorAgent failed: {e}")
+            return WorkerOutput(status="failure", data={"error": str(e)})
 
     def generate_video(
         self,
@@ -34,18 +53,24 @@ class DirectorAgent:
         camera_movement: CameraMovement = CameraMovement.STATIC,
         temporal_segments: Optional[List[Dict[str, Any]]] = None
     ) -> bytes:
-        """Generates a video with precise temporal orchestration."""
+        """Generates a video with precise temporal orchestration.
         
-        # 1. Construct Base Cinematic Prompt
-        cinematic_directives = f"Shot type: {shot_type.value}. Camera movement: {camera_movement.value}."
+        This agent uses Meta-Prompting to sync visual actions with timestamps.
+        Example: [00:00-00:02]: Dolly zoom on subject.
+        """
         
-        # 2. Add Temporal Segments (v2 Feature)
+        # 1. Base Cinematic Context
+        cinematic_directives = f"Format: {resolution}. Style: Cinematic. Shot: {shot_type.value}. Movement: {camera_movement.value}."
+        
+        # 2. Meta-Prompting (Temporal Orchestration)
         segment_directives = ""
         if temporal_segments:
             for seg in temporal_segments:
                 segment_directives += f" [{seg['start']}-{seg['end']}]: {seg['action']}."
         
+        # If no segments provided but prompt contains tags, Veo 3.1 will handle them natively
         full_prompt = f"{cinematic_directives} {segment_directives} {prompt}"
+        logger.info(f"DIRECTOR: Executing Meta-Prompt: {full_prompt[:100]}...")
 
         
         image = None

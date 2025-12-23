@@ -128,6 +128,38 @@ class WorkflowEngine:
         logger.warning(f"HITL_GATE: Timeout waiting for approval on {task_id}")
         return False
 
+    def produce_best_of_n_video(
+        self, 
+        intent: str, 
+        mood: Mood, 
+        subject_id: str,
+        n: int = 3
+    ) -> Dict[str, Any]:
+        """Generates N variants of a video and selects the best one based on VideoScore2."""
+        logger.info(f"WORKFLOW: Launching Best-of-{n} production for '{intent}'")
+        
+        candidates = []
+        for i in range(n):
+            logger.info(f"WORKFLOW: Generating variant {i+1}/{n}...")
+            # We use a slightly different seed or prompt variation if supported
+            # For now, we just rely on model stochasticity
+            production = self.produce_video_content(intent, mood, subject_id)
+            
+            # Score the candidate
+            score = self.critic_agent.score_video_quality(
+                production["video_bytes"], 
+                production["title"] # Or the optimized prompt
+            )
+            production["quality_score"] = score
+            candidates.append(production)
+            logger.info(f"WORKFLOW: Variant {i+1} Score: {score:.4f}")
+
+        # Selection (Arbitration)
+        best_production = max(candidates, key=lambda x: x["quality_score"])
+        logger.info(f"WORKFLOW: Best-of-{n} winner selected with score: {best_production['quality_score']:.4f}")
+        
+        return best_production
+
     def produce_video_content(
         self, 
         intent: str, 

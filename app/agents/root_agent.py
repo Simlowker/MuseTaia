@@ -10,93 +10,88 @@ from app.agents.protocols.master_sync import MasterSyncProtocol, CommandIntent
 from app.agents.orchestrator import Orchestrator, TaskGraph
 from app.core.vertex_init import get_genai_client
 
-class RootAgent:
-    """The central nervous system of the SMOS swarm.
+class HighLevelPlanner:
+
+    """The High Level Planner (HLP) of the SMOS swarm.
+
     
+
     This agent represents the 'High Cognition Lobe' (The Brain).
-    It handles:
-    1. Sensory Integration (Perception -> Reaction)
-    2. Intent Parsing (Single-Master Protocol)
-    3. Workflow Orchestration (ADK Task Graphs)
+
+    It is responsible for:
+
+    1. High-level intent analysis and strategic planning.
+
+    2. Delegation of technical tasks to specialized Workers.
+
+    3. Management of the collective swarm intelligence.
+
     """
 
-    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
-        """Initializes the RootAgent.
 
-        Args:
-            model_name: The name of the Gemini model to use.
-        """
+
+    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
+
+        """Initializes the HLP."""
+
         self.client = get_genai_client()
+
         self.chat_session = self.client.chats.create(
 
             model=model_name,
+
             config=types.GenerateContentConfig(
-                system_instruction="You are the RootAgent of the Sovereign Muse OS."
+
+                system_instruction=(
+
+                    "You are the High Level Planner (HLP) of the Sovereign Muse OS. "
+
+                    "Your role is to decompose complex goals into actionable tasks for specialized workers. "
+
+                    "You do not perform technical tasks yourself; you are the strategist and orchestrator."
+
+                )
+
             )
+
         )
+
         self.state_manager = StateManager()
+
         self.master_sync = MasterSyncProtocol()
+
         self.orchestrator = Orchestrator()
 
-    def ping(self) -> str:
-        """Sends a ping to the agent to verify connectivity.
 
-        Returns:
-            str: The agent's response.
-        """
-        response = self.chat_session.send_message("Ping")
-        return response.text
-
-    def process_sensory_input(self, stimulus: str) -> str:
-        """Processes real-time sensory data and updates the Muse's internal thought state.
-
-        Args:
-            stimulus: A description of what the Muse just perceived (Vision/Audio).
-
-        Returns:
-            str: The updated internal thought or reaction.
-        """
-        
-        prompt = f"""
-        SENSORY INPUT: "{stimulus}"
-        
-        You just perceived this in real-time. 
-        How does this affect your current thought process? 
-        Briefly update your internal monologue (1-2 sentences).
-        """
-        
-        response = self.chat_session.send_message(prompt)
-        reaction = response.text.strip()
-        
-        # Update shared state
-        current_mood = self.state_manager.get_mood()
-        current_mood.current_thought = reaction
-        self.state_manager.update_mood(current_mood)
-        
-        return reaction
-
-    def parse_and_route(self, command_text: str, source_override: Optional[str] = None) -> CommandIntent:
-        """Parses a command and routes it through the Single-Master Protocol.
-        
-        Args:
-            command_text: The raw user or system command.
-            source_override: Explicit source ('human', 'community', 'system').
-            
-        Returns:
-            CommandIntent: The structured and validated intent.
-        """
-        intent = self.master_sync.parse_command(command_text, source_override)
-        return intent
 
     def execute_intent(self, intent: Any) -> TaskGraph:
-        """Standardizes an intent into an ADK Task Graph for execution.
+
+        """HLP Role: Decomposes a high-level intent into a delegated Task Graph.
+
         
+
         Args:
-            intent: A structured IntentObject (from TrendScanner) or CommandIntent.
+
+            intent: A structured IntentObject or CommandIntent.
+
             
+
         Returns:
-            TaskGraph: The executable graph of sub-agents.
+
+            TaskGraph: The executable graph of sub-agents (Workers).
+
         """
-        # Decompose the intent into sub-tasks via the Orchestrator
+
+        logger.info(f"HLP: Planning delegation for intent: {intent}")
+
+        # The Orchestrator acts as the HLP's tactical office
+
         task_graph = self.orchestrator.plan_execution(intent)
+
         return task_graph
+
+
+
+# RootAgent remains as an alias for backward compatibility during transition
+
+RootAgent = HighLevelPlanner

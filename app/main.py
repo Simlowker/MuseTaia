@@ -30,10 +30,10 @@ app = FastAPI(title="Sovereign Muse OS (SMOS) v2")
 # --- CORS CONFIGURATION ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production, replace with specific frontend domains
+    allow_origins=settings.get_allowed_origins(),
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # --- API MODELS ---
@@ -44,27 +44,52 @@ class GenesisRequest(BaseModel):
 
 # --- API ENDPOINTS ---
 
+@app.get("/")
+async def root():
+    """Root endpoint for system identification."""
+    return {"message": "Welcome to SMOS v2 - Autonomous Muse Engine"}
+
+@app.get("/health")
+async def health():
+    """Health check endpoint for GKE/Liveness probes."""
+    return {"status": "healthy", "timestamp": datetime.now(timezone.utc).isoformat()}
+
 @app.get("/stream/muse-status")
 async def stream_status(request: Request):
     """Server-Sent Events (SSE) endpoint for the high-observability vitrine."""
     redis_client = get_redis_client()
     pubsub = redis_client.pubsub()
-    pubsub.subscribe("smos:events:vitrine")
+    
+    try:
+        pubsub.subscribe("smos:events:vitrine")
+    except Exception as e:
+        logger.error(f"SSE: Failed to subscribe to Redis: {e}")
+        raise HTTPException(status_code=500, detail="StateDB connection failed")
 
     async def event_generator():
         try:
             while True:
                 # Check for disconnection
                 if await request.is_disconnected():
+                    logger.info("SSE: Client disconnected from vitrine stream.")
                     break
                 
-                message = pubsub.get_message(ignore_subscribe_none=True)
+                # Get message with timeout to allow heartbeat
+                message = pubsub.get_message(ignore_subscribe_none=True, timeout=1.0)
                 if message:
                     yield f"data: {message['data'].decode('utf-8')}\n\n"
+                else:
+                    # Heartbeat to keep connection alive
+                    yield ": heartbeat\n\n"
                 
                 await asyncio.sleep(0.5)
+        except asyncio.CancelledError:
+            logger.info("SSE: Stream cancelled by server.")
+        except Exception as e:
+            logger.error(f"SSE: Stream error: {e}")
         finally:
             pubsub.unsubscribe("smos:events:vitrine")
+            pubsub.close()
 
     return StreamingResponse(event_generator(), media_type="text/event-stream")
 

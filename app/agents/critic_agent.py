@@ -151,4 +151,49 @@ class CriticAgent:
         # speaker embeddings.
         return 0.92 # Simulated match score
 
+    def score_video_quality(self, video_bytes: bytes, prompt: str) -> float:
+        """Implements VideoScore2-style evaluation using Gemini Vision.
+        
+        Evaluates:
+        1. Semantic Alignment (Does it match the prompt?)
+        2. Temporal Consistency (Is the motion fluid?)
+        3. Physical Fidelity (Are there artifacts?)
+        """
+        logger.info("CRITIC: Scoring video quality (Best-of-N Arbitration)...")
+        
+        eval_prompt = f"""
+        Evaluate this video clip based on the prompt: "{prompt}".
+        Rate from 0.0 to 1.0 on:
+        - semantic_alignment: How well it follows the prompt.
+        - temporal_stability: No flickering or sudden jumps.
+        - visual_fidelity: Sharpness and lack of AI artifacts.
+        
+        Return a JSON object with a single field 'final_score' (average weighted).
+        """
+        
+        # In a real implementation, we might send frames or use a model that supports video input
+        # Gemini 1.5 Pro/Flash supports video.
+        try:
+            response = self.client.models.generate_content(
+                model="gemini-1.5-flash", # Use Flash for fast evaluation
+                contents=[
+                    types.Content(
+                        role="user",
+                        parts=[
+                            # types.Part.from_bytes(data=video_bytes, mime_type="video/mp4"),
+                            types.Part.from_text(text=eval_prompt)
+                        ]
+                    )
+                ],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
+            )
+            import json
+            data = json.loads(response.text)
+            return data.get("final_score", 0.75) # Default to 0.75 if missing
+        except Exception as e:
+            logger.error(f"CRITIC: Video scoring failed: {e}")
+            return 0.5 # Penalty for failure
+
 

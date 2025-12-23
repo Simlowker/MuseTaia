@@ -16,11 +16,12 @@ class DNALoader:
         """
         self.cache_manager = cache_manager
 
-    def load_dna(self, dna_data: Dict[str, Any]) -> str:
+    def load_dna(self, dna_data: Dict[str, Any], model_name: str = "gemini-1.5-pro-002") -> str:
         """Validates DNA data, formats it, and stores it in the Vertex AI Context Cache.
 
         Args:
             dna_data: A dictionary containing the raw DNA data.
+            model_name: The model to create the cache for.
 
         Returns:
             str: The resource name of the created context cache.
@@ -31,11 +32,12 @@ class DNALoader:
         # Convert to the structured string required for the AI context
         context_string = dna.to_context_string()
         
-        # Create the cache (setting a default TTL or using settings)
-        # In a real scenario, this DNA cache might have a very long TTL.
-        resource_name = self.cache_manager.create_cache(
-            content=context_string,
-            ttl_seconds=86400 * 7 # 7 days default for DNA
+        # Create the 'Bible' cache with 7 days TTL
+        resource_name = self.cache_manager.create_bible_cache(
+            model_name=model_name,
+            system_instruction=context_string,
+            examples=[], # Could be populated with viral patterns in the future
+            ttl_days=7
         )
         
         return resource_name

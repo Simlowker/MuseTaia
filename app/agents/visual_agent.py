@@ -1,25 +1,47 @@
 """VisualAgent implementation using Imagen 3 via Google GenAI SDK."""
 
-from typing import List, Optional
+import logging
+from typing import List, Optional, Dict, Any
 import google.genai as genai
 from google.genai import types
 from app.core.config import settings
 from app.matrix.assets_manager import SignatureAssetsManager
 from app.core.vertex_init import get_genai_client
+from app.agents.base_worker import BaseWorker, WorkerOutput
 
-class VisualAgent:
+logger = logging.getLogger(__name__)
+
+class VisualAgent(BaseWorker):
     """The Photographer agent responsible for generating high-fidelity images."""
 
-    def __init__(self, model_name: str = "imagen-3.0-generate-002"):
-        """Initializes the VisualAgent.
-
-        Args:
-            model_name: The name of the Imagen 3 model to use.
-        """
+    def __init__(self, agent_id: str = "visual_01", model_name: str = "imagen-3.0-generate-002"):
+        """Initializes the VisualAgent."""
+        super().__init__(agent_id=agent_id, agent_type="visual")
         self.client = get_genai_client()
         self.model_name = model_name
         self.assets_manager = SignatureAssetsManager(bucket_name=settings.GCS_BUCKET_NAME)
 
+    async def execute_task(self, instruction: str, context: Dict[str, Any]) -> WorkerOutput:
+        """HLP/Worker contract: Executes image generation."""
+        logger.info(f"WORKER: VisualAgent {self.agent_id} executing task: {instruction}")
+        
+        try:
+            image_bytes = self.generate_image(
+                prompt=instruction,
+                subject_id=context.get("subject_id"),
+                location_id=context.get("location_id"),
+                object_ids=context.get("object_ids"),
+                item_ids=context.get("item_ids"),
+                aspect_ratio=context.get("aspect_ratio", "1:1")
+            )
+            return WorkerOutput(
+                status="success",
+                data={},
+                artifacts=[f"bytes://image_{self.agent_id}"] # Simulated artifact path
+            )
+        except Exception as e:
+            logger.error(f"WORKER: VisualAgent failed: {e}")
+            return WorkerOutput(status="failure", data={"error": str(e)})
 
     def generate_image(
         self,

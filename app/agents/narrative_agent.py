@@ -68,7 +68,7 @@ class NarrativeAgent(BaseWorker):
         
         STRICT RETENTION RULES:
         1. Use Google Search to verify cultural authenticity.
-        2. PATTERN INTERRUPTION: You MUST insert a drastic shift (camera angle, lighting change, glitch, or sound effect) at exactly [00:08], [00:16], [00:24], etc.
+        2. PATTERN INTERRUPTION: You MUST insert a drastic shift (camera angle, lighting change, glitch, or sound effect) at exactly [00:08], [00:16], [00:24], etc. Mark these moments with `attention_boost: true`.
         3. TEMPORAL TAGGING: Use tags like [00:00-00:02] for EVERY shot description to sync with Veo 3.1.
         4. DEFINITION: Populate the AttentionDynamics metadata with the specific timestamps and types of interrupts used.
         

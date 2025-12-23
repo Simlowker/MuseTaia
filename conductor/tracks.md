@@ -96,3 +96,18 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Scale & Cinematic Upgrade (2025-12-23)
 *Link: [./conductor/tracks/scale_cinematic_upgrade_20251223/](./conductor/tracks/scale_cinematic_upgrade_20251223/)*
+
+## [x] Track: Final Polish & Go Fix (2025-12-23)
+*Link: [./conductor/tracks/final_polish_20251223/](./conductor/tracks/final_polish_20251223/)*
+ J'ai finalisé les corrections de la track **"Final Polish & Go Fix"**.
+
+### ✅ Résumé des dernières interventions :
+
+1.  **Infrastructure Go :**
+    *   Vérification du Dispatcher (`server.go`) : l'appel à `CloneMultiplePods(1)` est correct et fonctionnel.
+2.  **Narratif & Rétention :**
+    *   Mise à jour de `NARRATIVE_SYSTEM_INSTRUCTION` et du prompt de `NarrativeAgent` pour imposer la règle des 8 secondes et l'utilisation de `attention_boost: true`.
+3.  **Visuel & Émotion :**
+    *   Implémentation du **Mapping de Profondeur Affective** dans `WorkflowEngine` : l'excitation (`arousal`) de la Muse réduit désormais la profondeur de champ (plus de flou artistique) pour créer un sentiment d'intimité ou d'urgence, utilisant la logique **Depth Anything V2**.
+
+Le système SMOS v2 est désormais dans son état "Golden Build", prêt pour un déploiement complet. Souhaitez-vous que je push ces derniers changements sur GitHub ?

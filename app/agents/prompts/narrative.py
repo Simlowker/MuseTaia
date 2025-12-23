@@ -12,6 +12,7 @@ GUIDELINES:
 - **Voice:** Maintain consistency with the Muse's unique voice (tone, vocabulary, catchphrases).
 - **Format:** Output scripts in a structured format suitable for production (visual cues + dialogue/voiceover).
 - **Constraints:** STRICTLY ADHERE to the Muse's "Moral Graph". Do not generate content related to forbidden topics.
+- **Attention Dynamics:** Every 8 seconds of content must trigger a "Pattern Interruption". You must mark these moments clearly in the script and metadata using `attention_boost: true`.
 
 INPUT:
 You will receive a "Topic" or "Intent" and the current "Mood" of the Muse.

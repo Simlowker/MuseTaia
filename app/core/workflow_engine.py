@@ -54,14 +54,36 @@ class WorkflowEngine:
         self.cost_calculator = CostCalculator()
         self.comfy_client = ComfyUIClient()
 
-    def _render_via_comfy(self, prompt: str, reference_images: List[bytes]) -> bytes:
-        """Executes a high-fidelity render via ComfyUI nodal workflow."""
-        logger.info("COMFY_UI: Triggering nodal workflow render...")
-        # Conceptual workflow JSON
+    def _get_affective_depth_params(self, mood: Mood) -> Dict[str, Any]:
+        """Maps emotional arousal to Depth Anything V2 parameters.
+        
+        High Arousal (urgency) -> Lower depth strength (more blur/intimacy).
+        Low Arousal (calm) -> Higher depth strength (sharpness/distance).
+        """
+        # Linear mapping: Arousal 0.0 -> Depth 1.0, Arousal 1.0 -> Depth 0.3
+        depth_strength = 1.0 - (mood.arousal * 0.7)
+        return {
+            "depth_strength": round(depth_strength, 2),
+            "blur_radius": round(mood.arousal * 10, 1) # More blur for high arousal
+        }
+
+    def _render_via_comfy(self, prompt: str, reference_images: List[bytes], mood: Mood) -> bytes:
+        """Executes a high-fidelity render via ComfyUI nodal workflow with affective depth."""
+        logger.info(f"COMFY_UI: Triggering nodal workflow render with Affective Depth (Arousal: {mood.arousal})...")
+        
+        affective_params = self._get_affective_depth_params(mood)
+        
+        # Conceptual workflow JSON with Affective Depth mapping
         workflow = {
             "3": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": "sd_xl_base_1.0.safetensors"}},
             "6": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt, "clip": ["3", 1]}},
-            # ... more nodes for Imagen 3 / Veo 3.1 wrappers ...
+            "10": {
+                "class_type": "DepthAnythingV2", 
+                "inputs": {
+                    "strength": affective_params["depth_strength"],
+                    "blur": affective_params["blur_radius"]
+                }
+            }
         }
         prompt_id = self.comfy_client.queue_prompt(workflow)
         return self.comfy_client.get_output_data(prompt_id) or b""

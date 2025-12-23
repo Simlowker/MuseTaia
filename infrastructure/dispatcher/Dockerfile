@@ -6,18 +6,14 @@ WORKDIR /app
 # Install system dependencies
 RUN apk add --no-cache git
 
-# Copy go mod and attempt to copy go.sum (ignore error if missing)
+# 1. Copy dependency files first (Optimizes Docker layer cache)
 COPY go.mod ./
-COPY go.sum* ./
 
-# Ensure dependencies are tidy and downloaded
-# Note: In Cloud Build, ensure the project has internet access
-RUN go mod tidy && go mod download
+# 2. Download dependencies
+RUN go mod download
 
-# Copy source code
+# 3. Copy source code and build
 COPY . .
-
-# Build the binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o smos-dispatcher .
 
 # Final stage

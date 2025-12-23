@@ -3,11 +3,10 @@
 import pytest
 from unittest.mock import MagicMock, patch
 from app.agents.root_agent import RootAgent
+from app.agents.protocols.master_sync import MasterSource
 
 @pytest.fixture
 def mock_genai():
-    # Patch the google.genai or ADK components
-    # Assuming RootAgent uses 'google.genai' for this implementation based on the task desc
     with patch("app.agents.root_agent.genai") as mock_gen:
         yield mock_gen
 
@@ -59,3 +58,25 @@ def test_root_agent_sensory_reaction(mock_genai):
         # Verify state update
         mock_manager.update_mood.assert_called_once()
         assert mock_manager.update_mood.call_args.args[0].current_thought == reaction
+
+def test_root_agent_parse_and_route(mock_genai):
+    """Tests that RootAgent parses and routes commands correctly."""
+    agent = RootAgent()
+    intent = agent.parse_and_route("create a fashion post")
+    
+    assert intent.action == "create_post"
+    assert intent.source == MasterSource.HUMAN
+    assert intent.parameters["topic"] == "fashion"
+
+def test_root_agent_execute_intent(mock_genai):
+    """Tests that RootAgent generates a TaskGraph for an intent."""
+    agent = RootAgent()
+    mock_intent = MagicMock()
+    mock_intent.command = "produce_content"
+    mock_intent.trend_type = "fashion"
+    mock_intent.raw_intent = "Sample raw intent"
+    
+    task_graph = agent.execute_intent(mock_intent)
+    
+    assert len(task_graph.nodes) > 0
+    assert task_graph.root_intent == mock_intent

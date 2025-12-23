@@ -6,9 +6,18 @@ from google.genai import types
 from app.core.config import settings
 from app.state.models import Mood
 from app.state.db_access import StateManager
+from app.agents.protocols.master_sync import MasterSyncProtocol, CommandIntent
+from app.agents.orchestrator import Orchestrator, TaskGraph
 
 class RootAgent:
-    """The central nervous system of the SMOS swarm."""
+    """The central nervous system of the SMOS swarm.
+    
+    This agent represents the 'High Cognition Lobe' (The Brain).
+    It handles:
+    1. Sensory Integration (Perception -> Reaction)
+    2. Intent Parsing (Single-Master Protocol)
+    3. Workflow Orchestration (ADK Task Graphs)
+    """
 
     def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
         """Initializes the RootAgent.
@@ -28,6 +37,8 @@ class RootAgent:
             )
         )
         self.state_manager = StateManager()
+        self.master_sync = MasterSyncProtocol()
+        self.orchestrator = Orchestrator()
 
     def ping(self) -> str:
         """Sends a ping to the agent to verify connectivity.
@@ -65,3 +76,29 @@ class RootAgent:
         self.state_manager.update_mood(current_mood)
         
         return reaction
+
+    def parse_and_route(self, command_text: str, source_override: Optional[str] = None) -> CommandIntent:
+        """Parses a command and routes it through the Single-Master Protocol.
+        
+        Args:
+            command_text: The raw user or system command.
+            source_override: Explicit source ('human', 'community', 'system').
+            
+        Returns:
+            CommandIntent: The structured and validated intent.
+        """
+        intent = self.master_sync.parse_command(command_text, source_override)
+        return intent
+
+    def execute_intent(self, intent: Any) -> TaskGraph:
+        """Standardizes an intent into an ADK Task Graph for execution.
+        
+        Args:
+            intent: A structured IntentObject (from TrendScanner) or CommandIntent.
+            
+        Returns:
+            TaskGraph: The executable graph of sub-agents.
+        """
+        # Decompose the intent into sub-tasks via the Orchestrator
+        task_graph = self.orchestrator.plan_execution(intent)
+        return task_graph

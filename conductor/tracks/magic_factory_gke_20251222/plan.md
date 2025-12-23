@@ -13,7 +13,7 @@
     - **Tests:** `docker-compose up` results in functional agents.
 - [x] Task: Conductor - User Manual Verification 'Containerization' (Protocol in workflow.md) 8c59437
 
-## Phase 2: Kubernetes Manifests (The Factory Floor)
+## Phase 2: Kubernetes Manifests (The Factory Floor) [checkpoint: 79bc3eb]
 - [x] Task: Define GKE Deployment Manifests
     - **Goal:** Create K8s configurations for deploying the Swarm.
     - **Files:** `infrastructure/k8s/deployment.yaml`, `infrastructure/k8s/service.yaml`
@@ -23,9 +23,9 @@
     - **Goal:** Enable secure isolation for the agents using gVisor (RuntimeClass).
     - **Files:** `infrastructure/k8s/runtime-class.yaml` (or update deployment).
     - **Tech:** gVisor (gvisor.io).
-- [ ] Task: Conductor - User Manual Verification 'Kubernetes Manifests' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Kubernetes Manifests' (Protocol in workflow.md) 79bc3eb
 
-## Phase 3: High-Performance Go Dispatcher
+## Phase 3: High-Performance Go Dispatcher [checkpoint: a8fb98a]
 - [x] Task: Initialize Go Module for Dispatcher
     - **Goal:** Set up the Go project structure for the high-concurrency scheduler.
     - **Files:** `infrastructure/dispatcher/go.mod`, `infrastructure/dispatcher/main.go`
@@ -35,11 +35,11 @@
     - **Files:** `infrastructure/dispatcher/server.go`, `infrastructure/dispatcher/worker_pool.go`
     - **Tech:** Goroutines, Channels.
     - **Tests:** Go unit tests for worker pool logic.
-- [ ] Task: Conductor - User Manual Verification 'Go Dispatcher' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Go Dispatcher' (Protocol in workflow.md) a8fb98a
 
-## Phase 4: CI/CD & Optimization
+## Phase 4: CI/CD & Optimization [checkpoint: c2aaaa1]
 - [x] Task: Define Cloud Build Configuration
     - **Goal:** Automate the build and deploy process.
     - **Files:** `cloudbuild.yaml`
     - **Tech:** Google Cloud Build.
-- [ ] Task: Conductor - User Manual Verification 'CI/CD & Optimization' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'CI/CD & Optimization' (Protocol in workflow.md) c2aaaa1

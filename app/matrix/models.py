@@ -34,3 +34,23 @@ class MuseDNA(BaseModel):
             f"--- Voice Guidelines ---\n{voice}\n\n"
             f"--- Moral Graph ---\n{morals}"
         )
+
+
+class WorldObject(BaseModel):
+    """Represents a persistent object in the Muse's world."""
+    object_id: str
+    name: str
+    description: str
+    visual_reference_path: str  # GCS path to reference image
+    properties: Dict[str, str] = Field(default_factory=dict)
+
+
+class WorldLocation(BaseModel):
+    """Represents a persistent location in the Muse's world."""
+    location_id: str
+    name: str
+    description: str
+    visual_reference_path: str  # GCS path to reference image
+    recurring_objects: List[str] = Field(default_factory=list)  # IDs of WorldObjects
+    lighting_setup: str = Field(..., description="Signature lighting for this location")
+

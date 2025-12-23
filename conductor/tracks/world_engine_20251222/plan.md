@@ -1,7 +1,7 @@
 # Track Plan: The World Engine (ArchitectAgent)
 
 ## Phase 1: Environmental Anchors & Registry
-- [ ] Task: Define Environmental DNA Schema (Locations & Objects)
+- [x] Task: Define Environmental DNA Schema (Locations & Objects)
     - **Goal:** Standardize how locations (e.g., "Paris Studio") and recurring objects (e.g., "Blue Velvet Sofa") are defined.
     - **Files:** `app/matrix/models.py` (update), `app/matrix/world_dna.py`
     - **Tech:** Pydantic.

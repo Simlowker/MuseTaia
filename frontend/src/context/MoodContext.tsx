@@ -10,6 +10,8 @@ interface MoodContextType {
   setMood: (mood: Mood) => void;
   accentColor: string;
   rawMood: MoodState | null;
+  isSovereign: boolean;
+  setIsSovereign: (active: boolean) => void;
 }
 
 const MoodContext = createContext<MoodContextType | undefined>(undefined);
@@ -17,6 +19,7 @@ const MoodContext = createContext<MoodContextType | undefined>(undefined);
 export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mood, setMood] = useState<Mood>('reflection');
   const [rawMood, setRawMood] = useState<MoodState | null>(null);
+  const [isSovereign, setIsSovereign] = useState<boolean>(true);
 
   const fetchMood = async () => {
     try {
@@ -57,7 +60,7 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const accentColor = getAccentColor(mood);
 
   return (
-    <MoodContext.Provider value={{ mood, setMood, accentColor, rawMood }}>
+    <MoodContext.Provider value={{ mood, setMood, accentColor, rawMood, isSovereign, setIsSovereign }}>
       {children}
     </MoodContext.Provider>
   );

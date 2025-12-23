@@ -57,5 +57,13 @@ export const smosApi = {
     const res = await fetch(`${API_BASE_URL}/finance/ledger/${walletAddress}`);
     if (!res.ok) throw new Error('Failed to fetch ledger');
     return res.json();
+  },
+
+  async toggleSovereignMode(active: boolean): Promise<any> {
+    const res = await fetch(`${API_BASE_URL}/state/sovereign-mode?active=${active}`, {
+      method: 'POST'
+    });
+    if (!res.ok) throw new Error('Failed to toggle mode');
+    return res.json();
   }
 };

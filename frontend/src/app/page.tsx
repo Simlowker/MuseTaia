@@ -49,6 +49,29 @@ export default function Home() {
       <div className="col-lg-3 order-lg-1">
         <div className="glass-card mb-4">
           <h4 className="fw-light mb-4 tracking-widest small">COGNITION_MATRIX</h4>
+          
+          {/* Sovereign Switch */}
+          <div className="mb-5 p-3 border border-white border-opacity-10 rounded-1">
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <label className="small text-secondary tracking-widest" style={{ fontSize: '0.6rem' }}>SOVEREIGN_SWITCH</label>
+              <span className={`font-monospace small ${isSovereign ? 'text-success' : 'text-warning'}`} style={{ fontSize: '0.6rem' }}>
+                {isSovereign ? "AUTO_MODE" : "COLLABORATIVE"}
+              </span>
+            </div>
+            <div className="d-flex gap-2">
+              <button 
+                className={`btn btn-sm flex-fill fw-light small py-2 ${isSovereign ? 'bg-white bg-opacity-10 text-white border-white' : 'text-secondary border-white border-opacity-5'}`}
+                onClick={async () => {
+                  const newState = !isSovereign;
+                  await smosApi.toggleSovereignMode(newState);
+                  setIsSovereign(newState);
+                }}
+              >
+                {isSovereign ? "[ ACTIVE ]" : "[ MANUAL ]"}
+              </button>
+            </div>
+          </div>
+
           <div className="mb-4">
             <label className="form-label small text-secondary tracking-widest" style={{ fontSize: '0.6rem' }}>MOOD VECTORED</label>
             <div className="d-flex flex-column gap-2">

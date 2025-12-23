@@ -13,9 +13,9 @@
 - [ ] Task: Conductor - User Manual Verification 'HITL Backend' (Protocol in workflow.md)
 
 ## Phase 2: Hybrid Frontend Interface
-- [ ] Task: Implement Sovereign Switch (Auto/Manual)
+- [x] Task: Implement Sovereign Switch (Auto/Manual)
     - **Goal:** Add the mode toggle to the cognition section.
-    - **Files:** `frontend/src/app/page.tsx`, `frontend/src/context/MoodContext.tsx`
+    - **Files:** `frontend/src/app/page.tsx`, `frontend/src/context/MoodContext.tsx`, `frontend/src/services/api.ts` (update)
 - [ ] Task: Build Mission Proposal UI
     - **Goal:** Transform the Trends Feed into a "Suggested Commands" list with Edit/Approve/Reject actions.
     - **Files:** `frontend/src/components/TrendFeed.tsx`, `frontend/src/components/ProposalEditor.tsx` (New)

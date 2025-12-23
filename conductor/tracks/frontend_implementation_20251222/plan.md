@@ -21,13 +21,13 @@
 - [x] Task: Conductor - User Manual Verification 'Sovereign Heart' (Protocol in workflow.md) 65be68b
 
 ## Phase 3: The Forge & DNA Matrix
-- [ ] Task: Implement Production Timeline & Critic Dashboard
+- [x] Task: Implement Production Timeline & Critic Dashboard
     - **Goal:** Build the Gantt-style timeline and the Drift Visualizer tool.
-    - **Files:** `frontend/pages/forge.tsx`, `frontend/components/DriftVisualizer.tsx`
-- [ ] Task: Build DNA Architect & Vault
+    - **Files:** `frontend/src/app/forge/page.tsx`, `frontend/src/components/DriftVisualizer.tsx`
+- [x] Task: Build DNA Architect & Vault
     - **Goal:** Create the visual editor for the Moral Graph and the high-res GCS asset gallery.
-    - **Files:** `frontend/pages/matrix.tsx`, `frontend/components/DNAEditor.tsx`
-- [ ] Task: Conductor - User Manual Verification 'Forge & Matrix' (Protocol in workflow.md)
+    - **Files:** `frontend/src/app/matrix/page.tsx`, `frontend/src/components/DNAEditor.tsx` (Inline)
+- [x] Task: Conductor - User Manual Verification 'Forge & Matrix' (Protocol in workflow.md)
 
 ## Phase 4: Ledger & Master Control
 - [ ] Task: Implement Financial Ledger & Sync Controller

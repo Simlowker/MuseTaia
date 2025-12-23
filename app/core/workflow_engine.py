@@ -11,10 +11,13 @@ from app.agents.critic_agent import CriticAgent
 from app.agents.director_agent import DirectorAgent
 from app.agents.eic_agent import EICAgent
 from app.agents.architect_agent import ArchitectAgent
+from app.agents.stylist_agent import StylistAgent
 from app.core.utils.prompt_optimizer import PromptOptimizer
 from app.state.models import Mood
 from app.matrix.world_dna import WorldRegistry
 from app.matrix.world_assets import WorldAssetsManager
+from app.matrix.wardrobe_dna import WardrobeRegistry
+from app.matrix.wardrobe_assets import WardrobeAssetsManager
 from app.core.config import settings
 from app.core.services.ledger_service import LedgerService
 from app.core.finance.cost_calculator import CostCalculator
@@ -32,10 +35,15 @@ class WorkflowEngine:
         self.director_agent = DirectorAgent()
         self.eic_agent = EICAgent()
         self.architect_agent = ArchitectAgent()
+        self.stylist_agent = StylistAgent()
         
         self.optimizer = PromptOptimizer()
         self.world_registry = WorldRegistry()
         self.world_assets = WorldAssetsManager(bucket_name=settings.GCS_BUCKET_NAME)
+        
+        self.wardrobe_registry = WardrobeRegistry()
+        self.wardrobe_assets = WardrobeAssetsManager(bucket_name=settings.GCS_BUCKET_NAME)
+        
         self.ledger_service = LedgerService()
         self.cost_calculator = CostCalculator()
 
@@ -70,15 +78,11 @@ class WorkflowEngine:
         subject_id: str,
         max_retries: int = 3
     ) -> Dict[str, Any]:
-        """Runs the full production pipeline with visual and spatial QA.
-        
-        Sequence: Budget Check -> Narrative -> Architect -> Optimize -> Visual -> Critic (Loop) -> Director -> Cost Deduction -> EIC.
-        """
+        """Runs the full production pipeline with visual, spatial, and look QA."""
         
         # 0. Budget Check
         logger.info("Checking production budget...")
         wallet = self.ledger_service.state_manager.get_wallet(subject_id)
-        # Assuming minimum production cost is around 0.15 USD
         MIN_PRODUCTION_COST = 0.15
         if not wallet or wallet.internal_usd_balance < MIN_PRODUCTION_COST:
             current_bal = wallet.internal_usd_balance if wallet else 0
@@ -92,14 +96,20 @@ class WorkflowEngine:
         logger.info("Planning scene layout...")
         layout = self.architect_agent.plan_scene_layout(script_data.script, self.world_registry)
         
-        # 3. Optimization Phase
-        logger.info("Optimizing prompt...")
-        optimized_prompt = self.optimizer.optimize(f"{script_data.script}. Setting: {layout.scene_description}")
+        # 3. Stylist Phase (Look & Continuity)
+        logger.info("Selecting wardrobe and props...")
+        look = self.stylist_agent.select_look(script_data.script, layout, mood, self.wardrobe_registry)
         
-        # 4. Visual & QA Loop
+        # 4. Optimization Phase
+        logger.info("Optimizing prompt...")
+        optimized_prompt = self.optimizer.optimize(
+            f"{script_data.script}. Setting: {layout.scene_description}. Look: {look.visual_details}"
+        )
+        
+        # 5. Visual & QA Loop
         logger.info("Starting Visual & QA Loop...")
         
-        # Collect all reference assets
+        # Collect ALL reference assets (Identity + World + Look)
         references = []
         # Identity ref
         subject_face = self.world_assets.download_asset(f"muses/{subject_id}/face.png")
@@ -110,7 +120,7 @@ class WorkflowEngine:
             location_ref = self.world_assets.download_asset(f"world/locations/{layout.location_id}/reference.png")
             references.append(location_ref)
         except Exception:
-            logger.warning(f"Reference image for location {layout.location_id} not found.")
+            pass
 
         # Object refs
         for obj_id in layout.selected_objects:
@@ -119,16 +129,25 @@ class WorkflowEngine:
                 references.append(obj_ref)
             except Exception:
                 pass
+        
+        # Wardrobe refs
+        for item_id in look.item_ids:
+            try:
+                item_ref = self.wardrobe_assets.download_asset(f"wardrobe/items/{item_id}/reference.png")
+                references.append(item_ref)
+            except Exception:
+                pass
 
         current_image = self.visual_agent.generate_image(
             optimized_prompt, 
             subject_id=subject_id,
             location_id=layout.location_id,
-            object_ids=layout.selected_objects
+            object_ids=layout.selected_objects,
+            item_ids=look.item_ids
         )
         
         for attempt in range(max_retries):
-            # Surgical QA check (Identity + World)
+            # Surgical QA check (Identity + World + Look)
             report = self.critic_agent.verify_consistency(current_image, references)
             
             if report.is_consistent:
@@ -162,12 +181,13 @@ class WorkflowEngine:
                     optimized_prompt, 
                     subject_id=subject_id,
                     location_id=layout.location_id,
-                    object_ids=layout.selected_objects
+                    object_ids=layout.selected_objects,
+                    item_ids=look.item_ids
                 )
         
         final_image = current_image
             
-        # 5. Production Phase
+        # 6. Production Phase
         logger.info("Starting Cinematography Phase...")
         video_data = self.director_agent.generate_video(optimized_prompt, image_bytes=final_image)
         
@@ -176,17 +196,17 @@ class WorkflowEngine:
             "caption": script_data.caption,
             "video_bytes": video_data,
             "poster_image_bytes": final_image,
-            "layout": layout.model_dump()
+            "layout": layout.model_dump(),
+            "look": look.model_dump()
         }
 
-        # 6. Cost Tracking
-        # Calculate approximate costs
+        # 7. Cost Tracking
         total_cost = self.cost_calculator.estimate_image_cost("imagen-3.0-generate-002", 1) + \
                      self.cost_calculator.estimate_video_cost("veo-3.1", 5.0)
         
         try:
             self.ledger_service.record_transaction(
-                wallet_address=subject_id, # Using subject_id as wallet address for now
+                wallet_address=subject_id,
                 tx_type=TransactionType.EXPENSE,
                 category=TransactionCategory.API_COST,
                 amount=total_cost,
@@ -195,7 +215,7 @@ class WorkflowEngine:
         except Exception as e:
             logger.error(f"Failed to record production cost: {e}")
 
-        # 7. Staging Phase (EIC)
+        # 8. Staging Phase (EIC)
         logger.info("Staging for review...")
         review_path = self.eic_agent.stage_for_review(production_data, subject_id)
         

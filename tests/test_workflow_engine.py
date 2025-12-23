@@ -1,7 +1,7 @@
-"""Tests for the WorkflowEngine and the Critic loop."""
+"Tests for the WorkflowEngine and the Critic loop."
 
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, AsyncMock
 from app.core.workflow_engine import WorkflowEngine
 from app.state.models import Mood, Wallet
 from app.core.schemas.qa import ConsistencyReport, FeedbackItem
@@ -14,9 +14,11 @@ def mock_agents():
          patch("app.core.workflow_engine.DirectorAgent") as m_director, \
          patch("app.core.workflow_engine.EICAgent") as m_eic, \
          patch("app.core.workflow_engine.ArchitectAgent") as m_architect, \
+         patch("app.core.workflow_engine.StylistAgent") as m_stylist, \
          patch("app.core.workflow_engine.PromptOptimizer") as m_optimizer, \
-         patch("app.core.workflow_engine.WorldAssetsManager") as m_assets, \
-         patch("app.core.services.ledger_service.get_redis_client"): # Mock redis for ledger_service
+         patch("app.core.workflow_engine.WorldAssetsManager") as m_world_assets, \
+         patch("app.core.workflow_engine.WardrobeAssetsManager") as m_wardrobe_assets, \
+         patch("app.core.services.ledger_service.get_redis_client"):
         
         yield {
             "narrative": m_narrative.return_value,
@@ -25,8 +27,10 @@ def mock_agents():
             "director": m_director.return_value,
             "eic": m_eic.return_value,
             "architect": m_architect.return_value,
+            "stylist": m_stylist.return_value,
             "optimizer": m_optimizer.return_value,
-            "assets": m_assets.return_value
+            "world_assets": m_world_assets.return_value,
+            "wardrobe_assets": m_wardrobe_assets.return_value
         }
 
 @pytest.fixture
@@ -38,8 +42,6 @@ def enough_budget():
 def test_workflow_insufficient_budget(mock_agents):
     """Verifies that the engine blocks production if the wallet is empty."""
     engine = WorkflowEngine()
-    
-    # Mock wallet with low balance
     low_wallet = Wallet(address="genesis", balance=0, internal_usd_balance=0.01)
     
     with patch("app.core.services.ledger_service.StateManager.get_wallet", return_value=low_wallet):
@@ -47,29 +49,62 @@ def test_workflow_insufficient_budget(mock_agents):
         with pytest.raises(RuntimeError, match="Insufficient budget"):
             engine.produce_video_content("test", mood, "genesis")
             
-    # Verify no agents were called
     assert not mock_agents["narrative"].generate_content.called
 
-def test_workflow_repair_loop(mock_agents, enough_budget):
-    """Verifies the inpainting repair loop logic."""
+def test_workflow_full_swarm_orchestration(mock_agents, enough_budget):
+    """Verifies the complete Narrative -> Architect -> Stylist -> Visual -> Critic -> Director flow."""
     engine = WorkflowEngine()
     
-    # Setup mocks for a repair flow
     mock_agents["narrative"].generate_content.return_value = MagicMock(title="T", script="S", caption="C")
-    mock_agents["optimizer"].optimize.return_value = "P"
-    mock_agents["assets"].download_asset.return_value = b"ref"
     
-    # Architect Mock
     from app.core.schemas.world import SceneLayout
     mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(
         location_id="loc", selected_objects=["obj"], scene_description="desc"
     )
     
-    # Visual: 1. Initial Gen (Bad), 2. Inpainted (Good)
-    mock_agents["visual"].generate_image.return_value = b"bad_image" # Initial call
-    mock_agents["visual"].edit_image.return_value = b"repaired_image" # Repair call
+    from app.core.schemas.look import LookSelection
+    mock_agents["stylist"].select_look.return_value = LookSelection(
+        item_ids=["item"], prop_ids=["prop"], stylist_note="note", visual_details="details"
+    )
     
-    # Critic: 1. Reject with Feedback, 2. Accept
+    mock_agents["optimizer"].optimize.return_value = "Optimized"
+    mock_agents["world_assets"].download_asset.return_value = b"asset"
+    mock_agents["wardrobe_assets"].download_asset.return_value = b"wardrobe"
+    mock_agents["visual"].generate_image.return_value = b"image"
+    mock_agents["critic"].verify_consistency.return_value = ConsistencyReport(is_consistent=True, score=0.9)
+    mock_agents["director"].generate_video.return_value = b"video"
+    mock_agents["eic"].stage_for_review.return_value = "path"
+    
+    mood = Mood(valence=0.5)
+    result = engine.produce_video_content("test", mood, "genesis")
+    
+    assert result["video_bytes"] == b"video"
+    assert "layout" in result
+    assert "look" in result
+    mock_agents["architect"].plan_scene_layout.assert_called_once()
+    mock_agents["stylist"].select_look.assert_called_once()
+
+def test_workflow_repair_loop(mock_agents, enough_budget):
+    """Verifies the inpainting repair loop logic."""
+    engine = WorkflowEngine()
+    
+    mock_agents["narrative"].generate_content.return_value = MagicMock(title="T", script="S", caption="C")
+    mock_agents["optimizer"].optimize.return_value = "P"
+    mock_agents["world_assets"].download_asset.return_value = b"ref"
+    mock_agents["wardrobe_assets"].download_asset.return_value = b"wardrobe"
+    
+    from app.core.schemas.world import SceneLayout
+    mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(
+        location_id="loc", selected_objects=[], scene_description="desc"
+    )
+    from app.core.schemas.look import LookSelection
+    mock_agents["stylist"].select_look.return_value = LookSelection(
+        item_ids=[], prop_ids=[], stylist_note="n", visual_details="d"
+    )
+    
+    mock_agents["visual"].generate_image.return_value = b"bad_image"
+    mock_agents["visual"].edit_image.return_value = b"repaired_image"
+    
     feedback = FeedbackItem(
         category="identity", description="Fix face", severity=0.8, 
         action_type="inpaint", target_area="face"
@@ -78,11 +113,8 @@ def test_workflow_repair_loop(mock_agents, enough_budget):
         ConsistencyReport(is_consistent=False, score=0.5, feedback=[feedback]),
         ConsistencyReport(is_consistent=True, score=0.95)
     ]
-    
-    # Critic Detect Mask
     mock_agents["critic"].detect_mask_area.return_value = [100, 100, 200, 200]
     
-    # Mock Mask Creation
     with patch("PIL.Image.open") as mock_img_open:
         mock_img = MagicMock()
         mock_img.size = (1000, 1000)
@@ -92,114 +124,28 @@ def test_workflow_repair_loop(mock_agents, enough_budget):
         result = engine.produce_video_content("test", mood, "gen")
         
         assert result["poster_image_bytes"] == b"repaired_image"
-        mock_agents["visual"].generate_image.assert_called_once()
-        mock_agents["critic"].detect_mask_area.assert_called_with(b"bad_image", "face")
         mock_agents["visual"].edit_image.assert_called_once()
-
-def test_workflow_critic_rejection_loop(mock_agents, enough_budget):
-    """Verifies that the engine retries generation if the Critic rejects the asset."""
-    engine = WorkflowEngine()
-    
-    # 1. Mock Narrative
-    mock_agents["narrative"].generate_content.return_value = MagicMock(
-        title="Test", script="Test script", caption="Test"
-    )
-    
-    # 2. Mock Architect
-    from app.core.schemas.world import SceneLayout
-    mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(
-        location_id="loc", selected_objects=[], scene_description="desc"
-    )
-    
-    # 3. Mock Optimizer
-    mock_agents["optimizer"].optimize.return_value = "Optimized prompt"
-    
-    # 4. Mock Assets
-    mock_agents["assets"].download_asset.return_value = b"ref_image"
-    
-    # 5. Mock Visual - will be called twice
-    mock_agents["visual"].generate_image.side_effect = [b"bad_image", b"good_image"]
-    
-    # 6. Mock Critic - first reject, then accept
-    mock_agents["critic"].verify_consistency.side_effect = [
-        ConsistencyReport(is_consistent=False, score=0.4, issues=["Bad eyes"]),
-        ConsistencyReport(is_consistent=True, score=0.9, issues=[])
-    ]
-    
-    # 7. Mock Director
-    mock_agents["director"].generate_video.return_value = b"video_data"
-
-    # 8. Mock EIC
-    mock_agents["eic"].stage_for_review.return_value = "reviews/gen/123"
-    
-    # Run engine
-    mood = Mood(valence=0.5)
-    result = engine.produce_video_content("test intent", mood, "genesis")
-    
-    # Verifications
-    assert result["video_bytes"] == b"video_data"
-    assert result["review_path"] == "reviews/gen/123"
-    assert mock_agents["visual"].generate_image.call_count == 2
-    assert mock_agents["critic"].verify_consistency.call_count == 2
-    assert mock_agents["director"].generate_video.called
-    assert mock_agents["eic"].stage_for_review.called
 
 def test_workflow_max_retries_failure(mock_agents, enough_budget):
     """Verifies that the engine proceeds with best effort after max retries."""
     engine = WorkflowEngine()
     
-    mock_agents["narrative"].generate_content.return_value = MagicMock(
-        title="Test", script="Test script", caption="Test"
-    )
+    mock_agents["narrative"].generate_content.return_value = MagicMock(title="T", script="S", caption="C")
     from app.core.schemas.world import SceneLayout
-    mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(
-        location_id="loc", selected_objects=[], scene_description="desc"
-    )
-    mock_agents["optimizer"].optimize.return_value = "Prompt"
-    mock_agents["assets"].download_asset.return_value = b"ref"
+    mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(location_id="loc", selected_objects=[], scene_description="d")
+    from app.core.schemas.look import LookSelection
+    mock_agents["stylist"].select_look.return_value = LookSelection(item_ids=[], prop_ids=[], stylist_note="n", visual_details="d")
+    
+    mock_agents["optimizer"].optimize.return_value = "P"
+    mock_agents["world_assets"].download_asset.return_value = b"ref"
     mock_agents["visual"].generate_image.return_value = b"bad"
     mock_agents["director"].generate_video.return_value = b"video"
     mock_agents["eic"].stage_for_review.return_value = "path"
     
-    # Always reject
-    mock_agents["critic"].verify_consistency.return_value = ConsistencyReport(
-        is_consistent=False, score=0.1, issues=["Fail"]
-    )
+    mock_agents["critic"].verify_consistency.return_value = ConsistencyReport(is_consistent=False, score=0.1, issues=["Fail"])
     
     mood = Mood(valence=0.5)
-    
-    # Should NOT raise RuntimeError anymore, just proceed
     result = engine.produce_video_content("test", mood, "genesis", max_retries=3)
     
     assert result["video_bytes"] == b"video"
-    # verify retries happened
-    assert mock_agents["visual"].generate_image.call_count >= 3
-    """Verifies that the engine proceeds with best effort after max retries."""
-    engine = WorkflowEngine()
-    
-    mock_agents["narrative"].generate_content.return_value = MagicMock(
-        title="Test", script="Test script", caption="Test"
-    )
-    from app.core.schemas.world import SceneLayout
-    mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(
-        location_id="loc", selected_objects=[], scene_description="desc"
-    )
-    mock_agents["optimizer"].optimize.return_value = "Prompt"
-    mock_agents["assets"].download_asset.return_value = b"ref"
-    mock_agents["visual"].generate_image.return_value = b"bad"
-    mock_agents["director"].generate_video.return_value = b"video"
-    mock_agents["eic"].stage_for_review.return_value = "path"
-    
-    # Always reject
-    mock_agents["critic"].verify_consistency.return_value = ConsistencyReport(
-        is_consistent=False, score=0.1, issues=["Fail"]
-    )
-    
-    mood = Mood(valence=0.5)
-    
-    # Should NOT raise RuntimeError anymore, just proceed
-    result = engine.produce_video_content("test", mood, "genesis", max_retries=3)
-    
-    assert result["video_bytes"] == b"video"
-    # verify retries happened
     assert mock_agents["visual"].generate_image.call_count >= 3

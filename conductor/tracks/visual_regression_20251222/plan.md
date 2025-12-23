@@ -1,13 +1,15 @@
 # Track Plan: Visual Regression Suite (Identity Anchors)
 
 ## Phase 1: Genesis Anchor Registry
-- [ ] Task: Define Identity Anchor Schema
+- [x] Task: Define Identity Anchor Schema
     - **Goal:** Standardize how "Day 0" reference assets and their embeddings are stored.
     - **Files:** `app/matrix/models.py` (update), `app/matrix/anchors.py`
     - **Tech:** Pydantic, GCS.
-- [ ] Task: Implement Anchor Management Utility
+    - **Tests:** Validate anchor objects and retrieval.
+- [x] Task: Implement Anchor Management Utility
     - **Goal:** Provide methods to register and retrieve the "Genesis" reference frames.
     - **Files:** `app/matrix/assets_manager.py` (update).
+    - **Tech:** Python, GCS.
 - [ ] Task: Conductor - User Manual Verification 'Genesis Anchor Registry' (Protocol in workflow.md)
 
 ## Phase 2: Similarity Analysis Engine

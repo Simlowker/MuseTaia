@@ -1,6 +1,7 @@
 """Pydantic models for the Muse DNA and identity anchor."""
 
 from typing import List, Dict
+from datetime import datetime, timezone
 from pydantic import BaseModel, Field
 
 
@@ -53,4 +54,15 @@ class WorldLocation(BaseModel):
     visual_reference_path: str  # GCS path to reference image
     recurring_objects: List[str] = Field(default_factory=list)  # IDs of WorldObjects
     lighting_setup: str = Field(..., description="Signature lighting for this location")
+
+
+class IdentityAnchor(BaseModel):
+    """Represents a 'Day 0' visual reference for regression testing."""
+    anchor_id: str
+    muse_id: str
+    asset_path: str  # GCS path
+    asset_type: str  # e.g., 'face_front', 'full_body', 'signature_style'
+    embedding_vector: List[float] = Field(default_factory=list) # Conceptual for future Vector Search
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
 

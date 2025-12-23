@@ -57,3 +57,12 @@ def test_download_asset(mock_storage_client):
     content = manager.download_asset("asset.png")
     assert content == b"downloaded-content"
     mock_blob.download_as_bytes.assert_called_once()
+
+def test_upload_identity_anchor(mock_storage_client):
+    manager = SignatureAssetsManager(bucket_name="test-bucket")
+    mock_bucket = mock_storage_client.return_value.bucket.return_value
+    mock_blob = mock_bucket.blob.return_value
+
+    path = manager.upload_identity_anchor("genesis", "face_front", b"data")
+    assert "anchors/face_front.png" in path
+    mock_blob.upload_from_string.assert_called_once_with(b"data")

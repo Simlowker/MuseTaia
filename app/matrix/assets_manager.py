@@ -77,3 +77,18 @@ class SignatureAssetsManager:
         """
         blob = self.bucket.blob(asset_name)
         return blob.download_as_bytes()
+
+    def upload_identity_anchor(
+        self,
+        muse_id: str,
+        anchor_type: str,
+        data: bytes
+    ) -> str:
+        """Uploads a Genesis identity anchor asset.
+
+        Returns:
+            str: The GCS path of the anchor.
+        """
+        path = f"muses/{muse_id}/anchors/{anchor_type}.png"
+        self.upload_asset(path, data, metadata={"muse_id": muse_id, "type": "identity_anchor", "anchor_type": anchor_type})
+        return path

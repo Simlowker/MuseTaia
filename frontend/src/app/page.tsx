@@ -1,13 +1,29 @@
 'use client';
 
+import { useState } from 'react';
 import { useMood } from '@/context/MoodContext';
+import { smosApi } from '@/services/api';
 import VisualVortex from '@/components/VisualVortex';
 import NeuralWaveform from '@/components/NeuralWaveform';
 import TrendFeed from '@/components/TrendFeed';
 import SwarmStatus from '@/components/SwarmStatus';
 
 export default function Home() {
-  const { mood, setMood, accentColor } = useMood();
+  const { mood, setMood, accentColor, rawMood } = useMood();
+  const [isTriggering, setIsTriggering] = useState(false);
+
+  const handleTriggerProduction = async (intent: string) => {
+    setIsTriggering(true);
+    try {
+      const result = await smosApi.triggerProduction(intent);
+      console.log('Production triggered:', result.task_id);
+      alert(`Production started: ${result.task_id}`);
+    } catch (error) {
+      console.error('Trigger failed:', error);
+    } finally {
+      setIsTriggering(false);
+    }
+  };
 
   return (
     <div className="row g-4">
@@ -18,6 +34,11 @@ export default function Home() {
           
           <VisualVortex />
           <NeuralWaveform />
+
+          {/* Real-time monologue from StateDB */}
+          <div className="mt-4 p-3 bg-dark bg-opacity-50 rounded italic small text-secondary">
+            {rawMood?.current_thought || "Initialising consciousness..."}
+          </div>
           
         </div>
       </div>
@@ -44,11 +65,14 @@ export default function Home() {
             </div>
           </div>
           <div className="p-3 border border-secondary rounded text-center small text-secondary">
-            [ Mood Matrix Chart Sync ]
+            VALENCE: {rawMood?.valence.toFixed(2) || "0.00"} | AROUSAL: {rawMood?.arousal.toFixed(2) || "0.00"}
           </div>
         </div>
 
-        <TrendFeed />
+        {/* Note: Pass production trigger to TrendFeed in a real app */}
+        <div onClick={() => handleTriggerProduction("Trending Topic Interaction")}>
+          <TrendFeed />
+        </div>
       </div>
 
       {/* 3. Zone Droite: L'Usine Créative */}
@@ -57,10 +81,17 @@ export default function Home() {
 
         <div className="glass-card">
           <h4 className="fw-bold mb-3">INSTANT CANVAS</h4>
-          <div className="bg-dark rounded-3 ratio ratio-1x1 d-flex align-items-center justify-content-center text-secondary overflow-hidden">
-            <div className="p-4 text-center">
-              <span className="small">WAITING FOR CRITIC APPROVAL...</span>
-            </div>
+          <div className="bg-dark rounded-3 ratio ratio-1x1 d-flex align-items-center justify-content-center text-secondary overflow-hidden text-center">
+            {isTriggering ? (
+              <div className="p-4">
+                <div className="spinner-border accent-text mb-2" role="status"></div>
+                <br/><span className="small">COMMUNICATING WITH SWARM...</span>
+              </div>
+            ) : (
+              <div className="p-4">
+                <span className="small">WAITING FOR CRITIC APPROVAL...</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

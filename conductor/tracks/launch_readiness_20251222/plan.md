@@ -4,17 +4,18 @@
 - [x] Task: Finalize Environment Variables
     - **Goal:** Ensure `.env` and `frontend/.env.local` are correctly structured for production/dev.
     - **Files:** `.env.example`, `frontend/.env.local.example`
-- [~] Task: Implement Bootstrap Script
+- [x] Task: Implement Bootstrap Script
     - **Goal:** Create a script to initialize the first MoodState and verify GCP API access.
     - **Files:** `scripts/bootstrap_system.py`
+    - **Tests:** Verify script initializes Redis keys correctly.
 - [ ] Task: Conductor - User Manual Verification 'Configuration' (Protocol in workflow.md)
 
 ## Phase 2: Real-time Frontend Synchronization
-- [ ] Task: Implement Mood Polling in Context
+- [x] Task: Implement Mood Polling in Context
     - **Goal:** Update `MoodContext.tsx` to fetch real-time state from the backend.
     - **Files:** `frontend/src/context/MoodContext.tsx`
     - **Tech:** React `useEffect`, polling.
-- [ ] Task: Wire Swarm Control Buttons
+- [~] Task: Wire Swarm Control Buttons
     - **Goal:** Connect the "Discuss" and "Trigger" buttons to the `smosApi.triggerProduction` call.
     - **Files:** `frontend/src/app/page.tsx` (update).
 - [ ] Task: Conductor - User Manual Verification 'Frontend Sync' (Protocol in workflow.md)

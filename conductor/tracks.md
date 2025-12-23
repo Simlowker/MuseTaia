@@ -57,3 +57,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: CFO Agent & Financial Sovereignty (Governance v2)
 *Link: [./conductor/tracks/cfo_agent_20251223/](./conductor/tracks/cfo_agent_20251223/)*
+
+## [x] Track: TrendScout VVS & ROI Discovery (Perception v2)
+*Link: [./conductor/tracks/trend_scout_vvs_20251223/](./conductor/tracks/trend_scout_vvs_20251223/)*

@@ -1,12 +1,32 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useMood } from '@/context/MoodContext';
+import { smosApi, WalletState } from '@/services/api';
 import { motion } from 'framer-motion';
 
 export default function LedgerPage() {
   const { accentColor } = useMood();
   const [masterMode, setMasterMode] = useState<'direct' | 'decisory'>('direct');
+  const [wallet, setWallet] = useState<WalletState | null>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
+
+  const fetchData = async () => {
+    try {
+      const w = await smosApi.getWallet();
+      setWallet(w);
+      const history = await smosApi.getLedger(w.address);
+      setTransactions(history.reverse()); // Newest first
+    } catch (error) {
+      console.error('Failed to fetch financial data:', error);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    const interval = setInterval(fetchData, 10000); // Poll ledger every 10s
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="row g-4">
@@ -17,26 +37,26 @@ export default function LedgerPage() {
 
       {/* Sovereign Ledger */}
       <div className="col-lg-8">
-        <div className="glass-card mb-4">
+        <div className="glass-card mb-4 h-100">
           <h4 className="fw-bold mb-4">SOVEREIGN LEDGER</h4>
           
           <div className="row g-4 mb-4 text-center">
             <div className="col-md-4">
               <div className="p-3 border border-secondary rounded">
                 <div className="x-small text-secondary fw-bold mb-1">INTERNAL BALANCE</div>
-                <div className="h4 m-0 fw-bold">$42.85 <span className="small text-secondary">USD</span></div>
+                <div className="h4 m-0 fw-bold">${wallet?.internal_usd_balance.toFixed(2) || "0.00"} <span className="small text-secondary">USD</span></div>
               </div>
             </div>
             <div className="col-md-4">
               <div className="p-3 border border-secondary rounded">
-                <div className="x-small text-secondary fw-bold mb-1">TOTAL ROI</div>
-                <div className="h4 m-0 fw-bold text-success">+12.4%</div>
+                <div className="x-small text-secondary fw-bold mb-1">PRIMARY BALANCE</div>
+                <div className="h4 m-0 fw-bold text-success">{wallet?.balance.toFixed(4) || "0.00"} <span className="small text-secondary">{wallet?.currency}</span></div>
               </div>
             </div>
             <div className="col-md-4">
               <div className="p-3 border border-secondary rounded">
-                <div className="x-small text-secondary fw-bold mb-1">OPEX (24H)</div>
-                <div className="h4 m-0 fw-bold text-danger">$1.42</div>
+                <div className="x-small text-secondary fw-bold mb-1">SYNC STATUS</div>
+                <div className="h4 m-0 fw-bold text-info">LIVE</div>
               </div>
             </div>
           </div>
@@ -52,18 +72,22 @@ export default function LedgerPage() {
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>2025-12-22 14:20</td>
-                  <td>Imagen 3 Generation</td>
-                  <td><span className="text-info">API_COST</span></td>
-                  <td className="text-danger">-$0.030</td>
-                </tr>
-                <tr>
-                  <td>2025-12-22 13:45</td>
-                  <td>Sponsorship: Digital Mesh</td>
-                  <td><span className="text-success">INCOME</span></td>
-                  <td className="text-success">+$5.000</td>
-                </tr>
+                {transactions.length > 0 ? (
+                  transactions.map((tx, idx) => (
+                    <tr key={idx}>
+                      <td>{new Date(tx.timestamp).toLocaleString()}</td>
+                      <td>{tx.description}</td>
+                      <td><span className="text-info">{tx.category.toUpperCase()}</span></td>
+                      <td className={tx.type === 'expense' ? 'text-danger' : 'text-success'}>
+                        {tx.type === 'expense' ? '-' : '+'}${tx.amount.toFixed(3)}
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="text-center text-secondary py-4 italic">No recent transactions recorded.</td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>

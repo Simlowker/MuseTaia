@@ -7,22 +7,18 @@ import (
 )
 
 func main() {
-	fmt.Println("Initializing SMOS Magic Factory Dispatcher...")
+	fmt.Println("--- SMOS Magic Factory Dispatcher (Infrastructure v2) ---")
 	
-	// Initialize Worker Pool (e.g., 10 concurrent workers)
-	pool := NewWorkerPool(10)
+	// Initialize Worker Pool (Capacity based on GKE node limits)
+	pool := NewWorkerPool(20)
 	pool.Start()
 
 	server := NewDispatcherServer(pool)
 
-	// Basic health check
-	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "Dispatcher is healthy")
-	})
-
-	// Dispatch endpoint
+	// Route Handlers
+	http.HandleFunc("/health", server.HandleHealth)
 	http.HandleFunc("/dispatch", server.HandleDispatch)
 
-	fmt.Println("Dispatcher listening on :8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
+	port := "8080"
+	fmt.Printf("DISPATCHER: High-concurrency listener active on :%s\n", port)
+	log.Fatal(http.ListenAndServe(":

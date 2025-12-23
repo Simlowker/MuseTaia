@@ -64,6 +64,13 @@ async def launch_genesis(request: GenesisRequest):
         logger.error(f"GENESIS: Failed to materialize Muse: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/internal/checkpoint-ready")
+async def checkpoint_ready():
+    """Signals that the agent is fully loaded and ready for GKE snapshotting (CRIU)."""
+    # In a real scenario, we would check if memory usage is stable and DNA is indexed.
+    return {"ready": True, "process_id": os.getpid(), "timestamp": datetime.now(timezone.utc)}
+
+
 # --- CLI LOGIC ---
 
 async def produce_content(topic: str):

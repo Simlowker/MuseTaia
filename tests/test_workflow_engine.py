@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import MagicMock, patch
 from app.core.workflow_engine import WorkflowEngine
-from app.state.models import Mood
+from app.state.models import Mood, Wallet
 from app.core.schemas.qa import ConsistencyReport, FeedbackItem
 
 @pytest.fixture
@@ -15,7 +15,8 @@ def mock_agents():
          patch("app.core.workflow_engine.EICAgent") as m_eic, \
          patch("app.core.workflow_engine.ArchitectAgent") as m_architect, \
          patch("app.core.workflow_engine.PromptOptimizer") as m_optimizer, \
-         patch("app.core.workflow_engine.WorldAssetsManager") as m_assets:
+         patch("app.core.workflow_engine.WorldAssetsManager") as m_assets, \
+         patch("app.core.services.ledger_service.get_redis_client"): # Mock redis for ledger_service
         
         yield {
             "narrative": m_narrative.return_value,
@@ -28,7 +29,28 @@ def mock_agents():
             "assets": m_assets.return_value
         }
 
-def test_workflow_repair_loop(mock_agents):
+@pytest.fixture
+def enough_budget():
+    with patch("app.core.services.ledger_service.StateManager.get_wallet") as m_get:
+        m_get.return_value = Wallet(address="any", balance=1.0, internal_usd_balance=100.0)
+        yield m_get
+
+def test_workflow_insufficient_budget(mock_agents):
+    """Verifies that the engine blocks production if the wallet is empty."""
+    engine = WorkflowEngine()
+    
+    # Mock wallet with low balance
+    low_wallet = Wallet(address="genesis", balance=0, internal_usd_balance=0.01)
+    
+    with patch("app.core.services.ledger_service.StateManager.get_wallet", return_value=low_wallet):
+        mood = Mood(valence=0.5)
+        with pytest.raises(RuntimeError, match="Insufficient budget"):
+            engine.produce_video_content("test", mood, "genesis")
+            
+    # Verify no agents were called
+    assert not mock_agents["narrative"].generate_content.called
+
+def test_workflow_repair_loop(mock_agents, enough_budget):
     """Verifies the inpainting repair loop logic."""
     engine = WorkflowEngine()
     
@@ -74,7 +96,7 @@ def test_workflow_repair_loop(mock_agents):
         mock_agents["critic"].detect_mask_area.assert_called_with(b"bad_image", "face")
         mock_agents["visual"].edit_image.assert_called_once()
 
-def test_workflow_critic_rejection_loop(mock_agents):
+def test_workflow_critic_rejection_loop(mock_agents, enough_budget):
     """Verifies that the engine retries generation if the Critic rejects the asset."""
     engine = WorkflowEngine()
     
@@ -122,7 +144,36 @@ def test_workflow_critic_rejection_loop(mock_agents):
     assert mock_agents["director"].generate_video.called
     assert mock_agents["eic"].stage_for_review.called
 
-def test_workflow_max_retries_failure(mock_agents):
+def test_workflow_max_retries_failure(mock_agents, enough_budget):
+    """Verifies that the engine proceeds with best effort after max retries."""
+    engine = WorkflowEngine()
+    
+    mock_agents["narrative"].generate_content.return_value = MagicMock(
+        title="Test", script="Test script", caption="Test"
+    )
+    from app.core.schemas.world import SceneLayout
+    mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(
+        location_id="loc", selected_objects=[], scene_description="desc"
+    )
+    mock_agents["optimizer"].optimize.return_value = "Prompt"
+    mock_agents["assets"].download_asset.return_value = b"ref"
+    mock_agents["visual"].generate_image.return_value = b"bad"
+    mock_agents["director"].generate_video.return_value = b"video"
+    mock_agents["eic"].stage_for_review.return_value = "path"
+    
+    # Always reject
+    mock_agents["critic"].verify_consistency.return_value = ConsistencyReport(
+        is_consistent=False, score=0.1, issues=["Fail"]
+    )
+    
+    mood = Mood(valence=0.5)
+    
+    # Should NOT raise RuntimeError anymore, just proceed
+    result = engine.produce_video_content("test", mood, "genesis", max_retries=3)
+    
+    assert result["video_bytes"] == b"video"
+    # verify retries happened
+    assert mock_agents["visual"].generate_image.call_count >= 3
     """Verifies that the engine proceeds with best effort after max retries."""
     engine = WorkflowEngine()
     

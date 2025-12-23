@@ -25,7 +25,7 @@
 - [ ] Task: Conductor - User Manual Verification 'Cost Tracking' (Protocol in workflow.md)
 
 ## Phase 3: Financial Autonomy & Budgeting
-- [ ] Task: Implement Budget-Aware Production Logic
+- [x] Task: Implement Budget-Aware Production Logic
     - **Goal:** Ensure the Muse stops production if her wallet balance is insufficient.
     - **Files:** `app/core/workflow_engine.py` (update).
     - **Tests:** Simulate zero balance and verify production is blocked.

@@ -72,9 +72,18 @@ class WorkflowEngine:
     ) -> Dict[str, Any]:
         """Runs the full production pipeline with visual and spatial QA.
         
-        Sequence: Narrative -> Architect -> Optimize -> Visual -> Critic (Loop) -> Director -> EIC.
+        Sequence: Budget Check -> Narrative -> Architect -> Optimize -> Visual -> Critic (Loop) -> Director -> Cost Deduction -> EIC.
         """
         
+        # 0. Budget Check
+        logger.info("Checking production budget...")
+        wallet = self.ledger_service.state_manager.get_wallet(subject_id)
+        # Assuming minimum production cost is around 0.15 USD
+        MIN_PRODUCTION_COST = 0.15
+        if not wallet or wallet.internal_usd_balance < MIN_PRODUCTION_COST:
+            current_bal = wallet.internal_usd_balance if wallet else 0
+            raise RuntimeError(f"Insufficient budget for production. Required: {MIN_PRODUCTION_COST}, Current: {current_bal}")
+
         # 1. Narrative Phase
         logger.info("Starting Narrative Phase...")
         script_data = self.narrative_agent.generate_content(intent, mood)

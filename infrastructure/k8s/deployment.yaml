@@ -1,58 +1,46 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: smos-agents
+  name: smos-agents-deployment
   labels:
     app: smos
-    component: agents
 spec:
   replicas: 3
   selector:
     matchLabels:
       app: smos
-      component: agents
   template:
     metadata:
       labels:
         app: smos
-        component: agents
+      annotations:
+        # GCS FUSE Sidecar configuration for instant model access
+        gke-gcsview.io/volumes: '[{"bucket":"smos-assets","mountPath":"/models"}]'
     spec:
-      runtimeClassName: gvisor # Secure isolation for untrusted workloads
+      runtimeClassName: smos-criu-runtime
       containers:
-      - name: smos-agents
-        image: gcr.io/PROJECT_ID/smos-agents:latest
-        imagePullPolicy: Always
+      - name: smos-agent
+        image: gcr.io/votre-projet-id/smos-agent:latest
         ports:
         - containerPort: 8000
         env:
         - name: PROJECT_ID
           valueFrom:
-            secretKeyRef:
-              name: smos-secrets
-              key: project-id
-        - name: REDIS_HOST
-          value: "redis-master"
-        - name: GCS_BUCKET_NAME
-          valueFrom:
             configMapKeyRef:
               name: smos-config
-              key: bucket-name
+              key: project_id
         resources:
-          requests:
-            cpu: "500m"
-            memory: "512Mi"
           limits:
-            cpu: "1000m"
-            memory: "1Gi"
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8000
-          initialDelaySeconds: 15
-          periodSeconds: 20
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8000
-          initialDelaySeconds: 5
-          periodSeconds: 10
+            nvidia.com/gpu: 1
+            memory: "16Gi"
+            cpu: "4"
+          requests:
+            nvidia.com/gpu: 1
+            memory: "8Gi"
+            cpu: "2"
+        volumeMounts:
+        - name: gcs-fuse-models
+          mountPath: /models
+      volumes:
+      - name: gcs-fuse-models
+        emptyDir: {}

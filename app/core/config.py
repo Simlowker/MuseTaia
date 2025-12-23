@@ -1,5 +1,6 @@
 """Configuration management for the SMOS application."""
 
+from typing import Optional
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -9,6 +10,7 @@ class Settings(BaseSettings):
     PROJECT_ID: str = "placeholder-project-id"
     LOCATION: str = "us-central1"
     GCS_BUCKET_NAME: str = "smos-assets"
+    APIFY_TOKEN: Optional[str] = None
 
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379

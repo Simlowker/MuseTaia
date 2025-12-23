@@ -30,8 +30,9 @@ class GenesisAgent:
         
         TASK:
         1. Conceptualize a Muse with a specific niche, personality, and visual style.
-        2. Draft their full DNA including a 'Moral Graph' and 'Visual Constancy' anchors.
+        2. Draft their full DNA including a 'Moral Graph' (ego, empathy, chaos, autonomy, sophistication, technophilia).
         3. Create a 'preview_prompt' that would generate their canonical master portrait.
+
         
         Return a JSON object following the MuseProposal schema.
         Ensure the concept is avant-garde, autonomous, and digitally native.

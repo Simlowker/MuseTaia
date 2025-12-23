@@ -8,6 +8,10 @@ class MoralGraph(BaseModel):
     ego: float = Field(..., ge=0.0, le=1.0)
     empathy: float = Field(..., ge=0.0, le=1.0)
     chaos: float = Field(..., ge=0.0, le=1.0)
+    autonomy: float = Field(0.5, ge=0.0, le=1.0, description="Propensity for independent action")
+    sophistication: float = Field(0.5, ge=0.0, le=1.0, description="Aesthetic level: 1.0=Luxury, 0.0=Raw/Street")
+    technophilia: float = Field(0.5, ge=0.0, le=1.0, description="Enthusiasm for high-tech themes")
+
 
 class GenesisIdentity(BaseModel):
     """Core identity traits for a new Muse."""

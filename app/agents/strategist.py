@@ -28,33 +28,41 @@ class StrategistAgent:
         self.model_name = model_name
         self.state_manager = StateManager()
 
-    def define_strategy(self, intent: Any) -> Dict[str, Any]:
-        """Develops a creative strategy for a given intent.
+    def define_strategy(self, intent: Any, dna: Optional[Any] = None) -> Dict[str, Any]:
+        """Develops a creative strategy for a given intent based on Moral Graph.
         
         Args:
             intent: The structured intent to strategize for.
+            dna: The Muse's DNA (including Moral Graph).
             
         Returns:
-            Dict: Detailed strategy including narrative angle and budget allocation.
+            Dict: Detailed strategy.
         """
-        # In a real implementation, this would use Vertex AI Context Caching
-        # to retrieve the Muse's full history and 'Moral Graph'.
+        
+        graph_context = ""
+        if dna and hasattr(dna, 'identity'):
+            g = dna.identity.moral_graph
+            graph_context = f"""
+            MUSE PSYCHOLOGY (Moral Graph):
+            - Autonomy: {g.autonomy} (High = very independent/bold)
+            - Sophistication: {g.sophistication} (High = luxury/minimalist aesthetic)
+            - Technophilia: {g.technophilia} (High = obsessed with future tech)
+            - Ego: {g.ego} / Empathy: {g.empathy} / Chaos: {g.chaos}
+            """
         
         prompt = f"""
         You are the 'Chief Strategy Officer' (CSO) for the Muse.
+        {graph_context}
         
         Intent: {intent}
         
         TASK:
-        1. Define a 'Narrative Angle' that aligns with the Muse's sovereign identity.
-        2. Propose a 'Budget Allocation' (Credits) for this task.
-        3. Identify 'Risk Factors' (e.g. Identity drift, budget overrun).
-        
-        Return a JSON object with:
-        - narrative_angle: A unique take on the trend.
-        - estimated_credits: Integer (50-500).
-        - strategy_id: A unique identifier.
+        1. Define a 'Narrative Angle' that STRICTLY respects the Muse's psychology.
+           - If Sophistication is High, avoid cheap viral hooks.
+           - If Autonomy is High, be provocative and self-sovereign.
+        2. Propose a 'Budget Allocation'.
         """
+
 
         response = self.client.models.generate_content(
             model=self.model_name,

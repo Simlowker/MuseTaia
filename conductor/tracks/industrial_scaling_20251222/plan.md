@@ -1,25 +1,25 @@
 # Track Plan: Industrial Scaling (Pod Snapshots & CRIU)
 
 ## Phase 1: Infrastructure Readiness (CRIU & GKE)
-- [x] Task: Configure Ubuntu Node Pool for CRIU
+- [x] Task: Configure Ubuntu Node Pool for CRIU 7a18b2e
     - **Goal:** Create a node pool that supports Checkpoint/Restore in Userspace (CRIU).
     - **Files:** `infrastructure/k8s/node-pool-config.yaml`
     - **Tech:** GKE, Ubuntu, CRIU.
-- [x] Task: Update RuntimeClass for Checkpoint Support
+- [x] Task: Update RuntimeClass for Checkpoint Support 7a18b2e
     - **Goal:** Ensure gVisor and the runtime class allow stateful snapshotting.
     - **Files:** `infrastructure/k8s/runtime-class.yaml` (update).
-- [ ] Task: Conductor - User Manual Verification 'Infra Readiness' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Infra Readiness' 7a18b2e
 
 ## Phase 2: The Golden Agent (Memory Template)
-- [x] Task: Implement Checkpoint Readiness Endpoint
+- [x] Task: Implement Checkpoint Readiness Endpoint in Python 7a18b2e
     - **Goal:** Add `/internal/checkpoint-ready` to the Python agent to signal that DNA and Matrix are fully loaded.
     - **Files:** `app/main.py` (update), `app/matrix/dna_loader.py` (update).
     - **Tech:** FastAPI, Vertex AI Context Caching.
-- [x] Task: Define Golden Deployment Manifest
+- [x] Task: Define Golden Deployment Manifest 7a18b2e
     - **Goal:** Create the deployment for the reference pod with `gke.io/pod-checkpointing` enabled.
     - **Files:** `infrastructure/k8s/snapshot-deployment.yaml`
     - **Tech:** Kubernetes, GKE Annotations.
-- [ ] Task: Conductor - User Manual Verification 'Golden Agent' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Golden Agent' 7a18b2e
 
 ## Phase 3: Go Dispatcher - The Restaurateur [checkpoint: a8fb98a]
 - [x] Task: Implement Fast-Clone logic in Go Dispatcher

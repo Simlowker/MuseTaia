@@ -1,52 +1,32 @@
-# infrastructure/k8s/snapshot-deployment.yaml
-# This manifest defines the "Golden Agent" pod used as a memory template for fast scaling.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: smos-agent-golden
-  labels:
-    app: smos
-    component: golden-template
+  name: smos-golden-agent
 spec:
-  replicas: 1 # Exactly one reference pod
+  replicas: 1
   selector:
     matchLabels:
-      app: smos
-      component: golden-template
+      app: smos-golden
   template:
     metadata:
       labels:
-        app: smos
-        component: golden-template
+        app: smos-golden
       annotations:
-        # Enable GKE Pod Checkpointing for this specific template
-        gke.io/pod-checkpointing: "enabled"
+        # Crucial: Enable GKE Checkpointing for this Pod
+        gke.io/pod-checkpointing: "true"
     spec:
-      runtimeClassName: gvisor
+      runtimeClassName: smos-criu-runtime
       containers:
-      - name: smos-agent
-        image: gcr.io/PROJECT_ID/smos-agents:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 8000
-        env:
-        - name: MODE
-          value: "GOLDEN_TEMPLATE"
-        - name: PROJECT_ID
-          valueFrom:
-            secretKeyRef:
-              name: smos-secrets
-              key: project-id
-        resources:
-          requests:
-            cpu: "1000m" # High allocation for fast cold-start init
-            memory: "1Gi"
-          limits:
-            cpu: "2000m"
-            memory: "2Gi"
+      - name: golden-agent
+        image: gcr.io/votre-projet-id/smos-agent:latest
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/bin/sh", "-c", "python scripts/bootstrap_dna.py"]
+        # Readiness probe used by Go Dispatcher to trigger snapshot
         readinessProbe:
           httpGet:
             path: /internal/checkpoint-ready
             port: 8000
-          initialDelaySeconds: 30
-          periodSeconds: 10
+          initialDelaySeconds: 15
+          periodSeconds: 5

@@ -1,24 +1,30 @@
-"""Manual verification script for VVS Algorithm and ROI Discovery."""
+"""Manual verification script for VVS Algorithm and ROI Discovery (Perception v2)."""
 
+import asyncio
 from app.agents.trend_scout import TrendScout
 from app.agents.strategist import StrategistAgent
 
-def verify_vvs_roi():
-    print("--- 1. Testing TrendScout VVS Discovery ---")
+async def verify_vvs_roi():
+    print("--- 1. Testing TrendScout VVS Discovery (Async Apify) ---")
     scout = TrendScout()
     try:
-        report = scout.scout_and_filter("virtual couture")
-        print(f"Topic: {report.topic}")
-        print(f"VVS Score: {report.vvs.score}/10 ({report.vvs.acceleration})")
-        print(f"Estimated ROI: {report.estimated_roi}")
+        # Note: This will return empty if APIFY_TOKEN is not set, 
+        # but we can verify the formula execution.
+        insights = await scout.scan_niche(["virtual couture", "cyberpunk"])
+        if not insights:
+            print("No insights found (check APIFY_TOKEN).")
+        else:
+            for insight in insights[:3]:
+                print(f"Topic: {insight.topic}")
+                print(f"VVS Score: {insight.vvs_score}")
+                print(f"Suggested Intent: {insight.suggested_intent}")
         
-        print("\n--- 2. Testing Strategist ROI Decision ---")
-        strategist = StrategistAgent()
-        approved = strategist.evaluate_production_roi(report, cost_estimate=0.50)
-        print(f"Decision for {report.topic} (Cost 0.50): {'APPROVED' if approved else 'REJECTED'}")
+        # Test mathematical formula directly
+        vvs = scout.calculate_vvs(1000, 1.0, 99)
+        print(f"\nFormula Verification: 1000 upvotes, 1h age, 99 comments -> VVS: {vvs}")
         
     except Exception as e:
         print(f"Verification failed: {e}")
 
 if __name__ == "__main__":
-    verify_vvs_roi()
+    asyncio.run(verify_vvs_roi())

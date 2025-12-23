@@ -107,15 +107,48 @@ class CriticAgent:
 
     def detect_physical_artifacts(self, image_bytes: bytes) -> List[QAFailure]:
         """Uses Gemini Vision to detect distorted limbs, shadows, or anatomy anomalies."""
+        logger.info("CRITIC: Analyzing image for physical artifacts (Hands, Shadows, Anatomy)...")
+        
         prompt = """
-        Analyze this image for AI artifacts. 
-        Focus on: distorted hands, extra fingers, missing shadows, or floating objects.
-        Return a JSON list of QAFailure objects if any major issues are found.
+        Analyze this AI-generated image for physical and anatomical artifacts.
+        Look specifically for:
+        - EXTRA FINGERS or distorted hands.
+        - MISSING or physically impossible shadows.
+        - FLOATING OBJECTS or detached limbs.
+        - BLURRY FACE or identity inconsistencies.
+
+        Return a JSON list of QAFailure objects. 
+        Each object MUST have:
+        - area: 'face', 'hands', 'shadows', or 'background'.
+        - severity: 0.0 to 1.0 (High if it ruins the image).
+        - description: Clear explanation of the artifact.
+        - action_type: 'inpaint' if it can be fixed, 'regenerate' if too severe.
+        
+        If NO artifacts are found, return an empty list [].
         """
         
-        # Conceptual call to Gemini Vision
-        # In a real implementation, we would use types.GenerateContentConfig with response_schema
-        return [] # Placeholder
+        try:
+            response = self.client.models.generate_content(
+                model="gemini-3.0-flash-preview", # Flash is excellent for fast vision QA
+                contents=[
+                    types.Content(
+                        role="user",
+                        parts=[
+                            types.Part.from_bytes(data=image_bytes, mime_type="image/jpeg"),
+                            types.Part.from_text(text=prompt)
+                        ]
+                    )
+                ],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    response_schema=List[QAFailure]
+                )
+            )
+            return response.parsed
+        except Exception as e:
+            logger.error(f"CRITIC: Artifact detection failed: {e}")
+            return []
+
 
     def verify_vocal_consistency(self, audio_bytes: bytes, vocal_dna: str) -> float:
         """Audits the generated audio against the Muse's vocal anchor."""

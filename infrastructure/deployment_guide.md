@@ -75,9 +75,9 @@ Since `gcloud` is not on your local machine, we will use **GitHub + Cloud Shell*
 ### Step B: Clone & Deploy in Cloud Shell
 Switch to your Google Cloud Shell window:
 
-1. **Clone the repo** (if not already done):
+1. **Clone the repo** (Public):
    ```bash
-   git clone https://github.com/YOUR_GITHUB_USER/MuseTaia.git
+   git clone https://github.com/Simlowker/MuseTaia.git
    cd MuseTaia
    ```
 

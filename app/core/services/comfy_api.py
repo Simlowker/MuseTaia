@@ -5,6 +5,7 @@ import logging
 import requests
 import time
 import asyncio
+import io
 from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
@@ -12,7 +13,7 @@ logger = logging.getLogger(__name__)
 class ComfyUIClient:
     """Client for executing nodal workflows via the ComfyUI API.
     
-    Optimized for GKE: Handles high-latency production and async retrieval.
+    Finalized for SMOS v2: Handles real asset retrieval from GKE pods.
     """
 
     def __init__(self, server_address: str = "localhost:8188"):
@@ -34,7 +35,7 @@ class ComfyUIClient:
             return "error"
 
     async def wait_for_output(self, prompt_id: str, timeout: int = 120) -> Optional[bytes]:
-        """Polls the history endpoint until the job is completed or timeout."""
+        """Polls the history endpoint and retrieves the actual generated asset."""
         start_time = time.time()
         url = f"http://{self.server_address}/history/{prompt_id}"
         
@@ -46,8 +47,19 @@ class ComfyUIClient:
                 if response.status_code == 200:
                     history = response.json()
                     if prompt_id in history:
-                        logger.info(f"COMFY_API: Production {prompt_id} SUCCESS.")
-                        return self.get_output_data(prompt_id)
+                        job_history = history[prompt_id]
+                        # Find the first output image/video in the nodes
+                        outputs = job_history.get("outputs", {})
+                        for node_id, node_output in outputs.items():
+                            if "images" in node_output:
+                                file_info = node_output["images"][0]
+                                filename = file_info["filename"]
+                                subfolder = file_info.get("subfolder", "")
+                                folder_type = file_info.get("type", "output")
+                                
+                                logger.info(f"COMFY_API: Asset found ({filename}). Fetching...")
+                                return self.get_output_data(filename, subfolder, folder_type)
+                                
             except Exception as e:
                 logger.warning(f"COMFY_API: Polling error: {e}")
             
@@ -56,7 +68,19 @@ class ComfyUIClient:
         logger.error(f"COMFY_API: Timeout reached for {prompt_id}")
         return None
 
-    def get_output_data(self, prompt_id: str) -> Optional[bytes]:
-        """Retrieves the actual output bytes from the ComfyUI server."""
-        # Implementation depends on internal storage mapping
-        return b"comfy_rendered_asset_bytes"
+    def get_output_data(self, filename: str, subfolder: str = "", folder_type: str = "output") -> Optional[bytes]:
+        """Retrieves the raw bytes of a generated asset via the /view API."""
+        url = f"http://{self.server_address}/view"
+        params = {
+            "filename": filename,
+            "subfolder": subfolder,
+            "type": folder_type
+        }
+        
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            return response.content
+        except Exception as e:
+            logger.error(f"COMFY_API: Failed to fetch asset data: {e}")
+            return None

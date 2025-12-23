@@ -46,8 +46,19 @@ kubectl apply -f infrastructure/k8s/service.yaml
 # 5. DEPLOYING LOBES
 echo "🛸 Launching the Swarm..."
 
+# Define full image paths
+REPO_PATH="us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo"
+AGENT_IMAGE="$REPO_PATH/smos-agent:latest"
+DISPATCHER_IMAGE="$REPO_PATH/smos-dispatcher:latest"
+
+# Update deployments with the correct images before applying
+# (Using sed to swap placeholders if necessary, or assuming yaml points to these tags)
+kubectl set image deployment/smos-agents-deployment smos-agent=$AGENT_IMAGE --local -o yaml | kubectl apply -f -
+kubectl set image deployment/smos-golden-agent golden-agent=$AGENT_IMAGE --local -o yaml | kubectl apply -f -
+
 # 5.1 Golden Agent (The Template)
 kubectl apply -f infrastructure/k8s/snapshot-deployment.yaml
+
 
 # 5.2 Main Agent Swarm
 kubectl apply -f infrastructure/k8s/deployment.yaml

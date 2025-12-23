@@ -78,3 +78,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Growth & Revenue Optimization (Learning v1)
 *Link: [./conductor/tracks/growth_learning_20251223/](./conductor/tracks/growth_learning_20251223/)*
+
+## [x] Track: High Compute Burst & Skill Sandboxing (Scale v1)
+*Link: [./conductor/tracks/high_compute_burst_20251223/](./conductor/tracks/high_compute_burst_20251223/)*

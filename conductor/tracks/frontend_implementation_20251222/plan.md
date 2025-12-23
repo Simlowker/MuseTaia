@@ -1,6 +1,6 @@
 # Track Plan: Sovereign Frontend (Sovereign Minimalism 2.0)
 
-## Phase 1: Environment Setup & Core Shell
+## Phase 1: Environment Setup & Core Shell [checkpoint: 5b4bcd7]
 - [x] Task: Initialize Next.js Project
     - **Goal:** Set up the frontend project structure with TypeScript and Bootstrap CSS.
     - **Files:** `frontend/`, `frontend/package.json`
@@ -9,7 +9,7 @@
     - **Goal:** Create the core layout with Z-index layers and the dynamic mood-based color provider.
     - **Files:** `frontend/src/components/Layout.tsx`, `frontend/src/context/MoodContext.tsx`
     - **Tech:** CSS Modules, React Context.
-- [ ] Task: Conductor - User Manual Verification 'Core Shell' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Core Shell' (Protocol in workflow.md) 5b4bcd7
 
 ## Phase 2: The Sovereign Heart (Command Center)
 - [ ] Task: Implement Central Visual Vortex & Waveform

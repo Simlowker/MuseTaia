@@ -16,7 +16,16 @@ steps:
     args: ['build', '-o', 'dispatcher', './infrastructure/dispatcher']
     env: ['GOOS=linux', 'GOARCH=amd64']
 
-  # 4. Deploy to GKE
+  # 4. Run Visual Regression Test (Identity Anchor)
+  - name: 'gcr.io/$PROJECT_ID/smos-agents:latest'
+    entrypoint: 'python3'
+    args: ['scripts/run_visual_regression.py', 'genesis']
+    env:
+      - 'PROJECT_ID=$PROJECT_ID'
+      - 'LOCATION=us-central1'
+      - 'GCS_BUCKET_NAME=smos-assets'
+
+  # 5. Deploy to GKE
   - name: 'gcr.io/cloud-builders/gke-deploy'
     args:
       - run

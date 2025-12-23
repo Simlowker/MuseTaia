@@ -37,7 +37,8 @@
 - [ ] Task: Conductor - User Manual Verification 'Regression Test Runner' (Protocol in workflow.md)
 
 ## Phase 4: CI/CD Integration
-- [ ] Task: Integrate Regression Suite into Cloud Build
+- [x] Task: Integrate Regression Suite into Cloud Build
     - **Goal:** Ensure the build fails if the visual identity drifts during updates.
     - **Files:** `cloudbuild.yaml` (update).
+    - **Tech:** Google Cloud Build.
 - [ ] Task: Conductor - User Manual Verification 'CI/CD Integration' (Protocol in workflow.md)

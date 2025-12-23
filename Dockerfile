@@ -1,5 +1,6 @@
 # SMOS v2 Agent Dockerfile
-FROM python:3.11-slim
+# SMOS v2 Agent Dockerfile
+FROM python:3.9-slim
 
 WORKDIR /app
 

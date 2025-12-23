@@ -85,6 +85,8 @@ def get_wallet(address: str = "genesis"):
 def toggle_sovereign_mode(active: bool):
     global sovereign_mode_active
     sovereign_mode_active = active
+    # Persist to Redis so other components can see it
+    state_manager.redis.set("smos:config:sovereign_mode", "true" if active else "false")
     return {"status": "updated", "sovereign_mode": sovereign_mode_active}
 
 # --- 2. Swarm & HITL Endpoints ---

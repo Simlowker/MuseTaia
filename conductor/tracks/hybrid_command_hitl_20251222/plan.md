@@ -23,9 +23,11 @@
 - [x] Task: Conductor - User Manual Verification 'Hybrid UI' (Protocol in workflow.md) c3e4803
 
 ## Phase 3: Validation Gates & Previews
-- [ ] Task: Implement Pipeline Pausing in WorkflowEngine
+- [x] Task: Implement Pipeline Pausing in WorkflowEngine
     - **Goal:** Update the production loop to suspend execution and wait for human signal when in "Collaborative" mode.
     - **Files:** `app/core/workflow_engine.py` (update).
+    - **Tech:** Python, Redis Polling/Blocking.
+    - **Tests:** Verify pipeline pauses at script and visual QA gates.
 - [ ] Task: Integrate Low-Res Previews in Instant Canvas
     - **Goal:** Display intermediate render results from ComfyUI before the final 4K render.
     - **Files:** `frontend/src/app/page.tsx` (update), `app/core/services/comfy_api.py` (update).

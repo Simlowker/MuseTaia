@@ -35,8 +35,11 @@ def mock_agents():
 
 @pytest.fixture
 def enough_budget():
-    with patch("app.core.services.ledger_service.StateManager.get_wallet") as m_get:
+    with patch("app.core.services.ledger_service.StateManager.get_wallet") as m_get, \
+         patch("app.core.services.ledger_service.get_redis_client") as m_redis:
         m_get.return_value = Wallet(address="any", balance=1.0, internal_usd_balance=100.0)
+        # Ensure sovereign mode is ON by default for tests
+        m_redis.return_value.get.return_value = b"true"
         yield m_get
 
 def test_workflow_insufficient_budget(mock_agents):
@@ -105,13 +108,15 @@ def test_workflow_repair_loop(mock_agents, enough_budget):
     mock_agents["visual"].generate_image.return_value = b"bad_image"
     mock_agents["visual"].edit_image.return_value = b"repaired_image"
     
+    # Critic: 1. Reject with Feedback, 2. Accept, 3+ Fallback Accept
     feedback = FeedbackItem(
         category="identity", description="Fix face", severity=0.8, 
         action_type="inpaint", target_area="face"
     )
     mock_agents["critic"].verify_consistency.side_effect = [
         ConsistencyReport(is_consistent=False, score=0.5, feedback=[feedback]),
-        ConsistencyReport(is_consistent=True, score=0.95)
+        ConsistencyReport(is_consistent=True, score=0.99),
+        ConsistencyReport(is_consistent=True, score=0.99)
     ]
     mock_agents["critic"].detect_mask_area.return_value = [100, 100, 200, 200]
     

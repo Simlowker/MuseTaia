@@ -28,9 +28,10 @@
     - **Files:** `app/core/workflow_engine.py` (update).
     - **Tech:** Python, Redis Polling/Blocking.
     - **Tests:** Verify pipeline pauses at script and visual QA gates.
-- [ ] Task: Integrate Low-Res Previews in Instant Canvas
+- [x] Task: Integrate Low-Res Previews in Instant Canvas
     - **Goal:** Display intermediate render results from ComfyUI before the final 4K render.
-    - **Files:** `frontend/src/app/page.tsx` (update), `app/core/services/comfy_api.py` (update).
+    - **Files:** `frontend/src/app/page.tsx` (update), `app/main.py` (update), `frontend/src/services/api.ts` (update).
+    - **Tests:** Verify 'Awaiting Approval' state shows buttons and clears on resolution.
 - [ ] Task: Conductor - User Manual Verification 'Validation Gates' (Protocol in workflow.md)
 
 ## Phase 4: Full Hybrid Loop

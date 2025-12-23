@@ -108,6 +108,22 @@ async def trigger_production(req: ProductionRequest):
 def list_proposals():
     return state_manager.get_proposals()
 
+@app.get("/swarm/pending")
+def list_pending_tasks():
+    # Fetch all keys from the pending hash
+    tasks = state_manager.redis.hgetall(state_manager.pending_tasks_key)
+    return [json.loads(v.decode('utf-8')) for v in tasks.values()]
+
+@app.post("/swarm/resolve/{task_id}")
+async def resolve_task(task_id: str, action: str):
+    if action not in ["approve", "reject"]:
+        raise HTTPException(status_code=400, detail="Invalid action")
+    
+    # Set the signal in Redis for the waiting WorkflowEngine
+    approval_key = f"smos:swarm:approve:{task_id}"
+    state_manager.redis.setex(approval_key, 300, action)
+    return {"status": "signal_sent", "task_id": task_id, "action": action}
+
 @app.post("/swarm/approve")
 async def approve_proposal(req: ApprovalRequest):
     # In a real HITL setup, we'd fetch the proposal details and trigger production

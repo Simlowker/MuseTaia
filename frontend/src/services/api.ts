@@ -65,5 +65,19 @@ export const smosApi = {
     });
     if (!res.ok) throw new Error('Failed to toggle mode');
     return res.json();
+  },
+
+  async getPendingTasks(): Promise<any[]> {
+    const res = await fetch(`${API_BASE_URL}/swarm/pending`);
+    if (!res.ok) throw new Error('Failed to fetch pending tasks');
+    return res.json();
+  },
+
+  async resolveTask(taskId: string, action: 'approve' | 'reject'): Promise<any> {
+    const res = await fetch(`${API_BASE_URL}/swarm/resolve/${taskId}?action=${action}`, {
+      method: 'POST'
+    });
+    if (!res.ok) throw new Error('Failed to resolve task');
+    return res.json();
   }
 };

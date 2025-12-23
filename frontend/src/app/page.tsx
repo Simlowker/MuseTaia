@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMood } from '@/context/MoodContext';
 import { smosApi } from '@/services/api';
@@ -14,6 +14,28 @@ export default function Home() {
   const { mood, setMood, accentColor, rawMood, isSovereign, setIsSovereign } = useMood();
   const [isTriggering, setIsTriggering] = useState(false);
   const [activeProposal, setActiveProposal] = useState<any>(null);
+  const [pendingTask, setPendingTask] = useState<any>(null);
+
+  const fetchPending = async () => {
+    if (isSovereign) return;
+    try {
+      const tasks = await smosApi.getPendingTasks();
+      setPendingTask(tasks.length > 0 ? tasks[0] : null);
+    } catch (e) { console.error(e); }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(fetchPending, 3000);
+    return () => clearInterval(interval);
+  }, [isSovereign]);
+
+  const handleResolveTask = async (action: 'approve' | 'reject') => {
+    if (!pendingTask) return;
+    try {
+      await smosApi.resolveTask(pendingTask.task_id, action);
+      setPendingTask(null);
+    } catch (e) { console.error(e); }
+  };
 
   const handleTriggerProduction = async (intent: string) => {
     setIsTriggering(true);
@@ -140,9 +162,25 @@ export default function Home() {
         <SwarmStatus />
 
         <div className="glass-card">
-          <h4 className="fw-light mb-4 tracking-widest small">INSTANT CANVAS</h4>
-          <div className="bg-black rounded-1 ratio ratio-1x1 border border-white border-opacity-5 d-flex align-items-center justify-content-center text-secondary overflow-hidden text-center shadow-inner">
-            {isTriggering ? (
+          <h4 className="fw-light mb-4 tracking-widest small">INSTANT_CANVAS</h4>
+          <div className="bg-black rounded-1 ratio ratio-1x1 border border-white border-opacity-5 d-flex align-items-center justify-content-center text-secondary overflow-hidden text-center shadow-inner relative">
+            {pendingTask ? (
+              <div className="p-3 w-100 h-100 d-flex flex-column justify-content-between">
+                <div>
+                  <div className="text-warning small font-monospace tracking-widest mb-2" style={{ fontSize: '0.6rem' }}>[ AWAITING_APPROVAL ]</div>
+                  <div className="text-white-50 x-small mb-3">{pendingTask.step_name.toUpperCase()}</div>
+                </div>
+                
+                <div className="flex-fill d-flex align-items-center justify-content-center border border-white border-opacity-5 rounded bg-white bg-opacity-5 mb-3">
+                  <span className="text-secondary small font-monospace" style={{ fontSize: '0.55rem' }}>LOW_RES_PREVIEW_STREAM</span>
+                </div>
+
+                <div className="d-flex gap-2">
+                  <button className="btn btn-sm btn-outline-danger flex-fill fw-light x-small" onClick={() => handleResolveTask('reject')}>REJECT</button>
+                  <button className="btn btn-sm flex-fill fw-light x-small text-white" style={{ backgroundColor: accentColor }} onClick={() => handleResolveTask('approve')}>PROCEED</button>
+                </div>
+              </div>
+            ) : isTriggering ? (
               <div className="p-4">
                 <div className="spinner-border text-white-50 border-1 mb-3" style={{ width: '1.5rem', height: '1.5rem' }} role="status"></div>
                 <br/><span className="text-white-50 small tracking-widest font-monospace" style={{ fontSize: '0.6rem' }}>DISPATCHING_SWARM...</span>

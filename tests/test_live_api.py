@@ -3,6 +3,7 @@
 import pytest
 import asyncio
 from unittest.mock import MagicMock, patch, AsyncMock
+from google.genai import types
 from app.core.services.live_api import LiveApiService
 
 @pytest.fixture
@@ -21,38 +22,64 @@ async def test_live_session_connection(mock_genai):
     mock_connect.__aenter__.return_value = mock_session
     mock_client.live.connect.return_value = mock_connect
     
-    service = LiveApiService()
-    
-    async with service.session() as session:
-        assert session == mock_session
-        mock_client.live.connect.assert_called_once()
+    with patch("app.core.services.live_api.SwarmToolbox"):
+        service = LiveApiService()
+        
+        async with service.session() as session:
+            assert session == mock_session
+            mock_client.live.connect.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_run_interaction_loop(mock_genai):
-    """Test the interaction loop with a mock session."""
+async def test_run_interaction_loop_with_tool_call(mock_genai):
+    """Test the interaction loop with a tool call."""
     mock_client = mock_genai.Client.return_value
     mock_session = AsyncMock()
     
-    # Mock session.receive() as an async generator
-    # Using MagicMock instead of AsyncMock for the method itself
-    mock_session.receive = MagicMock()
-    async def mock_receive():
-        yield "msg1"
-        yield "msg2"
+    # 1. Mock a tool call message
+    mock_fc = MagicMock()
+    mock_fc.name = "search_web"
+    mock_fc.args = {"query": "cyberpunk"}
+    mock_fc.id = "call_1"
     
+    mock_msg_tool = MagicMock()
+    mock_msg_tool.tool_call.function_calls = [mock_fc]
+    mock_msg_tool.server_content = None
+    
+    mock_msg_text = MagicMock()
+    mock_msg_text.tool_call = None
+    
+    async def mock_receive():
+        yield mock_msg_tool
+        yield mock_msg_text
+    
+    mock_session.receive = MagicMock()
     mock_session.receive.side_effect = mock_receive
     
     mock_connect = MagicMock()
     mock_connect.__aenter__.return_value = mock_session
     mock_client.live.connect.return_value = mock_connect
     
-    service = LiveApiService()
-    
-    received_messages = []
-    async def on_message(msg):
-        received_messages.append(msg)
+    # Patch SwarmToolbox
+    with patch("app.core.services.live_api.SwarmToolbox") as mock_toolbox_class:
+        mock_toolbox = mock_toolbox_class.return_value
+        mock_toolbox.execute_tool = AsyncMock(return_value={"result": "search result"})
+        mock_toolbox.get_tool_definitions.return_value = []
         
-    await service.run_interaction_loop(on_message, initial_message="Hello")
-    
-    assert received_messages == ["msg1", "msg2"]
-    mock_session.send.assert_called_once_with(input="Hello", end_of_turn=True)
+        service = LiveApiService()
+        
+        received_messages = []
+        async def on_message(msg):
+            received_messages.append(msg)
+            
+        await service.run_interaction_loop(on_message, initial_message="Hello")
+        
+        assert len(received_messages) == 2
+        # Verify tool was executed
+        mock_toolbox.execute_tool.assert_called_once_with("search_web", {"query": "cyberpunk"})
+        # Verify response was sent back to session
+        mock_session.send_tool_response.assert_called_once()
+        call_args = mock_session.send_tool_response.call_args
+        responses = call_args.kwargs["function_responses"]
+        assert responses[0].name == "search_web"
+        assert responses[0].response == {"result": "search result"}
+

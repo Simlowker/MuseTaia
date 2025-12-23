@@ -1,27 +1,20 @@
 steps:
-  # 1. Build the Go Dispatcher Binary FIRST
-  - name: 'golang:1.21'
-    dir: 'infrastructure/dispatcher'
-    entrypoint: 'go'
-    args: ['build', '-o', '../../smos-dispatcher', '.']
-    env: ['GOOS=linux', 'GOARCH=amd64', 'CGO_ENABLED=0']
-
-  # 2. Build the Swarm Agent Image
+  # 1. Build the Swarm Agent Image (Python)
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:$COMMIT_SHA', '.', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:latest']
 
-  # 3. Build the Dispatcher Image (Separate container for scale)
+  # 2. Build the Dispatcher Image (Go) - The Dockerfile handles its own compilation
   - name: 'gcr.io/cloud-builders/docker'
     dir: 'infrastructure/dispatcher'
     args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:$COMMIT_SHA', '.', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:latest']
 
-  # 4. Push Swarm Agent
+  # 3. Push Swarm Agent
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:$COMMIT_SHA']
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:latest']
 
-  # 5. Push Dispatcher
+  # 4. Push Dispatcher
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:$COMMIT_SHA']
   - name: 'gcr.io/cloud-builders/docker'

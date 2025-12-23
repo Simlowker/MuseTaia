@@ -16,9 +16,10 @@
 - [x] Task: Implement Sovereign Switch (Auto/Manual)
     - **Goal:** Add the mode toggle to the cognition section.
     - **Files:** `frontend/src/app/page.tsx`, `frontend/src/context/MoodContext.tsx`, `frontend/src/services/api.ts` (update)
-- [ ] Task: Build Mission Proposal UI
+- [x] Task: Build Mission Proposal UI
     - **Goal:** Transform the Trends Feed into a "Suggested Commands" list with Edit/Approve/Reject actions.
     - **Files:** `frontend/src/components/TrendFeed.tsx`, `frontend/src/components/ProposalEditor.tsx` (New)
+    - **Tests:** Verify modal opens with correct data when trend is clicked.
 - [ ] Task: Conductor - User Manual Verification 'Hybrid UI' (Protocol in workflow.md)
 
 ## Phase 3: Validation Gates & Previews

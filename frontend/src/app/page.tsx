@@ -1,16 +1,19 @@
 'use client';
 
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useMood } from '@/context/MoodContext';
 import { smosApi } from '@/services/api';
 import VisualVortex from '@/components/VisualVortex';
 import NeuralWaveform from '@/components/NeuralWaveform';
 import TrendFeed from '@/components/TrendFeed';
 import SwarmStatus from '@/components/SwarmStatus';
+import ProposalEditor from '@/components/ProposalEditor';
 
 export default function Home() {
-  const { mood, setMood, accentColor, rawMood } = useMood();
+  const { mood, setMood, accentColor, rawMood, isSovereign, setIsSovereign } = useMood();
   const [isTriggering, setIsTriggering] = useState(false);
+  const [activeProposal, setActiveProposal] = useState<any>(null);
 
   const handleTriggerProduction = async (intent: string) => {
     setIsTriggering(true);
@@ -24,8 +27,35 @@ export default function Home() {
     }
   };
 
+  const openProposal = (topic: string) => {
+    setActiveProposal({
+      id: Math.random().toString(36).substr(2, 9),
+      topic: topic,
+      script: `[VISUAL: ${topic} in high-fidelity studio lighting]\n\nMUSE: Digital sovereignty isn't a goal, it's a foundation. Let's explore ${topic} together.`,
+      confidence: 0.94
+    });
+  };
+
   return (
     <div className="row g-4">
+      {/* Proposal Editor Modal */}
+      <AnimatePresence>
+        {activeProposal && (
+          <>
+            <div className="position-fixed top-0 start-0 w-100 h-100 bg-black bg-opacity-80 z-2" onClick={() => setActiveProposal(null)} />
+            <ProposalEditor 
+              proposal={activeProposal}
+              onClose={() => setActiveProposal(null)}
+              onReject={() => setActiveProposal(null)}
+              onApprove={(id, script) => {
+                handleTriggerProduction(script);
+                setActiveProposal(null);
+              }}
+            />
+          </>
+        )}
+      </AnimatePresence>
+
       {/* 1. Zone Centrale: L'Entité */}
       <div className="col-lg-6 order-lg-2">
         <div className="glass-card h-100" style={{ borderTop: `0.5px solid ${accentColor}` }}>
@@ -99,9 +129,10 @@ export default function Home() {
           </div>
         </div>
 
-        <div onClick={() => handleTriggerProduction("Adaptive Narrative Sync")}>
-          <TrendFeed />
-        </div>
+        <TrendFeed 
+          onExecute={openProposal}
+          onDiscuss={openProposal}
+        />
       </div>
 
       {/* 3. Zone Droite: L'Usine Créative */}

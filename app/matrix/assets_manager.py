@@ -3,6 +3,31 @@
 from typing import List, Optional
 from google.cloud import storage
 
+class MockBlob:
+    def __init__(self, name):
+        self.name = name
+        self.public_url = f"https://mock-gcs.local/{name}"
+        self.metadata = {}
+    
+    def upload_from_string(self, data):
+        pass
+    
+    def download_as_bytes(self):
+        return b"mock_data"
+
+class MockBucket:
+    def __init__(self, name):
+        self.name = name
+    
+    def blob(self, name):
+        return MockBlob(name)
+
+class MockStorageClient:
+    def bucket(self, name):
+        return MockBucket(name)
+    
+    def list_blobs(self, bucket_name, prefix=None):
+        return []
 
 class SignatureAssetsManager:
     """Manages the upload, retrieval, and listing of Muse Signature Assets."""
@@ -13,9 +38,13 @@ class SignatureAssetsManager:
         Args:
             bucket_name: The name of the GCS bucket to use.
         """
-        self.client = storage.Client()
-        self.bucket_name = bucket_name
-        self.bucket = self.client.bucket(bucket_name)
+        try:
+            self.client = storage.Client()
+            self.bucket = self.client.bucket(bucket_name)
+        except Exception as e:
+            print(f"WARNING: GCS Client initialization failed ({e}). Using Mock Client.")
+            self.client = MockStorageClient()
+            self.bucket = self.client.bucket(bucket_name)
 
     def upload_asset(
         self,

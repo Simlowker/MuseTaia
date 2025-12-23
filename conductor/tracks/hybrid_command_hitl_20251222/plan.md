@@ -12,7 +12,7 @@
     - **Tests:** Verify endpoints return data from StateManager.
 - [ ] Task: Conductor - User Manual Verification 'HITL Backend' (Protocol in workflow.md)
 
-## Phase 2: Hybrid Frontend Interface
+## Phase 2: Hybrid Frontend Interface [checkpoint: c3e4803]
 - [x] Task: Implement Sovereign Switch (Auto/Manual)
     - **Goal:** Add the mode toggle to the cognition section.
     - **Files:** `frontend/src/app/page.tsx`, `frontend/src/context/MoodContext.tsx`, `frontend/src/services/api.ts` (update)
@@ -20,7 +20,7 @@
     - **Goal:** Transform the Trends Feed into a "Suggested Commands" list with Edit/Approve/Reject actions.
     - **Files:** `frontend/src/components/TrendFeed.tsx`, `frontend/src/components/ProposalEditor.tsx` (New)
     - **Tests:** Verify modal opens with correct data when trend is clicked.
-- [ ] Task: Conductor - User Manual Verification 'Hybrid UI' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Hybrid UI' (Protocol in workflow.md) c3e4803
 
 ## Phase 3: Validation Gates & Previews
 - [ ] Task: Implement Pipeline Pausing in WorkflowEngine

@@ -21,11 +21,26 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+import os
+import logging
+
+logger = logging.getLogger(__name__)
+
+# Global flag for snapshot readiness
+is_ready_for_snapshot = False
+
 # Initialize Services
 state_manager = StateManager()
 workflow_engine = WorkflowEngine()
 trend_scanner = TrendScanner()
 ledger_service = LedgerService()
+
+# Check for Golden Template Mode
+MODE = os.getenv("MODE", "STANDARD")
+if MODE == "GOLDEN_TEMPLATE":
+    logger.info("SMOS GOLDEN_TEMPLATE MODE ACTIVE: Warming up engine for snapshot...")
+    # Trigger any heavy initializations here (e.g. warming up caches)
+    is_ready_for_snapshot = True
 
 class ProductionRequest(BaseModel):
     intent: str
@@ -34,7 +49,16 @@ class ProductionRequest(BaseModel):
 @app.get("/")
 def read_root() -> dict:
     """Returns a welcome message for the SMOS API."""
-    return {"message": "Welcome to SMOS API"}
+    return {"message": "Welcome to SMOS API", "mode": MODE}
+
+# --- 0. Internal / GKE Lifecycle Endpoints ---
+
+@app.get("/internal/checkpoint-ready")
+def check_snapshot_readiness():
+    """Endpoint used by GKE / Dispatcher to verify the pod is ready to be 'frozen'."""
+    if is_ready_for_snapshot:
+        return {"status": "ready", "mode": MODE}
+    raise HTTPException(status_code=503, detail="System warming up...")
 
 # --- 1. State Endpoints ---
 

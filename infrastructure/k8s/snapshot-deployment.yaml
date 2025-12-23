@@ -1,0 +1,52 @@
+# infrastructure/k8s/snapshot-deployment.yaml
+# This manifest defines the "Golden Agent" pod used as a memory template for fast scaling.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smos-agent-golden
+  labels:
+    app: smos
+    component: golden-template
+spec:
+  replicas: 1 # Exactly one reference pod
+  selector:
+    matchLabels:
+      app: smos
+      component: golden-template
+  template:
+    metadata:
+      labels:
+        app: smos
+        component: golden-template
+      annotations:
+        # Enable GKE Pod Checkpointing for this specific template
+        gke.io/pod-checkpointing: "enabled"
+    spec:
+      runtimeClassName: gvisor
+      containers:
+      - name: smos-agent
+        image: gcr.io/PROJECT_ID/smos-agents:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8000
+        env:
+        - name: MODE
+          value: "GOLDEN_TEMPLATE"
+        - name: PROJECT_ID
+          valueFrom:
+            secretKeyRef:
+              name: smos-secrets
+              key: project-id
+        resources:
+          requests:
+            cpu: "1000m" # High allocation for fast cold-start init
+            memory: "1Gi"
+          limits:
+            cpu: "2000m"
+            memory: "2Gi"
+        readinessProbe:
+          httpGet:
+            path: /internal/checkpoint-ready
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10

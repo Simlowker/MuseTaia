@@ -1,0 +1,20 @@
+# Node pool configuration for GKE with CRIU support
+# This uses the Ubuntu image type which is required for reliable CRIU Checkpoint/Restore operations in 2025.
+nodeConfig:
+  imageType: UBUNTU_CONTAINERD
+  machineType: e2-standard-4
+  oauthScopes:
+    - https://www.googleapis.com/auth/cloud-platform
+  labels:
+    smos-role: magic-factory
+    criu-support: "true"
+  taints:
+    - key: "smos-factory"
+      value: "true"
+      effect: "NO_SCHEDULE"
+autoscaling:
+  minNodeCount: 1
+  maxNodeCount: 10
+management:
+  autoUpgrade: true
+  autoRepair: true

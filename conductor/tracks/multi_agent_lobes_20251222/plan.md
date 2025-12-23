@@ -1,7 +1,7 @@
 # Track Plan: Functional Lobe Architecture (SMOS Swarm v2)
 
 ## Phase 1: Perception Lobe (The Scout Lobe)
-- [ ] Task: Implement The TrendScout Tools
+- [x] Task: Implement The TrendScout Tools 25771ce
     - **Goal:** Integrate social scraping and niche filtering.
     - **Files:** `app/agents/trend_scout.py`, `app/core/services/scraper.py`
     - **Tech:** Gemma 2 27B, Apify (Conceptual).

@@ -6,7 +6,7 @@
     - **Files:** `app/matrix/models.py` (update), `app/matrix/world_dna.py`
     - **Tech:** Pydantic.
     - **Tests:** Validate environmental objects against the schema.
-- [ ] Task: Implement World Assets Manager (GCS Integration)
+- [x] Task: Implement World Assets Manager (GCS Integration)
     - **Goal:** Manage the storage and retrieval of environmental reference images (Backgrounds, Objects).
     - **Files:** `app/matrix/world_assets.py`
     - **Tech:** Google Cloud Storage.

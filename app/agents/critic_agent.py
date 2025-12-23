@@ -119,3 +119,11 @@ class CriticAgent:
         # In a real implementation, we would use types.GenerateContentConfig with response_schema
         return [] # Placeholder
 
+    def verify_vocal_consistency(self, audio_bytes: bytes, vocal_dna: str) -> float:
+        """Audits the generated audio against the Muse's vocal anchor."""
+        logger.info(f"CRITIC_AUDIO: Verifying timbre match for {vocal_dna}")
+        # In production, this uses a Siamese Neural Network to compare 
+        # speaker embeddings.
+        return 0.92 # Simulated match score
+
+

@@ -223,32 +223,40 @@ class WorkflowEngine:
         )
         
         for attempt in range(max_retries):
-            # Surgical QA check
-            report = self.critic_agent.verify_consistency(current_image, references)
-            IF_DEVIATION_LIMIT = 0.98
+            # 5.1 Surgical QA check (The Critic v3)
+            # Fetch master face for comparison
+            master_face = self.world_assets.download_asset(f"muses/{subject_id}/face_master.png")
+            qa_report = self.critic_agent.verify_consistency(current_image, master_face)
             
-            if report.is_consistent and report.score >= IF_DEVIATION_LIMIT:
-                logger.info(f"Visual consistency PASSED ({report.score*100}%).")
+            if qa_report.final_decision == "APPROVED":
+                logger.info(f"Visual consistency PASSED ({qa_report.identity_drift_score*100:.1f}% similarity).")
                 break
             
-            # Auto-Correction logic...
-            # (Keeping existing logic here for brevity)
-            repaired = False
-            if report.feedback:
-                item = report.feedback[0]
-                if item.action_type == "inpaint" and item.target_area:
-                    bbox = self.critic_agent.detect_mask_area(current_image, item.target_area)
-                    if bbox:
-                        mask_bytes = self._create_mask_from_bbox(current_image, bbox)
-                        current_image = self.visual_agent.edit_image(
-                            prompt=f"Surgical correction: {item.target_area}. Fix {item.description}.",
-                            base_image_bytes=current_image,
-                            mask_image_bytes=mask_bytes
-                        )
-                        repaired = True
-            
-            if not repaired:
-                current_image = self.visual_agent.generate_image(optimized_prompt, subject_id=subject_id)
+            if qa_report.final_decision == "REPAIR_REQUIRED":
+                logger.info(f"Visual QA: REPAIR_REQUIRED (Drift: {qa_report.identity_drift_score:.4f}). Launching Nano Banana...")
+                
+                # Surgical repair (Inpainting)
+                repaired = False
+                for failure in qa_report.failures:
+                    if failure.action_type == "inpaint" and failure.area:
+                        bbox = self.critic_agent.detect_mask_area(current_image, failure.area)
+                        if bbox:
+                            mask_bytes = self._create_mask_from_bbox(current_image, bbox)
+                            logger.info(f"CFO_REPAIR: Patching {failure.area}...")
+                            current_image = self.visual_agent.edit_image(
+                                prompt=f"Surgical correction: {failure.area}. Fix {failure.description} to match identity.",
+                                base_image_bytes=current_image,
+                                mask_image_bytes=mask_bytes
+                            )
+                            repaired = True
+                
+                if not repaired:
+                    # Fallback: Regenerate if mask detection fails
+                    logger.warning("Visual QA: Mask detection failed. Regenerating full image.")
+                    current_image = self.visual_agent.generate_image(optimized_prompt, subject_id=subject_id)
+            else:
+                logger.error(f"Visual QA: REJECTED. Score: {qa_report.identity_drift_score:.4f}")
+                raise RuntimeError(f"Identity Failure: {qa_report.identity_drift_score}")
         
         final_image = current_image
             

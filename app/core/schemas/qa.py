@@ -19,3 +19,20 @@ class ConsistencyReport(BaseModel):
     issues: List[str] = Field(default_factory=list, description="Summary of issues")
     feedback: List[FeedbackItem] = Field(default_factory=list, description="Structured feedback items")
     recommendations: Optional[str] = Field(None, description="High-level recommendations")
+
+class QAFailure(BaseModel):
+    """Specific failure detected during the Visual QA audit."""
+    area: str = Field(..., description="Affected zone: 'face', 'identity', 'anatomy', etc.")
+    severity: float = Field(..., ge=0.0, le=1.0, description="Severity score (1.0 = total failure)")
+    description: str = Field(..., description="Detailed issue description")
+    action_type: str = Field(..., description="'inpaint' for surgical repair or 'regenerate' for full failure")
+    target_bbox: Optional[List[int]] = Field(None, description="[ymin, xmin, ymax, xmax] coordinates for repair")
+
+class QAReport(BaseModel):
+    """Comprehensive Visual QA report enforcing the 2% rule."""
+    is_consistent: bool
+    identity_drift_score: float = Field(..., description="Biometric similarity score (InsightFace logic)")
+    clip_semantic_score: float = Field(0.0, description="CLIP-based prompt alignment score")
+    failures: List[QAFailure] = Field(default_factory=list)
+    final_decision: str = Field(..., description="'APPROVED', 'REJECTED', or 'REPAIR_REQUIRED'")
+

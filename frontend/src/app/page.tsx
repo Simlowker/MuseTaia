@@ -1,6 +1,10 @@
 'use client';
 
 import { useMood } from '@/context/MoodContext';
+import VisualVortex from '@/components/VisualVortex';
+import NeuralWaveform from '@/components/NeuralWaveform';
+import TrendFeed from '@/components/TrendFeed';
+import SwarmStatus from '@/components/SwarmStatus';
 
 export default function Home() {
   const { mood, setMood, accentColor } = useMood();
@@ -9,18 +13,12 @@ export default function Home() {
     <div className="row g-4">
       {/* 1. Zone Centrale: L'Entité */}
       <div className="col-lg-6 order-lg-2">
-        <div className="glass-card accent-border" style={{ minHeight: '600px', borderTop: '4px solid' }}>
+        <div className="glass-card accent-border h-100" style={{ borderTop: '4px solid' }}>
           <h2 className="fw-bold mb-4 accent-text">THE ENTITY</h2>
-          <div className="bg-dark rounded-3 d-flex align-items-center justify-content-center" style={{ minHeight: '400px' }}>
-            <span className="text-secondary">[ Veo 3.1 4K Visual Vortex Placeholder ]</span>
-          </div>
-          <div className="mt-4 p-3 border border-secondary rounded">
-            <div className="d-flex justify-content-between align-items-center">
-              <span className="small text-secondary">NEURAL WAVEFORM</span>
-              <span className="badge border border-secondary" style={{ color: accentColor }}>ACTIVE</span>
-            </div>
-            <div className="mt-2 text-secondary small">[ Sinusoidal Particle Animation ]</div>
-          </div>
+          
+          <VisualVortex />
+          <NeuralWaveform />
+          
         </div>
       </div>
 
@@ -50,47 +48,19 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="glass-card">
-          <h4 className="fw-bold mb-3">NICHE TRENDS</h4>
-          <ul className="list-group list-group-flush bg-transparent">
-            <li className="list-group-item bg-transparent text-white border-secondary small">
-              Digital Couture #PFW <span className="float-end text-success">92%</span>
-            </li>
-            <li className="list-group-item bg-transparent text-white border-secondary small">
-              Generative Arch <span className="float-end text-warning">74%</span>
-            </li>
-          </ul>
-        </div>
+        <TrendFeed />
       </div>
 
       {/* 3. Zone Droite: L'Usine Créative */}
       <div className="col-lg-3 order-lg-3">
-        <div className="glass-card mb-4">
-          <h4 className="fw-bold mb-3">SWARM STATUS</h4>
-          <div className="mb-3 small">
-            <div className="d-flex justify-content-between mb-1">
-              <span>Narrative Lead</span>
-              <span className="text-secondary">Ready</span>
-            </div>
-            <div className="progress bg-dark" style={{ height: '4px' }}>
-              <div className="progress-bar" style={{ width: '100%', backgroundColor: accentColor }}></div>
-            </div>
-          </div>
-          <div className="mb-3 small">
-            <div className="d-flex justify-content-between mb-1">
-              <span>Visual Virtuoso</span>
-              <span className="text-secondary">Rendering...</span>
-            </div>
-            <div className="progress bg-dark" style={{ height: '4px' }}>
-              <div className="progress-bar progress-bar-animated progress-bar-striped" style={{ width: '60%', backgroundColor: accentColor }}></div>
-            </div>
-          </div>
-        </div>
+        <SwarmStatus />
 
         <div className="glass-card">
           <h4 className="fw-bold mb-3">INSTANT CANVAS</h4>
-          <div className="bg-dark rounded-3 ratio ratio-1x1 d-flex align-items-center justify-content-center text-secondary">
-            [ Preview Slot ]
+          <div className="bg-dark rounded-3 ratio ratio-1x1 d-flex align-items-center justify-content-center text-secondary overflow-hidden">
+            <div className="p-4 text-center">
+              <span className="small">WAITING FOR CRITIC APPROVAL...</span>
+            </div>
           </div>
         </div>
       </div>

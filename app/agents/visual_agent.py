@@ -5,6 +5,7 @@ import google.genai as genai
 from google.genai import types
 from app.core.config import settings
 from app.matrix.assets_manager import SignatureAssetsManager
+from app.core.vertex_init import get_genai_client
 
 class VisualAgent:
     """The Photographer agent responsible for generating high-fidelity images."""
@@ -15,13 +16,10 @@ class VisualAgent:
         Args:
             model_name: The name of the Imagen 3 model to use.
         """
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
         self.assets_manager = SignatureAssetsManager(bucket_name=settings.GCS_BUCKET_NAME)
+
 
     def generate_image(
         self,

@@ -8,6 +8,7 @@ from app.state.models import Mood
 from app.state.db_access import StateManager
 from app.agents.protocols.master_sync import MasterSyncProtocol, CommandIntent
 from app.agents.orchestrator import Orchestrator, TaskGraph
+from app.core.vertex_init import get_genai_client
 
 class RootAgent:
     """The central nervous system of the SMOS swarm.
@@ -25,12 +26,9 @@ class RootAgent:
         Args:
             model_name: The name of the Gemini model to use.
         """
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.chat_session = self.client.chats.create(
+
             model=model_name,
             config=types.GenerateContentConfig(
                 system_instruction="You are the RootAgent of the Sovereign Muse OS."

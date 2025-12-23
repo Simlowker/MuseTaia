@@ -8,6 +8,7 @@ from app.core.config import settings
 from app.core.schemas.qa import QAReport, QAFailure, ConsistencyReport
 from app.core.utils.visual_comparison import VisualComparator
 from app.state.db_access import StateManager
+from app.core.vertex_init import get_genai_client
 
 logger = logging.getLogger(__name__)
 
@@ -16,12 +17,9 @@ class CriticAgent:
 
     def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
         """Initializes The Critic."""
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
+
         self.comparator = VisualComparator()
         self.state_manager = StateManager()
         # Seuil critique : 0.75 de similarité cosinus (Règle des 2% de déviation)

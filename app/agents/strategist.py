@@ -6,6 +6,7 @@ import google.genai as genai
 from google.genai import types
 from app.core.config import settings
 from app.state.db_access import StateManager
+from app.core.vertex_init import get_genai_client
 
 logger = logging.getLogger(__name__)
 
@@ -19,13 +20,10 @@ class HighLevelPlanner:
     """
 
     def __init__(self, model_name: str = "gemini-3.0-pro"):
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
         self.state_manager = StateManager()
+
 
     def plan_mission(self, intent: str, dna: Any) -> Dict[str, Any]:
         """Translates a raw intent into a high-level strategic plan."""

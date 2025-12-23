@@ -5,6 +5,7 @@ import google.genai as genai
 from google.genai import types
 from app.core.config import settings
 from app.core.schemas.genesis import GenesisDNA, MuseProposal
+from app.core.vertex_init import get_genai_client
 
 class GenesisAgent:
     """Agent responsible for the 'Inspiration' phase of Muse creation.
@@ -14,12 +15,9 @@ class GenesisAgent:
     """
 
     def __init__(self, model_name: str = "gemini-3.0-pro"):
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
+
 
     def generate_random_concept(self) -> MuseProposal:
         """Generates a complete Muse concept for the 'Surprise Me' mode."""

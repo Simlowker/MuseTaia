@@ -121,3 +121,10 @@ class SignatureAssetsManager:
         path = f"muses/{muse_id}/anchors/{anchor_type}.png"
         self.upload_asset(path, data, metadata={"muse_id": muse_id, "type": "identity_anchor", "anchor_type": anchor_type})
         return path
+
+    def upload_dna(self, muse_id: str, dna_json: str) -> str:
+        """Uploads the canonical dna.json for a Muse."""
+        path = f"muses/{muse_id}/dna.json"
+        self.upload_asset(path, dna_json.encode('utf-8'), metadata={"muse_id": muse_id, "type": "dna"})
+        return path
+

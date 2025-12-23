@@ -13,7 +13,7 @@ def mock_genai():
 
 @pytest.mark.asyncio
 async def test_live_session_connection(mock_genai):
-    """Test that the live session connects correctly."""
+    """Test that the live session connects correctly with context and voice."""
     mock_client = mock_genai.Client.return_value
     
     # Mock the async context manager client.live.connect
@@ -22,12 +22,21 @@ async def test_live_session_connection(mock_genai):
     mock_connect.__aenter__.return_value = mock_session
     mock_client.live.connect.return_value = mock_connect
     
-    with patch("app.core.services.live_api.SwarmToolbox"):
+    with patch("app.core.services.live_api.SwarmToolbox"), \
+         patch("app.core.services.live_api.ContextCacheManager"):
+        
         service = LiveApiService()
         
         async with service.session() as session:
             assert session == mock_session
             mock_client.live.connect.assert_called_once()
+            
+            # Verify config
+            call_args = mock_client.live.connect.call_args
+            config = call_args.kwargs["config"]
+            assert config.system_instruction is not None
+            assert config.speech_config.voice_config.prebuilt_voice_config.voice_name == "Aoede"
+            assert "AUDIO" in config.response_modalities
 
 @pytest.mark.asyncio
 async def test_run_interaction_loop_with_tool_call(mock_genai):

@@ -12,13 +12,14 @@
 - [x] Task: Conductor - User Manual Verification 'Interactive Toolset' (Protocol in workflow.md) ee2ed1f
 
 ## Phase 2: Live Persona & Context (The Muse's Soul)
-- [ ] Task: Integrate Identity Context (Caching) into Live Session
+- [x] Task: Integrate Identity Context (Caching) into Live Session
     - **Goal:** Ensure the live session starts with the Muse's full DNA context (1M+ tokens).
     - **Files:** `app/core/services/live_api.py` (update).
     - **Tech:** Vertex AI Context Caching.
-- [ ] Task: Implement Signature Voice & Audio Config
+- [x] Task: Implement Signature Voice & Audio Config
     - **Goal:** Configure the Live API with the Muse's vocal personality.
     - **Files:** `app/core/services/live_api.py` (update).
+    - **Tech:** Gemini Multimodal Live (Audio).
 - [ ] Task: Conductor - User Manual Verification 'Live Persona' (Protocol in workflow.md)
 
 ## Phase 3: Real-time Brain (The RootAgent Loop)

@@ -30,10 +30,10 @@
 - [x] Task: Conductor - User Manual Verification 'Forge & Matrix' (Protocol in workflow.md) 5795183
 
 ## Phase 4: Ledger & Master Control
-- [ ] Task: Implement Financial Ledger & Sync Controller
+- [x] Task: Implement Financial Ledger & Sync Controller
     - **Goal:** Build the ROI/Cost dashboard and the Master Sync (Human vs Community) toggle.
-    - **Files:** `frontend/pages/ledger.tsx`, `frontend/components/MasterSync.tsx`
-- [ ] Task: End-to-End API Integration
+    - **Files:** `frontend/src/app/ledger/page.tsx`, `frontend/src/components/MasterSync.tsx` (Inline)
+- [x] Task: End-to-End API Integration
     - **Goal:** Connect all frontend components to the existing Python Backend (StateDB, WorkflowEngine).
-    - **Files:** `frontend/services/api.ts`
-- [ ] Task: Conductor - User Manual Verification 'Frontend Completion' (Protocol in workflow.md)
+    - **Files:** `frontend/src/services/api.ts`, `app/main.py` (update)
+- [x] Task: Conductor - User Manual Verification 'Frontend Completion' (Protocol in workflow.md) [checkpoint: PENDING]

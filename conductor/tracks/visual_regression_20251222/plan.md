@@ -13,15 +13,16 @@
 - [ ] Task: Conductor - User Manual Verification 'Genesis Anchor Registry' (Protocol in workflow.md)
 
 ## Phase 2: Similarity Analysis Engine
-- [ ] Task: Implement Multimodal Similarity Module
+- [x] Task: Implement Multimodal Similarity Module
     - **Goal:** Use Gemini 3 Vision to compare a new render against the Identity Anchor.
     - **Files:** `app/core/utils/visual_comparison.py`
     - **Tech:** Gemini 3.0 Flash Preview (Vision).
     - **Tests:** Verify score generation for matching vs. different faces.
-- [ ] Task: Implement Structural Similarity (SSIM) Fallback
+- [x] Task: Implement Structural Similarity (SSIM) Fallback
     - **Goal:** Add pixel-level structural comparison for background consistency.
     - **Files:** `app/core/utils/visual_comparison.py`
     - **Tech:** Pillow/NumPy or specialized library.
+    - **Tests:** Verify score for identical vs different images.
 - [ ] Task: Conductor - User Manual Verification 'Similarity Analysis' (Protocol in workflow.md)
 
 ## Phase 3: Regression Test Runner

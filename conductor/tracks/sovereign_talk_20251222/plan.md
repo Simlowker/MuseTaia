@@ -1,6 +1,6 @@
 # Track Plan: Sovereign Talk (Interactive Orchestration)
 
-## Phase 1: Interactive Toolset (The Muse's Hands)
+## Phase 1: Interactive Toolset (The Muse's Hands) [checkpoint: ee2ed1f]
 - [x] Task: Wrap Swarm Agents as Executable Tools
     - **Goal:** Standardize Narrative, Visual, and Search agents into a format that the Gemini Live API can call as functions.
     - **Files:** `app/agents/tools/swarm_tools.py`
@@ -9,7 +9,7 @@
 - [x] Task: Implement Live Tool Dispatcher
     - **Goal:** Create a handler that executes swarm tasks in response to model function calls during a live session.
     - **Files:** `app/core/services/live_api.py` (update).
-- [ ] Task: Conductor - User Manual Verification 'Interactive Toolset' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Interactive Toolset' (Protocol in workflow.md) ee2ed1f
 
 ## Phase 2: Live Persona & Context (The Muse's Soul)
 - [ ] Task: Integrate Identity Context (Caching) into Live Session

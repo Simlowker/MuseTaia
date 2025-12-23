@@ -93,8 +93,7 @@ class StrategistAgent:
         Returns:
             bool: True if production is approved.
         """
-        # Improved Heuristic: Use the estimated ROI from TrendScout
-        # Approve if ROI > 1.2 (20% margin) or VVS is Peaking (> 7.0)
+        # Heuristic: Approve if ROI > 1.2 (20% margin) or VVS is Peaking (> 7.0)
         
         vvs_score = trend_report.vvs.score if trend_report.vvs else 0.0
         roi = trend_report.estimated_roi
@@ -103,3 +102,12 @@ class StrategistAgent:
             return True # Always capture peaks
             
         return roi >= 1.2 or (vvs_score * 0.5) >= cost_estimate
+
+    def update_the_matrix(self, post_mortem: Any) -> bool:
+        """Injects lessons from the Learning Loop into long-term context memory."""
+        logger.info(f"STRATEGIST: Updating The Matrix with lessons from task {post_mortem.task_id}.")
+        # Simulation: Update Redis with key lessons
+        summary = f"Success Factors: {post_mortem.success_factors}. Next Strategy: {post_mortem.next_step_strategy}"
+        self.state_manager.redis.set(f"smos:experience:lesson:{post_mortem.task_id}", summary)
+        return True
+

@@ -1,0 +1,19 @@
+{
+  "cpm_by_niche": {
+    "luxury-fashion": 45.0,
+    "tech-hardware": 32.0,
+    "digital-art": 18.5,
+    "ai-lifestyle": 25.0
+  },
+  "compute_costs_usd": {
+    "image_gen": 0.03,
+    "video_veo_5s": 0.50,
+    "video_flux_5s": 0.15
+  },
+  "profit_threshold_min": 1.5,
+  "sponsorship_leads": [
+    "Techwear brands",
+    "GPU providers",
+    "Digital jewelry designers"
+  ]
+}

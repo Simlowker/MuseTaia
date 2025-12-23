@@ -73,10 +73,22 @@ class Orchestrator:
             ]
         )
 
+        # 4. Learning Loop (Optimization) - New Phase
+        learning_loop = ParallelAgent(
+            agent_id="learn_01",
+            agent_type="learning_loop",
+            instruction="Analyze performance and monetize.",
+            swarm=[
+                ADKAgent(agent_id="growth_01", agent_type="growth_hacker", instruction="Analyze retention."),
+                ADKAgent(agent_id="rev_01", agent_type="revenue_optimizer", instruction="Match sponsorships.")
+            ]
+        )
+
         return TaskGraph(
             root_intent=intent,
-            nodes=[cso, creative_swarm, production_pipe]
+            nodes=[cso, creative_swarm, production_pipe, learning_loop]
         )
+
 
 class TaskGraphRunner:
     """The 'Transmission' that executes the ADK TaskGraph."""

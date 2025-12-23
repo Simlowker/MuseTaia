@@ -1,0 +1,25 @@
+# Attention Patterns for Muse Growth
+# Updated automatically by GrowthHacker Agent
+
+high_performing_hooks:
+  - type: "Question"
+    example: "Why is no one talking about [topic]?"
+    retention_score: 0.85
+  - type: "Contrarian"
+    example: "Everything you know about [topic] is wrong."
+    retention_score: 0.92
+  - type: "Visual Reveal"
+    example: "Wait for the transition..."
+    retention_score: 0.78
+
+visual_styles:
+  - name: "Dramatic Macro"
+    ctr_boost: 0.12
+  - name: "Cyberpunk Neon"
+    ctr_boost: 0.18
+
+language_nuances:
+  - "Sovereign"
+  - "Autonomous"
+  - "The Matrix"
+  - "Deep-tech"

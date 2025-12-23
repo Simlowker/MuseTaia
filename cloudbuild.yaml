@@ -20,11 +20,24 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:latest']
 
+  # 5. Build Frontend Image (Next.js)
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: 'frontend'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-frontend:$COMMIT_SHA', '.', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-frontend:latest']
+
+  # 6. Push Frontend
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-frontend:$COMMIT_SHA']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-frontend:latest']
+
 images:
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:$COMMIT_SHA'
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:latest'
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:$COMMIT_SHA'
   - 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:latest'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-frontend:$COMMIT_SHA'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-frontend:latest'
 
 options:
   logging: CLOUD_LOGGING_ONLY

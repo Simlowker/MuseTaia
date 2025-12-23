@@ -35,3 +35,77 @@ spec:
       port: 80
       targetPort: 8000
   type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smos-dispatcher
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smos-dispatcher
+  template:
+    metadata:
+      labels:
+        app: smos-dispatcher
+    spec:
+      containers:
+        - name: smos-dispatcher
+          image: us-central1-docker.pkg.dev/PROJECT_ID_PLACEHOLDER/smos-repo/smos-dispatcher:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: smos-config
+            - secretRef:
+                name: smos-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smos-dispatcher-service
+spec:
+  selector:
+    app: smos-dispatcher
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smos-frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: smos-frontend
+  template:
+    metadata:
+      labels:
+        app: smos-frontend
+    spec:
+      containers:
+        - name: smos-frontend
+          image: us-central1-docker.pkg.dev/PROJECT_ID_PLACEHOLDER/smos-repo/smos-frontend:latest
+          ports:
+            - containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: smos-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: smos-frontend-service
+spec:
+  selector:
+    app: smos-frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: LoadBalancer

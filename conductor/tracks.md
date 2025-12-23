@@ -66,3 +66,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: The Critic & Visual QA (Governance v3)
 *Link: [./conductor/tracks/visual_qa_v3_20251223/](./conductor/tracks/visual_qa_v3_20251223/)*
+
+## [x] Track: Genesis Pipeline & Studio Automation (Creation v2)
+*Link: [./conductor/tracks/genesis_pipeline_20251223/](./conductor/tracks/genesis_pipeline_20251223/)*

@@ -25,9 +25,10 @@ class Settings(BaseSettings):
     @classmethod
     def validate_project_id(cls, v: str) -> str:
         if v == "placeholder-project-id":
-            # For local dev we might allow it, but let's warn or enforce if in production
-            # Since we are in the context of an "Industrial" project, let's be strict
-            pass 
+            import os
+            # If we are in production or any non-local env, fail
+            if os.getenv("ENVIRONMENT") == "production":
+                raise ValueError("PROJECT_ID must be set to a real GCP project ID in production.")
         return v
 
     def get_allowed_origins(self) -> List[str]:

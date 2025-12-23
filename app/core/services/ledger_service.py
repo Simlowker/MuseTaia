@@ -43,9 +43,10 @@ class LedgerService:
 
         # 1. Update Wallet Balance atomically using Redis WATCH
         wallet_key = f"smos:state:wallet:{wallet_address}"
+        MAX_RETRIES = 5
         
         with self.redis.pipeline() as pipe:
-            while True:
+            for attempt in range(MAX_RETRIES):
                 try:
                     pipe.watch(wallet_key)
                     
@@ -74,6 +75,9 @@ class LedgerService:
                     break # Success
                 except redis.WatchError:
                     # Target key changed, retry
+                    if attempt == MAX_RETRIES - 1:
+                        logger.error(f"LEDGER: Max retries ({MAX_RETRIES}) reached for wallet {wallet_address}. Aborting.")
+                        raise RuntimeError(f"Failed to update wallet {wallet_address} after max retries due to concurrency.")
                     continue
 
         logger.info(f"Recorded {tx_type} of {amount} for {wallet_address}. New internal balance: {wallet.internal_usd_balance}")

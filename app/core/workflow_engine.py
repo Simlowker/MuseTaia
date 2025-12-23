@@ -219,7 +219,6 @@ class WorkflowEngine:
         logger.info(f"CFO_GATE: Production AUTHORIZED. Projected balance: {solvency.projected_balance}")
 
         # Task ID for HITL tracking
-        import uuid
         task_id = str(uuid.uuid4())[:8]
 
         # 1. Narrative Phase
@@ -322,7 +321,7 @@ class WorkflowEngine:
         # --- HITL GATE 2: PRE-RENDER QA ---
         if not is_sovereign:
             approved = self._wait_for_approval(task_id, "visual_qa", {
-                "score": report.score, "issues": report.issues
+                "score": qa_report.identity_drift_score, "issues": qa_report.failures
             }, preview_data=final_image)
             if not approved:
                 raise RuntimeError("Mission rejected by human master during visual QA.")
@@ -370,8 +369,6 @@ class WorkflowEngine:
         subject_id: str
     ) -> str:
         """Starts the production pipeline in the background and returns a task ID."""
-        import asyncio
-        import uuid
         task_id = str(uuid.uuid4())[:8]
         
         # Fire and forget the production

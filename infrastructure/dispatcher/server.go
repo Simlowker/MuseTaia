@@ -59,5 +59,21 @@ default:
 }
 
 func (s *DispatcherServer) HandleHealth(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "OK - Active Workers: %d", s.pool.MaxWorkers)
+
+	status := map[string]interface{}{
+
+		"status":     "healthy",
+
+		"workers":    s.pool.MaxWorkers,
+
+		"queue_size": len(s.pool.JobQueue),
+
+		"timestamp":  time.Now().Format(time.RFC3339),
+
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	json.NewEncoder(w).Encode(status)
+
 }

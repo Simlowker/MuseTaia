@@ -49,5 +49,8 @@ This file tracks all major tracks for the project. Each track has its own detail
 ## [x] Track: Proactive Sovereignty (SMOS v2 Core Overhaul)
 *Link: [./conductor/tracks/proactive_sovereignty_20251222/](./conductor/tracks/proactive_sovereignty_20251222/)*
 
-## [~] Track: Hybrid Command & HITL Integration
+## [x] Track: Hybrid Command & HITL Integration
 *Link: [./conductor/tracks/hybrid_command_hitl_20251222/](./conductor/tracks/hybrid_command_hitl_20251222/)*
+
+## [~] Track: Functional Lobe Architecture (SMOS Swarm v2)
+*Link: [./conductor/tracks/multi_agent_lobes_20251222/](./conductor/tracks/multi_agent_lobes_20251222/)*

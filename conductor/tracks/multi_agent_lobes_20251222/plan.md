@@ -12,11 +12,11 @@
 - [x] Task: Conductor - User Manual Verification 'Perception Lobe' (Protocol in workflow.md) 89da3ac
 
 ## Phase 2: High Cognition Lobe (The Brain)
-- [ ] Task: Refactor RootAgent for ADK Workflow Management
+- [x] Task: Refactor RootAgent for ADK Workflow Management a3058a1
     - **Goal:** Standardize intent parsing and validation gate logic.
     - **Files:** `app/agents/root_agent.py` (update).
     - **Tech:** Google ADK.
-- [ ] Task: Refactor The Strategist
+- [x] Task: Refactor The Strategist a3058a1
     - **Goal:** Guardian of long-term narrative and budget allocation logic.
     - **Files:** `app/agents/strategist.py`
     - **Tech:** Gemini 3 Pro, Context Cache.

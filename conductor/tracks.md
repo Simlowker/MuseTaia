@@ -63,3 +63,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Identity Persistence & ComfyScript (Visual v2)
 *Link: [./conductor/tracks/visual_identity_v2_20251223/](./conductor/tracks/visual_identity_v2_20251223/)*
+
+## [x] Track: The Critic & Visual QA (Governance v3)
+*Link: [./conductor/tracks/visual_qa_v3_20251223/](./conductor/tracks/visual_qa_v3_20251223/)*

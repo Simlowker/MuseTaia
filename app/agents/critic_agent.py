@@ -7,16 +7,12 @@ from google.genai import types
 from app.core.config import settings
 from app.core.schemas.qa import QAReport, QAFailure, ConsistencyReport
 from app.core.utils.visual_comparison import VisualComparator
+from app.state.db_access import StateManager
 
 logger = logging.getLogger(__name__)
 
 class CriticAgent:
-    """Agent de gouvernance visuelle appliquant la règle des 2% de dérive.
-    
-    This agent represents the 'Governance Lobe' (v3).
-    It uses biometric comparison and semantic analysis to block or repair 
-    unauthorized identity drifts.
-    """
+    """Agent de gouvernance visuelle appliquant la règle des 2% de dérive."""
 
     def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
         """Initializes The Critic."""
@@ -27,6 +23,7 @@ class CriticAgent:
         )
         self.model_name = model_name
         self.comparator = VisualComparator()
+        self.state_manager = StateManager()
         # Seuil critique : 0.75 de similarité cosinus (Règle des 2% de déviation)
         self.identity_threshold = 0.75
 
@@ -37,12 +34,16 @@ class CriticAgent:
         criteria: str = "visual identity, colors, and spatial continuity"
     ) -> QAReport:
         """Comprehensive audit of the generated image vs Signature Assets."""
+        self.state_manager.publish_event("CRITIC_AUDIT", "Performing biometric identity check...")
         
         # 1. Biometric Analysis (Identity Drift)
         drift_score = self.comparator.calculate_face_similarity(
             generated_image_bytes, 
             reference_face_bytes
         )
+        
+        self.state_manager.publish_event("CRITIC_SCORE", f"Identity Similarity Score: {drift_score:.4f}", {"score": drift_score})
+
         
         # 2. Semantic Analysis (Simulated CLIP/Gemini Vision)
         semantic_score = 0.85 

@@ -49,11 +49,8 @@ class CFOAgent:
         self.SPEND_LIMIT_PER_HOUR = 5.0
 
     def verify_solvency(self, wallet: Wallet, history: List[Transaction], estimated_cost: float) -> SolvencyCheck:
-        """Verifies solvency before any action (Hard Constraint).
-        
-        Applies the rule: If Projected_Balance < 0, the action is FORBIDDEN.
-        Also applies a temporal Circuit Breaker.
-        """
+        """Verifies solvency before any action (Hard Constraint)."""
+        self.ledger_service.state_manager.publish_event("CFO_AUDIT", f"Analyzing solvency for production (Cost: {estimated_cost} USD)")
         
         # 1. Circuit Breaker Calculation (Spend in the last hour)
         one_hour_ago = datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(hours=1)
@@ -61,12 +58,14 @@ class CFOAgent:
                           if tx.timestamp > one_hour_ago and tx.type == TransactionType.EXPENSE)
         
         if (recent_spend + estimated_cost) > self.SPEND_LIMIT_PER_HOUR:
+            self.ledger_service.state_manager.publish_event("CIRCUIT_BREAKER", "Hourly limit exceeded. Blocking production.")
             return SolvencyCheck(
                 is_authorized=False,
                 projected_balance=wallet.internal_usd_balance - estimated_cost,
                 reasoning=f"CIRCUIT BREAKER ACTIVE: Hourly spend rate ({recent_spend + estimated_cost:.2f}) exceeds safety limit ({self.SPEND_LIMIT_PER_HOUR}).",
                 circuit_breaker_active=True
             )
+
 
         # 2. LLM Reasoning for Strategic Decision
         prompt = f"""
@@ -110,22 +109,26 @@ class CFOAgent:
 
     def settle_production_cost(self, cost_estimate: float, task_id: str) -> Transaction:
         """Records a production expense in the ledger."""
-        return self.ledger_service.record_transaction(
+        tx = self.ledger_service.record_transaction(
             amount=cost_estimate,
             tx_type=TransactionType.EXPENSE,
             category=TransactionCategory.API_COST,
             description=f"Production cost settlement for task: {task_id}"
         )
+        self.ledger_service.state_manager.publish_event("CFO_SETTLEMENT", f"Deducted {cost_estimate} USD for task {task_id}.")
+        return tx
 
     def rollback_production_cost(self, amount: float, task_id: str) -> Transaction:
         """Refunds the wallet if a production task fails (Financial Safety)."""
         logger.warning(f"FINANCE_ROLLBACK: Refunding {amount} USD for failed task {task_id}.")
+        self.ledger_service.state_manager.publish_event("CFO_ROLLBACK", f"Refunded {amount} USD due to failure in {task_id}.")
         return self.ledger_service.record_transaction(
             amount=amount,
             tx_type=TransactionType.INCOME, # Refund is income/re-credit
             category=TransactionCategory.OTHER,
             description=f"REFUND: Failed production rollback for {task_id}"
         )
+
 
 
     def summarize_health(self, wallet: Wallet, history: List[Transaction]) -> FinancialSummary:

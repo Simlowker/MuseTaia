@@ -1,0 +1,51 @@
+/* Sovereign Aesthetic for SMOS v2 */
+.sovereign-container {
+  background: radial-gradient(circle at center, #050a05 0%, #000000 100%);
+  color: #00ff41;
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+.neural-card {
+  background: rgba(0, 20, 0, 0.4);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 65, 0.2);
+  box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+  transition: all 0.3s ease;
+}
+
+.neural-card:hover {
+  border-color: rgba(0, 255, 65, 0.5);
+  box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+}
+
+.glitch-text {
+  text-shadow: 2px 0 #ff00c1, -2px 0 #00fff9;
+  animation: glitch 2s infinite;
+}
+
+@keyframes glitch {
+  0% { transform: translate(0); }
+  20% { transform: translate(-2px, 2px); }
+  40% { transform: translate(-2px, -2px); }
+  60% { transform: translate(2px, 2px); }
+  80% { transform: translate(2px, -2px); }
+  100% { transform: translate(0); }
+}
+
+.ledger-ticker {
+  background: #000;
+  border-top: 1px solid #004d00;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ticker-item {
+  display: inline-block;
+  padding: 0 20px;
+  animation: scroll-left 20s linear infinite;
+}
+
+@keyframes scroll-left {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}

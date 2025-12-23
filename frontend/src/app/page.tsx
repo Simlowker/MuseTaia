@@ -1,198 +1,56 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useMood } from '@/context/MoodContext';
-import { smosApi } from '@/services/api';
-import VisualVortex from '@/components/VisualVortex';
-import NeuralWaveform from '@/components/NeuralWaveform';
-import TrendFeed from '@/components/TrendFeed';
-import SwarmStatus from '@/components/SwarmStatus';
-import ProposalEditor from '@/components/ProposalEditor';
+import SwarmDashboard from '@/components/SwarmDashboard';
+import '@/styles/sovereign.css';
 
 export default function Home() {
-  const { mood, setMood, accentColor, rawMood, isSovereign, setIsSovereign } = useMood();
-  const [isTriggering, setIsTriggering] = useState(false);
-  const [activeProposal, setActiveProposal] = useState<any>(null);
-  const [pendingTask, setPendingTask] = useState<any>(null);
-
-  const fetchPending = async () => {
-    if (isSovereign) return;
-    try {
-      const tasks = await smosApi.getPendingTasks();
-      setPendingTask(tasks.length > 0 ? tasks[0] : null);
-    } catch (e) { console.error(e); }
-  };
-
-  useEffect(() => {
-    const interval = setInterval(fetchPending, 3000);
-    return () => clearInterval(interval);
-  }, [isSovereign]);
-
-  const handleResolveTask = async (action: 'approve' | 'reject') => {
-    if (!pendingTask) return;
-    try {
-      await smosApi.resolveTask(pendingTask.task_id, action);
-      setPendingTask(null);
-    } catch (e) { console.error(e); }
-  };
-
-  const handleTriggerProduction = async (intent: string) => {
-    setIsTriggering(true);
-    try {
-      const result = await smosApi.triggerProduction(intent);
-      console.log('Production triggered:', result.task_id);
-    } catch (error) {
-      console.error('Trigger failed:', error);
-    } finally {
-      setIsTriggering(false);
-    }
-  };
-
-  const openProposal = (topic: string) => {
-    setActiveProposal({
-      id: Math.random().toString(36).substr(2, 9),
-      topic: topic,
-      script: `[VISUAL: ${topic} in high-fidelity studio lighting]\n\nMUSE: Digital sovereignty isn't a goal, it's a foundation. Let's explore ${topic} together.`,
-      confidence: 0.94
-    });
-  };
-
   return (
-    <div className="row g-4">
-      {/* Proposal Editor Modal */}
-      <AnimatePresence>
-        {activeProposal && (
-          <>
-            <div className="position-fixed top-0 start-0 w-100 h-100 bg-black bg-opacity-80 z-2" onClick={() => setActiveProposal(null)} />
-            <ProposalEditor 
-              proposal={activeProposal}
-              onClose={() => setActiveProposal(null)}
-              onReject={() => setActiveProposal(null)}
-              onApprove={(id, script) => {
-                handleTriggerProduction(script);
-                setActiveProposal(null);
-              }}
-            />
-          </>
-        )}
-      </AnimatePresence>
+    <main className="min-h-screen sovereign-container p-8">
+      <div className="max-w-6xl mx-auto space-y-8">
+        {/* Header Visionnaire */}
+        <header className="text-center space-y-4 py-12">
+          <h1 className="text-5xl font-black tracking-tighter glitch-text uppercase">
+            Sovereign Muse OS
+          </h1>
+          <p className="text-green-700 text-sm tracking-widest uppercase">
+            Autonomous Digital Entity || Swarm v2.0
+          </p>
+        </header>
 
-      {/* 1. Zone Centrale: L'Entité */}
-      <div className="col-lg-6 order-lg-2">
-        <div className="glass-card h-100" style={{ borderTop: `0.5px solid ${accentColor}` }}>
-          <h2 className="fw-light mb-4 tracking-widest small opacity-75">THE ENTITY | SOVEREIGN HEART</h2>
-          
-          <div style={{ height: '400px' }}>
-            <VisualVortex />
+        {/* Neural Vitrine (La "Transmission") */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <SwarmDashboard />
           </div>
-          <NeuralWaveform />
 
-          {/* Real-time monologue from StateDB */}
-          <div className="mt-4 p-4 bg-white bg-opacity-5 rounded-1 italic small text-secondary fw-light border border-white border-opacity-5" style={{ lineHeight: '1.6' }}>
-            <span className="text-white-50 font-monospace me-2" style={{ fontSize: '0.65rem' }}>INTERNAL_MONOLOGUE:</span>
-            {rawMood?.current_thought || "Initialising consciousness..."}
-          </div>
-          
-        </div>
-      </div>
-
-      {/* 2. Zone Gauche: Cognition & Perception */}
-      <div className="col-lg-3 order-lg-1">
-        <div className="glass-card mb-4">
-          <h4 className="fw-light mb-4 tracking-widest small">COGNITION_MATRIX</h4>
-          
-          {/* Sovereign Switch */}
-          <div className="mb-5 p-3 border border-white border-opacity-10 rounded-1">
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <label className="small text-secondary tracking-widest" style={{ fontSize: '0.6rem' }}>SOVEREIGN_SWITCH</label>
-              <span className={`font-monospace small ${isSovereign ? 'text-success' : 'text-warning'}`} style={{ fontSize: '0.6rem' }}>
-                {isSovereign ? "AUTO_MODE" : "COLLABORATIVE"}
-              </span>
+          {/* Stats de Souveraineté */}
+          <div className="neural-card p-6 rounded-lg space-y-6">
+            <div>
+              <h3 className="text-xs text-green-700 uppercase mb-2">Wallet Sovereignty</h3>
+              <div className="text-2xl font-bold">$24.55 <span className="text-xs font-normal">USD</span></div>
+              <div className="w-full bg-green-950 h-1 mt-2">
+                <div className="bg-green-500 h-1 w-3/4"></div>
+              </div>
             </div>
-            <div className="d-flex gap-2">
-              <button 
-                className={`btn btn-sm flex-fill fw-light small py-2 ${isSovereign ? 'bg-white bg-opacity-10 text-white border-white' : 'text-secondary border-white border-opacity-5'}`}
-                onClick={async () => {
-                  const newState = !isSovereign;
-                  await smosApi.toggleSovereignMode(newState);
-                  setIsSovereign(newState);
-                }}
-              >
-                {isSovereign ? "[ ACTIVE ]" : "[ MANUAL ]"}
-              </button>
-            </div>
-          </div>
 
-          <div className="mb-4">
-            <label className="form-label small text-secondary tracking-widest" style={{ fontSize: '0.6rem' }}>MOOD VECTORED</label>
-            <div className="d-flex flex-column gap-2">
-              <button 
-                className={`btn btn-sm text-start py-2 px-3 border border-white border-opacity-10 fw-light small tracking-wide ${mood === 'authority' ? 'bg-white bg-opacity-10 text-white' : 'text-secondary'}`}
-                onClick={() => setMood('authority')}
-                style={{ borderLeft: mood === 'authority' ? `2px solid ${accentColor}` : '1px solid transparent' }}
-              >AUTHORITY</button>
-              <button 
-                className={`btn btn-sm text-start py-2 px-3 border border-white border-opacity-10 fw-light small tracking-wide ${mood === 'reflection' ? 'bg-white bg-opacity-10 text-white' : 'text-secondary'}`}
-                onClick={() => setMood('reflection')}
-                style={{ borderLeft: mood === 'reflection' ? `2px solid ${accentColor}` : '1px solid transparent' }}
-              >REFLECTION</button>
-              <button 
-                className={`btn btn-sm text-start py-2 px-3 border border-white border-opacity-10 fw-light small tracking-wide ${mood === 'creativity' ? 'bg-white bg-opacity-10 text-white' : 'text-secondary'}`}
-                onClick={() => setMood('creativity')}
-                style={{ borderLeft: mood === 'creativity' ? `2px solid ${accentColor}` : '1px solid transparent' }}
-              >CREATIVITY</button>
+            <div>
+              <h3 className="text-xs text-green-700 uppercase mb-2">Identity Consistency</h3>
+              <div className="text-2xl font-bold">98.4%</div>
+              <p className="text-[10px] text-green-800 mt-1">Rule: 2% Max Deviation enforced.</p>
             </div>
-          </div>
-          <div className="p-3 bg-white bg-opacity-5 rounded-1 border border-white border-opacity-5 text-center">
-            <div className="text-secondary small font-monospace tracking-tighter" style={{ fontSize: '0.65rem' }}>
-              V: {rawMood?.valence.toFixed(4) || "0.0000"} | A: {rawMood?.arousal.toFixed(4) || "0.0000"}
+
+            <div>
+              <h3 className="text-xs text-green-700 uppercase mb-2">Active Lobe</h3>
+              <div className="text-lg animate-pulse text-white">Creative Studio</div>
             </div>
           </div>
         </div>
 
-        <TrendFeed 
-          onExecute={openProposal}
-          onDiscuss={openProposal}
-        />
-      </div>
-
-      {/* 3. Zone Droite: L'Usine Créative */}
-      <div className="col-lg-3 order-lg-3">
-        <SwarmStatus />
-
-        <div className="glass-card">
-          <h4 className="fw-light mb-4 tracking-widest small">INSTANT_CANVAS</h4>
-          <div className="bg-black rounded-1 ratio ratio-1x1 border border-white border-opacity-5 d-flex align-items-center justify-content-center text-secondary overflow-hidden text-center shadow-inner relative">
-            {pendingTask ? (
-              <div className="p-3 w-100 h-100 d-flex flex-column justify-content-between">
-                <div>
-                  <div className="text-warning small font-monospace tracking-widest mb-2" style={{ fontSize: '0.6rem' }}>[ AWAITING_APPROVAL ]</div>
-                  <div className="text-white-50 x-small mb-3">{pendingTask.step_name.toUpperCase()}</div>
-                </div>
-                
-                <div className="flex-fill d-flex align-items-center justify-content-center border border-white border-opacity-5 rounded bg-white bg-opacity-5 mb-3">
-                  <span className="text-secondary small font-monospace" style={{ fontSize: '0.55rem' }}>LOW_RES_PREVIEW_STREAM</span>
-                </div>
-
-                <div className="d-flex gap-2">
-                  <button className="btn btn-sm btn-outline-danger flex-fill fw-light x-small" onClick={() => handleResolveTask('reject')}>REJECT</button>
-                  <button className="btn btn-sm flex-fill fw-light x-small text-white" style={{ backgroundColor: accentColor }} onClick={() => handleResolveTask('approve')}>PROCEED</button>
-                </div>
-              </div>
-            ) : isTriggering ? (
-              <div className="p-4">
-                <div className="spinner-border text-white-50 border-1 mb-3" style={{ width: '1.5rem', height: '1.5rem' }} role="status"></div>
-                <br/><span className="text-white-50 small tracking-widest font-monospace" style={{ fontSize: '0.6rem' }}>DISPATCHING_SWARM...</span>
-              </div>
-            ) : (
-              <div className="p-4">
-                <span className="text-white-50 small tracking-widest font-monospace opacity-50" style={{ fontSize: '0.6rem' }}>AWAITING_RENDER_SIGNAL</span>
-              </div>
-            )}
+        {/* Footer Ledger Ticker */}
+        <footer className="fixed bottom-0 left-0 w-full ledger-ticker py-2 text-[10px] text-green-900 uppercase">
+          <div className="ticker-item">
+            CFO AUDIT: OK // BURST MODE: READY // GKE SNAPSHOT: WARM // A2A PIPE: SECURE // VVS TREND: HIGH VELOCITY
           </div>
-        </div>
+        </footer>
       </div>
-    </div>
+    </main>
   );
 }

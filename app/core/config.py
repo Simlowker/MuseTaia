@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     LOCATION: str = "us-central1"
     GCS_BUCKET_NAME: str = "smos-assets"
     APIFY_TOKEN: Optional[str] = None
+    GOOGLE_API_KEY: Optional[str] = None
 
     REDIS_HOST: str = "localhost"
     REDIS_PORT: int = 6379

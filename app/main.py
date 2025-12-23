@@ -5,7 +5,8 @@ import sys
 import asyncio
 import logging
 from typing import Optional, Dict, Any
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 
 from app.agents.root_agent import RootAgent
@@ -15,6 +16,7 @@ from app.core.schemas.trend import IntentObject, TrendType
 from app.core.schemas.genesis import MuseProposal, GenesisDNA
 from app.matrix.assets_manager import SignatureAssetsManager
 from app.core.config import settings
+from app.core.redis_client import get_redis_client
 
 # Global Logger
 logging.basicConfig(level=logging.INFO)
@@ -29,6 +31,30 @@ class GenesisRequest(BaseModel):
     image_data_b64: Optional[str] = None # Simulating preview image data
 
 # --- API ENDPOINTS ---
+
+@app.get("/stream/muse-status")
+async def stream_status(request: Request):
+    """Server-Sent Events (SSE) endpoint for the high-observability vitrine."""
+    redis_client = get_redis_client()
+    pubsub = redis_client.pubsub()
+    pubsub.subscribe("smos:events:vitrine")
+
+    async def event_generator():
+        try:
+            while True:
+                # Check for disconnection
+                if await request.is_disconnected():
+                    break
+                
+                message = pubsub.get_message(ignore_subscribe_none=True)
+                if message:
+                    yield f"data: {message['data'].decode('utf-8')}\n\n"
+                
+                await asyncio.sleep(0.5)
+        finally:
+            pubsub.unsubscribe("smos:events:vitrine")
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
 
 @app.get("/muses/surprise-me", response_model=MuseProposal)
 async def surprise_me():

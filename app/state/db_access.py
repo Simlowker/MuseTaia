@@ -74,3 +74,14 @@ class StateManager:
         """Clears a task from the pending set after resolution."""
         self.redis.hdel(self.pending_tasks_key, task_id)
 
+    def publish_event(self, event_type: str, message: str, metadata: dict = None):
+        """Publishes a real-time event for the Frontend vitrine."""
+        payload = {
+            "type": event_type,
+            "message": message,
+            "metadata": metadata or {},
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+        self.redis.publish("smos:events:vitrine", json.dumps(payload))
+
+

@@ -11,14 +11,14 @@
     - **Tech:** CSS Modules, React Context.
 - [x] Task: Conductor - User Manual Verification 'Core Shell' (Protocol in workflow.md) 5b4bcd7
 
-## Phase 2: The Sovereign Heart (Command Center)
+## Phase 2: The Sovereign Heart (Command Center) [checkpoint: 65be68b]
 - [x] Task: Implement Central Visual Vortex & Waveform
     - **Goal:** Build the main video area (Veo 3.1 placeholder) and the reactive neural waveform.
     - **Files:** `frontend/src/components/VisualVortex.tsx`, `frontend/src/components/NeuralWaveform.tsx`
 - [x] Task: Build Cognition & Swarm Sidebars
     - **Goal:** Implement the Trends Feed (left) and Swarm Status/Instant Canvas (right).
     - **Files:** `frontend/src/components/TrendFeed.tsx`, `frontend/src/components/SwarmStatus.tsx`
-- [x] Task: Conductor - User Manual Verification 'Sovereign Heart' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Sovereign Heart' (Protocol in workflow.md) 65be68b
 
 ## Phase 3: The Forge & DNA Matrix
 - [ ] Task: Implement Production Timeline & Critic Dashboard

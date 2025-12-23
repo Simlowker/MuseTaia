@@ -24,6 +24,7 @@ class CriticAgent:
         self.state_manager = StateManager()
         # Seuil critique : 0.75 de similarité cosinus (Règle des 2% de déviation)
         self.identity_threshold = 0.75
+        self.quality_threshold = 0.85 # VideoScore2 Threshold
 
     def verify_consistency(
         self,

@@ -32,9 +32,15 @@ class Scene(BaseModel):
     camera_movement: CameraMovement = Field(CameraMovement.STATIC, description="Camera movement")
     duration: float = Field(..., gt=0, description="Duration in seconds")
 
+class AttentionDynamics(BaseModel):
+    """Paramètres pour maximiser le ROI attentionnel."""
+    pattern_interruption_trigger: float = Field(8.0, description="Rupture visuelle toutes les X secondes")
+    interruption_type: str = Field("visual_snap", description="Type de transition (glitch, snap, zoom)")
+
 class Screenplay(BaseModel):
     """The full screenplay document."""
     title: str
     concept: str = Field(..., description="High-level concept or summary")
     scenes: List[Scene]
+    attention_dynamics: AttentionDynamics = Field(default_factory=AttentionDynamics)
     total_duration: float = Field(..., description="Total estimated duration")

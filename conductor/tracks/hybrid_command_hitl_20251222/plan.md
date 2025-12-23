@@ -6,9 +6,10 @@
     - **Files:** `app/state/db_access.py` (update), `app/core/schemas/swarm.py` (New)
     - **Tech:** Redis, Pydantic.
     - **Tests:** Verify proposal and pending task storage in Redis.
-- [ ] Task: Implement Proposal Endpoints
+- [x] Task: Implement Proposal Endpoints
     - **Goal:** Create `/swarm/proposals` (GET) and `/swarm/approve` (POST) endpoints.
     - **Files:** `app/main.py` (update).
+    - **Tests:** Verify endpoints return data from StateManager.
 - [ ] Task: Conductor - User Manual Verification 'HITL Backend' (Protocol in workflow.md)
 
 ## Phase 2: Hybrid Frontend Interface

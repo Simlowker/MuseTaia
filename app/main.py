@@ -46,10 +46,18 @@ class ProductionRequest(BaseModel):
     intent: str
     subject_id: str = "genesis"
 
+class ApprovalRequest(BaseModel):
+    proposal_id: str
+    action: str = "approve" # approve, reject, edit
+    modified_intent: Optional[str] = None
+
+# Global Sovereign Switch state (In-memory for now, could move to Redis)
+sovereign_mode_active = True
+
 @app.get("/")
 def read_root() -> dict:
     """Returns a welcome message for the SMOS API."""
-    return {"message": "Welcome to SMOS API", "mode": MODE}
+    return {"message": "Welcome to SMOS API", "mode": MODE, "sovereign_mode": sovereign_mode_active}
 
 # --- 0. Internal / GKE Lifecycle Endpoints ---
 
@@ -73,7 +81,13 @@ def get_wallet(address: str = "genesis"):
         raise HTTPException(status_code=404, detail="Wallet not found")
     return wallet
 
-# --- 2. Swarm Endpoints ---
+@app.post("/state/sovereign-mode")
+def toggle_sovereign_mode(active: bool):
+    global sovereign_mode_active
+    sovereign_mode_active = active
+    return {"status": "updated", "sovereign_mode": sovereign_mode_active}
+
+# --- 2. Swarm & HITL Endpoints ---
 
 @app.post("/swarm/produce")
 async def trigger_production(req: ProductionRequest):
@@ -87,6 +101,27 @@ async def trigger_production(req: ProductionRequest):
         return {"status": "started", "task_id": task_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/swarm/proposals")
+def list_proposals():
+    return state_manager.get_proposals()
+
+@app.post("/swarm/approve")
+async def approve_proposal(req: ApprovalRequest):
+    # In a real HITL setup, we'd fetch the proposal details and trigger production
+    # with the (potentially modified) intent.
+    if req.action == "reject":
+        return {"status": "rejected", "proposal_id": req.proposal_id}
+    
+    # Trigger Production
+    intent_to_use = req.modified_intent or f"Approved proposal {req.proposal_id}"
+    task_id = await workflow_engine.produce_video_content_async(
+        intent=intent_to_use,
+        mood=state_manager.get_mood(),
+        subject_id="genesis"
+    )
+    return {"status": "triggered", "task_id": task_id, "proposal_id": req.proposal_id}
+
 
 # --- 3. Perception Endpoints ---
 

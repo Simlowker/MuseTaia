@@ -75,3 +75,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Final Bridges & Autonomous Transmission (Integration v2)
 *Link: [./conductor/tracks/final_bridges_20251223/](./conductor/tracks/final_bridges_20251223/)*
+
+## [x] Track: Growth & Revenue Optimization (Learning v1)
+*Link: [./conductor/tracks/growth_learning_20251223/](./conductor/tracks/growth_learning_20251223/)*

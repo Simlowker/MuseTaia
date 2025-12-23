@@ -17,7 +17,7 @@ google-cloud-bigquery
 google-cloud-core
 google-cloud-resource-manager
 google-cloud-storage
-google-cloud-text-to-speech
+google-cloud-texttospeech
 google-crc32c
 google-genai
 google-resumable-media

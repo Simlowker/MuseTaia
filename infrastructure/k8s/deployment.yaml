@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: smos-backend
-        image: gcr.io/GEN_LANG_CLIENT_ID_PLACEHOLDER/smos-backend:latest
+        image: us-central1-docker.pkg.dev/muse-taia/smos-repo/smos-agent:latest
         ports:
         - containerPort: 8000
         envFrom:
@@ -52,7 +52,7 @@ spec:
     spec:
       containers:
         - name: smos-dispatcher
-          image: us-central1-docker.pkg.dev/PROJECT_ID_PLACEHOLDER/smos-repo/smos-dispatcher:latest
+          image: us-central1-docker.pkg.dev/muse-taia/smos-repo/smos-dispatcher:latest
           ports:
             - containerPort: 8080
           envFrom:
@@ -90,7 +90,7 @@ spec:
     spec:
       containers:
         - name: smos-frontend
-          image: us-central1-docker.pkg.dev/PROJECT_ID_PLACEHOLDER/smos-repo/smos-frontend:latest
+          image: us-central1-docker.pkg.dev/muse-taia/smos-repo/smos-frontend:latest
           ports:
             - containerPort: 3000
           envFrom:

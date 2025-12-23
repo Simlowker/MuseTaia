@@ -40,24 +40,41 @@ class LedgerService:
             metadata=metadata or {}
         )
 
-        # 1. Update Wallet Balance
-        # In a high-concurrency environment, we would use Redis WATCH/MULTI or Lua script.
-        # For this MVP, we use the state_manager.
-        wallet = self.state_manager.get_wallet(wallet_address)
-        if not wallet:
-            raise ValueError(f"Wallet with address {wallet_address} not found.")
-
-        if tx_type == TransactionType.EXPENSE:
-            wallet.internal_usd_balance -= amount
-        else:
-            wallet.internal_usd_balance += amount
-            
-        self.state_manager.update_wallet(wallet)
-
-        # 2. Append to History
-        history_key = f"{self.history_key_prefix}{wallet_address}"
-        self.redis.rpush(history_key, tx.model_dump_json())
+        # 1. Update Wallet Balance atomically using Redis WATCH
+        wallet_key = f"smos:state:wallet:{wallet_address}"
         
+        with self.redis.pipeline() as pipe:
+            while True:
+                try:
+                    pipe.watch(wallet_key)
+                    
+                    # Get current wallet state
+                    wallet_data = pipe.get(wallet_key)
+                    if not wallet_data:
+                        raise ValueError(f"Wallet with address {wallet_address} not found.")
+                    
+                    wallet = Wallet.model_validate_json(wallet_data)
+                    
+                    # Apply transaction
+                    if tx_type == TransactionType.EXPENSE:
+                        wallet.internal_usd_balance -= amount
+                    else:
+                        wallet.internal_usd_balance += amount
+                    
+                    # Transactional update
+                    pipe.multi()
+                    pipe.set(wallet_key, wallet.model_dump_json())
+                    
+                    # Append to history in the same transaction
+                    history_key = f"{self.history_key_prefix}{wallet_address}"
+                    pipe.rpush(history_key, tx.model_dump_json())
+                    
+                    pipe.execute()
+                    break # Success
+                except redis.WatchError:
+                    # Target key changed, retry
+                    continue
+
         logger.info(f"Recorded {tx_type} of {amount} for {wallet_address}. New internal balance: {wallet.internal_usd_balance}")
         
         return tx

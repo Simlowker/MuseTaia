@@ -1,10 +1,15 @@
 """DirectorAgent implementation using Veo 3.1 via Google GenAI SDK."""
 
-from typing import Optional, List, Tuple
+import logging
+from typing import Optional, List, Tuple, Dict, Any
 import google.genai as genai
 from google.genai import types
 from app.core.config import settings
 from app.core.schemas.screenplay import ShotType, CameraMovement
+
+from app.core.vertex_init import get_genai_client
+
+logger = logging.getLogger(__name__)
 
 class DirectorAgent:
     """The Cinematographer agent responsible for generating video content."""
@@ -15,11 +20,7 @@ class DirectorAgent:
         Args:
             model_name: The name of the Veo model to use.
         """
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
 
     def generate_video(
@@ -68,15 +69,23 @@ class DirectorAgent:
             ]
 
         # Veo 3.1 generation is a Long Running Operation (LRO)
-        operation = self.client.models.generate_videos(
-            model=self.model_name,
-            prompt=full_prompt,
-            image=image,
-            config=types.GenerateVideosConfig(**config_params)
-        )
+        try:
+            operation = self.client.models.generate_videos(
+                model=self.model_name,
+                prompt=full_prompt,
+                image=image,
+                config=types.GenerateVideosConfig(**config_params)
+            )
 
-        # Wait for completion (blocking for now in this MVP implementation)
-        response = operation.result()
-        
-        # Return the bytes of the first video
-        return response.generated_videos[0].video_bytes
+            # Wait for completion (blocking for now in this MVP implementation)
+            # Timeout set to 10 minutes (Veo can be slow)
+            response = operation.result(timeout=600)
+            
+            if not response.generated_videos:
+                raise RuntimeError("Veo 3.1 returned no videos.")
+
+            # Return the bytes of the first video
+            return response.generated_videos[0].video_bytes
+        except Exception as e:
+            logger.error(f"DIRECTOR: Video generation failed: {e}")
+            raise

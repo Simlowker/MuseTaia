@@ -92,19 +92,26 @@ class VisualAgent:
                 except Exception:
                     pass
 
-        response = self.client.models.generate_images(
-            model=self.model_name,
-            prompt=enhanced_prompt,
-            config=types.GenerateImagesConfig(
-                number_of_images=number_of_images,
-                aspect_ratio=aspect_ratio,
-                safety_filter_level="BLOCK_LOW_AND_ABOVE",
-                person_generation="ALLOW_ADULT"
+        try:
+            response = self.client.models.generate_images(
+                model=self.model_name,
+                prompt=enhanced_prompt,
+                config=types.GenerateImagesConfig(
+                    number_of_images=number_of_images,
+                    aspect_ratio=aspect_ratio,
+                    safety_filter_level="BLOCK_LOW_AND_ABOVE",
+                    person_generation="ALLOW_ADULT"
+                )
             )
-        )
 
-        # Return the bytes of the first image
-        return response.generated_images[0].image_bytes
+            if not response.generated_images:
+                raise RuntimeError("Imagen 3 returned no images.")
+
+            # Return the bytes of the first image
+            return response.generated_images[0].image_bytes
+        except Exception as e:
+            logger.error(f"VISUAL: Image generation failed: {e}")
+            raise
 
     def edit_image(
         self,
@@ -141,15 +148,22 @@ class VisualAgent:
                 )
             )
             
-        response = self.client.models.edit_image(
-            model=self.model_name,
-            prompt=prompt,
-            reference_images=reference_images,
-            config=types.EditImageConfig(
-                number_of_images=number_of_images,
-                safety_filter_level="BLOCK_LOW_AND_ABOVE",
-                person_generation="ALLOW_ADULT"
+        try:
+            response = self.client.models.edit_image(
+                model=self.model_name,
+                prompt=prompt,
+                reference_images=reference_images,
+                config=types.EditImageConfig(
+                    number_of_images=number_of_images,
+                    safety_filter_level="BLOCK_LOW_AND_ABOVE",
+                    person_generation="ALLOW_ADULT"
+                )
             )
-        )
-        
-        return response.generated_images[0].image_bytes
+            
+            if not response.generated_images:
+                raise RuntimeError("Imagen 3 returned no edited images.")
+            
+            return response.generated_images[0].image_bytes
+        except Exception as e:
+            logger.error(f"VISUAL: Image editing failed: {e}")
+            raise

@@ -91,131 +91,47 @@ class Orchestrator:
 
 
 class TaskGraphRunner:
-
-
     """The 'Transmission' that executes the ADK TaskGraph."""
 
-
-
-
-
     def __init__(self, workflow_engine: Any):
-
-
         self.engine = workflow_engine
-
-
         self.state_manager = StateManager()
 
-
-
-
-
     async def execute(self, graph: TaskGraph) -> Dict[str, Any]:
-
-
         """Executes the entire graph and returns the final context."""
-
-
         context = {"intent": graph.root_intent}
-
-
         self.state_manager.publish_event("ADK_START", f"Starting production for: {graph.root_intent}")
-
-
         
-
-
         for node in graph.nodes:
-
-
             context = await self.run_node(node, context)
-
-
             
-
-
         self.state_manager.publish_event("ADK_COMPLETE", "Production cycle finished.")
-
-
         return context
 
-
-
-
-
     async def execute_burst(self, graph: TaskGraph, n: int = 5) -> Dict[str, Any]:
-
-
         """Executes N instances of the graph in parallel and selects the BEST (Best-of-N)."""
-
-
         logger.info(f"ADK_BURST: Launching {n} parallel production streams (Consensus Mode).")
-
-
         self.state_manager.publish_event("BURST_START", f"Scaling up {n} parallel rendering pods.")
-
-
         
-
-
         tasks = [self.execute(graph) for _ in range(n)]
-
-
         results = await asyncio.gather(*tasks)
-
-
         
-
-
         # Arbitrator Logic: Find result with highest score (simulated)
-
-
         best_result = results[0]
-
-
         logger.info("ADK_BURST: The Critic arbitrating Best-of-N samples...")
-
-
         self.state_manager.publish_event("BURST_ARBITRATION", "The Critic selecting best pixel candidate.")
-
-
         
-
-
         # In a real run, we'd call The Critic here to compare results
-
-
         return best_result
 
-
-
-
-
     async def run_node(self, node: Any, context: Dict[str, Any]) -> Dict[str, Any]:
-
-
         """Dispatches a single node based on its type."""
-
-
         logger.info(f"ADK_RUNNER: Executing {node.agent_id} ({node.agent_type})")
-
-
         self.state_manager.publish_event("NODE_RUN", f"Agent {node.agent_id} active: {node.instruction}", {"agent_type": node.agent_type})
-
-
         
-
-
         if isinstance(node, SequentialAgent):
-
-
             for sub_node in node.pipeline:
-
-
                 context = await self.run_node(sub_node, context)
-
-
             return context
 
 

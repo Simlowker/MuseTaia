@@ -15,7 +15,7 @@ kind: ConfigMap
 metadata:
   name: smos-config
 data:
-  PROJECT_ID: "gen-lang-client-0865631950"
+  PROJECT_ID: "muse-taia"
   PROJECT_NUMBER: "289248039846"
   LOCATION: "us-central1"
   GCS_BUCKET_NAME: "smos-assets"

@@ -81,7 +81,15 @@ Switch to your Google Cloud Shell window:
    cd MuseTaia
    ```
 
-2. **Trigger Build & Deploy**:
+2. **Create Artifact Registry** (First time only):
+   ```bash
+   gcloud artifacts repositories create smos-repo \
+       --repository-format=docker \
+       --location=us-central1 \
+       --description="SMOS v2 Docker repository"
+   ```
+
+3. **Trigger Build & Deploy**:
    ```bash
    gcloud builds submit --config=cloudbuild.yaml --substitutions=COMMIT_SHA=$(git rev-parse --short HEAD) .
    ```

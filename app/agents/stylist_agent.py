@@ -8,16 +8,13 @@ from app.matrix.wardrobe_dna import WardrobeRegistry
 from app.core.schemas.look import LookSelection
 from app.core.schemas.world import SceneLayout
 from app.state.models import Mood
+from app.core.vertex_init import get_genai_client
 
 class StylistAgent:
     """The Guardian of Look agent responsible for wardrobe and props."""
 
     def __init__(self, model_name: str = "gemini-3.0-pro-preview"):
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
 
     def select_look(

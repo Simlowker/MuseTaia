@@ -2,6 +2,8 @@
 
 import logging
 import io
+import time
+import uuid
 from typing import Optional, Dict, Any, List
 from PIL import Image, ImageDraw
 
@@ -90,8 +92,7 @@ class WorkflowEngine:
 
     def _wait_for_approval(self, task_id: str, step_name: str, context: Dict[str, Any], preview_data: Optional[bytes] = None) -> bool:
         """Suspends execution and waits for a human approval signal in Redis."""
-        import time
-        logger.info(f"HITL_GATE: Pausing at '{step_name}'. Waiting for master signal...")
+        logger.info(f"HITL_GATE: Pausing at '{step_name}'. Waiting for master signal (Task: {task_id})...")
         
         # 1. Register Pending Task
         task = PendingTask(
@@ -102,8 +103,7 @@ class WorkflowEngine:
         )
         self.ledger_service.state_manager.set_pending_task(task)
         
-        # 2. Polling Loop (In a real system, we'd use Pub/Sub or a long-poll)
-        # For MVP, we poll Redis for a specific approval key
+        # 2. Polling Loop
         approval_key = f"smos:swarm:approve:{task_id}"
         timeout = 300 # 5 minutes max wait
         start_time = time.time()
@@ -119,7 +119,8 @@ class WorkflowEngine:
                     elif action == "reject":
                         logger.info(f"HITL_GATE: Received REJECTION for {task_id}")
                         return False
-                time.sleep(2)
+                # Use slightly longer sleep to reduce Redis load
+                time.sleep(5)
         finally:
             self.ledger_service.state_manager.remove_pending_task(task_id)
             self.ledger_service.redis.delete(approval_key)
@@ -135,9 +136,8 @@ class WorkflowEngine:
         max_retries: int = 3
     ) -> Dict[str, Any]:
         """Runs the full production pipeline with visual, spatial, and look QA."""
-        
-        # Determine mode from global state (importing from main is tricky, so we check Redis or a config)
-        # For now, let's assume we fetch it from Redis
+
+        # Determine mode from global state
         is_sovereign = True
         mode_data = self.ledger_service.redis.get("smos:config:sovereign_mode")
         if mode_data:
@@ -149,6 +149,11 @@ class WorkflowEngine:
                    self.cost_calculator.estimate_video_cost("veo-3.1", 5.0)
         
         wallet = self.ledger_service.state_manager.get_wallet(subject_id)
+        if not wallet:
+            logger.warning(f"CFO_GATE: No wallet found for {subject_id}. Initializing empty wallet.")
+            from app.state.models import Wallet
+            wallet = Wallet(address=subject_id, internal_usd_balance=0.0)
+
         history = self.ledger_service.get_transaction_history(subject_id)
         
         solvency = self.cfo_agent.verify_solvency(wallet, history, est_cost)

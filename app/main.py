@@ -4,9 +4,12 @@ import argparse
 import sys
 import asyncio
 import logging
+import os
+from datetime import datetime, timezone
 from typing import Optional, Dict, Any
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 from app.agents.root_agent import RootAgent
@@ -23,6 +26,15 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Sovereign Muse OS (SMOS) v2")
+
+# --- CORS CONFIGURATION ---
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], # In production, replace with specific frontend domains
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # --- API MODELS ---
 class GenesisRequest(BaseModel):
@@ -71,7 +83,15 @@ async def surprise_me():
 async def launch_genesis(request: GenesisRequest):
     """Automates GCS storage of face_master and dna.json for a new Muse."""
     assets = SignatureAssetsManager(bucket_name=settings.GCS_BUCKET_NAME)
-    muse_id = request.draft_dna.identity.name.lower().replace(" ", "-")
+    
+    # 0. Sanitize Input
+    import re
+    muse_id = request.draft_dna.identity.name.lower()
+    muse_id = re.sub(r'[^a-z0-9\-]', '-', muse_id) # Only allow alphanumeric and dashes
+    muse_id = muse_id.strip('-')
+    
+    if not muse_id:
+        raise HTTPException(status_code=400, detail="Invalid Muse Name")
     
     try:
         # 1. Store DNA

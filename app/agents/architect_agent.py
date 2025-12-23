@@ -6,6 +6,7 @@ from typing import List
 from app.core.config import settings
 from app.matrix.world_dna import WorldRegistry
 from app.core.schemas.world import SceneLayout
+from app.core.vertex_init import get_genai_client
 
 class ArchitectAgent:
     """The Space Guardian agent responsible for environmental consistency."""
@@ -16,11 +17,7 @@ class ArchitectAgent:
         Args:
             model_name: The name of the Gemini model to use.
         """
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
 
     def plan_scene_layout(self, script_intent: str, world_registry: WorldRegistry) -> SceneLayout:

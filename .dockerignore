@@ -8,5 +8,4 @@ __pycache__/
 .env
 .venv/
 infrastructure/
-frontend/
 conductor/

@@ -1,8 +1,11 @@
 """Motion Engineer for lip-sync and cinematic animation hand-off."""
 
+import logging
 from typing import Optional, List, Tuple
 from app.agents.director_agent import DirectorAgent
 from app.core.schemas.screenplay import ShotType, CameraMovement
+
+logger = logging.getLogger(__name__)
 
 class MotionEngineer(DirectorAgent):
     """Agent that specializes in refined cinematic motion and character persistence.

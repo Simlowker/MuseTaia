@@ -18,7 +18,7 @@ spec:
       runtimeClassName: smos-criu-runtime
       containers:
       - name: golden-agent
-        image: gcr.io/votre-projet-id/smos-agent:latest
+        image: us-central1-docker.pkg.dev/muse-taia/smos-repo/smos-agent:latest
         lifecycle:
           postStart:
             exec:

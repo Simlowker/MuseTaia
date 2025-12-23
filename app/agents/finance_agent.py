@@ -11,6 +11,7 @@ from app.core.schemas.finance import Transaction, TransactionType, TransactionCa
 from app.state.models import Wallet
 from app.core.services.ledger_service import LedgerService
 from app.core.finance.cost_calculator import CostCalculator
+from app.core.vertex_init import get_genai_client
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +37,7 @@ class CFOAgent:
         Args:
             model_name: Gemini model name. Gemini 3 Pro is recommended for complex risk analysis.
         """
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
         self.ledger_service = LedgerService()
         self.cost_calculator = CostCalculator()
@@ -127,6 +124,7 @@ class CFOAgent:
 
         """Records a production expense in the ledger."""
         tx = self.ledger_service.record_transaction(
+            wallet_address="main-wallet",
             amount=cost_estimate,
             tx_type=TransactionType.EXPENSE,
             category=TransactionCategory.API_COST,
@@ -140,6 +138,7 @@ class CFOAgent:
         logger.warning(f"FINANCE_ROLLBACK: Refunding {amount} USD for failed task {task_id}.")
         self.ledger_service.state_manager.publish_event("CFO_ROLLBACK", f"Refunded {amount} USD due to failure in {task_id}.")
         return self.ledger_service.record_transaction(
+            wallet_address="main-wallet",
             amount=amount,
             tx_type=TransactionType.INCOME, # Refund is income/re-credit
             category=TransactionCategory.OTHER,

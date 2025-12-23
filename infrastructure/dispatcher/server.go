@@ -53,7 +53,7 @@ func (s *DispatcherServer) HandleDispatch(w http.ResponseWriter, r *http.Request
 		json.NewEncoder(w).Encode(response)
 default:
 		// Channel full, trigger snapshot restore immediately
-		go s.pool.cloneGoldenPod()
+		go s.pool.CloneMultiplePods(1)
 		http.Error(w, "Dispatcher queue full, scaling up...", http.StatusServiceUnavailable)
 	}
 }

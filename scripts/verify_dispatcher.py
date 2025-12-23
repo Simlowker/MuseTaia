@@ -22,7 +22,7 @@ def verify_dispatcher():
     # Simulate a burst of 5 concurrent requests
     threads = []
     for i in range(5):
-        t = threading.Thread(target=trigger_dispatch, args=(i,)))
+        t = threading.Thread(target=trigger_dispatch, args=(i,))
         threads.append(t)
         t.start()
     

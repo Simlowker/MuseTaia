@@ -3,15 +3,18 @@
 import redis
 from app.core.config import settings
 
+# Global connection pool
+_REDIS_POOL = redis.ConnectionPool(
+    host=settings.REDIS_HOST,
+    port=settings.REDIS_PORT,
+    decode_responses=False,
+    max_connections=20
+)
 
 def get_redis_client() -> redis.Redis:
-    """Creates and returns a Redis client based on application settings.
+    """Returns a Redis client from the global connection pool.
 
     Returns:
         redis.Redis: A Redis client instance.
     """
-    return redis.Redis(
-        host=settings.REDIS_HOST,
-        port=settings.REDIS_PORT,
-        decode_responses=False,  # Return bytes for binary data compatibility
-    )
+    return redis.Redis(connection_pool=_REDIS_POOL)

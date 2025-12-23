@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-func test_worker_pool(t *testing.T) {
+func TestWorkerPool(t *testing.T) {
 	pool := NewWorkerPool(2)
 	pool.Start()
 

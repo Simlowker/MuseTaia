@@ -90,3 +90,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: High-Level Autonomy & Multimodal Voice (Final v1)
 *Link: [./conductor/tracks/final_autonomy_voice_20251223/](./conductor/tracks/final_autonomy_voice_20251223/)*
+
+## [x] Track: System Repair & Stabilization (2025-12-23)
+*Link: [./conductor/tracks/system_repair_20251223/](./conductor/tracks/system_repair_20251223/)*

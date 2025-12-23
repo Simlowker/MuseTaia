@@ -35,33 +35,26 @@ class CriticAgent:
         """Comprehensive audit of the generated image vs Signature Assets."""
         self.state_manager.publish_event("CRITIC_AUDIT", "Performing biometric identity check...")
         
+        failures = []
+        semantic_score = 1.0 # Default if not using CLIP yet
+
         # 1. Biometric Analysis (Identity Drift)
         drift_score = self.comparator.calculate_face_similarity(
             generated_image_bytes, 
             reference_face_bytes
         )
         
-                self.state_manager.publish_event("CRITIC_SCORE", f"Identity Similarity Score: {drift_score:.4f}", {"score": drift_score})
+        self.state_manager.publish_event("CRITIC_SCORE", f"Identity Similarity Score: {drift_score:.4f}", {"score": drift_score})
         
-                
-        
-                # 3. Artifact Detection (v2 Expansion)
-        
-                # Use Bounding Boxes to find anomalies (Hands, Shadows, Anatomy)
-        
-                artifact_report = self.detect_physical_artifacts(generated_image_bytes)
-        
-                if artifact_report:
-        
-                    failures.extend(artifact_report)
-        
-        
-        
-                is_consistent = drift_score >= self.identity_threshold and not any(f.severity > 0.8 for f in failures)
-        
-        
+        # 2. Artifact Detection (v2 Expansion)
+        artifact_report = self.detect_physical_artifacts(generated_image_bytes)
+        if artifact_report:
+            failures.extend(artifact_report)
 
-        if not is_consistent:
+        # 3. Decision Logic (2% rule equivalent - simplified)
+        is_consistent = drift_score >= self.identity_threshold and not any(f.severity > 0.8 for f in failures)
+
+        if not is_consistent and drift_score < self.identity_threshold:
             logger.warning(f"Identity Drift detected: {drift_score:.4f} < {self.identity_threshold}")
             failures.append(QAFailure(
                 area="face",

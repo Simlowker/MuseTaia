@@ -10,7 +10,7 @@ from app.core.vertex_init import get_genai_client
 
 logger = logging.getLogger(__name__)
 
-class HighLevelPlanner:
+class StrategistAgent:
     """The 'Brain' of the swarm. 
     
     In the HLP/Worker dichotomy, this agent only handles:
@@ -24,6 +24,9 @@ class HighLevelPlanner:
         self.model_name = model_name
         self.state_manager = StateManager()
 
+    def define_strategy(self, intent: str, dna: Any) -> Dict[str, Any]:
+        """Alias for plan_mission for script compatibility."""
+        return self.plan_mission(intent, dna)
 
     def plan_mission(self, intent: str, dna: Any) -> Dict[str, Any]:
         """Translates a raw intent into a high-level strategic plan."""
@@ -56,7 +59,20 @@ class HighLevelPlanner:
         import json
         return json.loads(response.text)
 
-    def evaluate_roi(self, vvs_score: float, actual_cost: float) -> bool:
-        """Post-production audit: Was the compute investment worth it?"""
-        # Simple heuristic: ROI = VVS / Cost
-        return (vvs_score / actual_cost) > 50.0
+        def evaluate_roi(self, vvs_score: float, actual_cost: float) -> bool:
+
+            """Post-production audit: Was the compute investment worth it?"""
+
+            # Simple heuristic: ROI = VVS / Cost
+
+            return (vvs_score / actual_cost) > 50.0
+
+    
+
+        def evaluate_production_roi(self, vvs_score: float, actual_cost: float) -> bool:
+
+            """Alias for evaluate_roi for script compatibility."""
+
+            return self.evaluate_roi(vvs_score, actual_cost)
+
+    

@@ -5,7 +5,7 @@
 
 set -e
 
-PROJECT_ID="gen-lang-client-0865631950"
+PROJECT_ID="muse-taia"
 REGION="us-central1"
 REPO_NAME="smos-repo" # Created via setup_gcp.sh
 

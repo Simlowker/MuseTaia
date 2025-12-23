@@ -5,7 +5,7 @@
 
 set -e
 
-PROJECT_ID="gen-lang-client-0865631950"
+PROJECT_ID="muse-taia"
 CLUSTER_NAME="smos-v2-cluster"
 REGION="us-central1"
 

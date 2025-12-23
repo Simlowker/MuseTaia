@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from app.core.config import settings
 from app.agents.prompts.narrative import NARRATIVE_SYSTEM_INSTRUCTION
 from app.state.models import Mood
+from app.core.vertex_init import get_genai_client
 
 class AttentionDynamics(BaseModel):
     """Dynamic markers to maintain viewer retention."""
@@ -27,11 +28,7 @@ class NarrativeAgent:
 
     def __init__(self, model_name: str = "gemini-3.0-pro"):
         """Initializes the NarrativeAgent."""
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
         self.search_tool = types.Tool(
             google_search=types.GoogleSearch()

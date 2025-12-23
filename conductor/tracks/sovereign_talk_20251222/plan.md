@@ -11,7 +11,7 @@
     - **Files:** `app/core/services/live_api.py` (update).
 - [x] Task: Conductor - User Manual Verification 'Interactive Toolset' (Protocol in workflow.md) ee2ed1f
 
-## Phase 2: Live Persona & Context (The Muse's Soul)
+## Phase 2: Live Persona & Context (The Muse's Soul) [checkpoint: 2ccd107]
 - [x] Task: Integrate Identity Context (Caching) into Live Session
     - **Goal:** Ensure the live session starts with the Muse's full DNA context (1M+ tokens).
     - **Files:** `app/core/services/live_api.py` (update).
@@ -20,9 +20,9 @@
     - **Goal:** Configure the Live API with the Muse's vocal personality.
     - **Files:** `app/core/services/live_api.py` (update).
     - **Tech:** Gemini Multimodal Live (Audio).
-- [ ] Task: Conductor - User Manual Verification 'Live Persona' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Live Persona' (Protocol in workflow.md) 2ccd107
 
-## Phase 3: Real-time Brain (The RootAgent Loop)
+## Phase 3: Real-time Brain (The RootAgent Loop) [checkpoint: 0553f71]
 - [x] Task: Implement Interactive RootAgent Handler
     - **Goal:** Manage the state of the conversation, updating Mood and Thoughts in Redis as the dialogue progresses.
     - **Files:** `app/agents/interactive_root.py`
@@ -31,10 +31,10 @@
     - **Goal:** Allow the Muse to "hand off" heavy tasks (like video rendering) to the ACE factory without breaking the conversation flow.
     - **Files:** `app/core/workflow_engine.py` (update).
     - **Tech:** Asyncio Tasks.
-- [ ] Task: Conductor - User Manual Verification 'Real-time Brain' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Real-time Brain' (Protocol in workflow.md) 0553f71
 
-## Phase 4: Low-Latency Studio Interaction
+## Phase 4: Low-Latency Studio Interaction [checkpoint: dfd0cc0]
 - [x] Task: End-to-End Voice Scenario Test
     - **Goal:** Verify the full flow: "Human Voice -> RootAgent Tool Call (Visual) -> Critic Validation -> Voice Response".
     - **Files:** `tests/test_sovereign_talk_flow.py`
-- [ ] Task: Conductor - User Manual Verification 'Low-Latency Interaction' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Low-Latency Interaction' (Protocol in workflow.md) dfd0cc0

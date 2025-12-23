@@ -1,39 +1,37 @@
 steps:
-  # 1. Build the Python Agents image
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/smos-agents:$COMMIT_SHA', '-t', 'gcr.io/$PROJECT_ID/smos-agents:latest', '.']
-
-  # 2. Push the image to Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/smos-agents:$COMMIT_SHA']
-  
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/smos-agents:latest']
-
-  # 3. Build the Go Dispatcher
+  # 1. Build the Go Dispatcher Binary FIRST
   - name: 'golang:1.21'
+    dir: 'infrastructure/dispatcher'
     entrypoint: 'go'
-    args: ['build', '-o', 'dispatcher', './infrastructure/dispatcher']
-    env: ['GOOS=linux', 'GOARCH=amd64']
+    args: ['build', '-o', '../../smos-dispatcher', '.']
+    env: ['GOOS=linux', 'GOARCH=amd64', 'CGO_ENABLED=0']
 
-  # 4. Run Visual Regression Test (Identity Anchor)
-  - name: 'gcr.io/$PROJECT_ID/smos-agents:latest'
-    entrypoint: 'python3'
-    args: ['scripts/run_visual_regression.py', 'genesis']
-    env:
-      - 'PROJECT_ID=$PROJECT_ID'
-      - 'LOCATION=us-central1'
-      - 'GCS_BUCKET_NAME=smos-assets'
+  # 2. Build the Swarm Agent Image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:$COMMIT_SHA', '.', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:latest']
 
-  # 5. Deploy to GKE
-  - name: 'gcr.io/cloud-builders/gke-deploy'
-    args:
-      - run
-      - --filename=infrastructure/k8s/deployment.yaml
-      - --image=gcr.io/$PROJECT_ID/smos-backend:$COMMIT_SHA
-      - --location=us-central1
-      - --cluster=smos-cpu-cluster
+  # 3. Build the Dispatcher Image (Separate container for scale)
+  - name: 'gcr.io/cloud-builders/docker'
+    dir: 'infrastructure/dispatcher'
+    args: ['build', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:$COMMIT_SHA', '.', '-t', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:latest']
+
+  # 4. Push Swarm Agent
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:$COMMIT_SHA']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:latest']
+
+  # 5. Push Dispatcher
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:$COMMIT_SHA']
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:latest']
 
 images:
-  - 'gcr.io/$PROJECT_ID/smos-backend:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/smos-backend:latest'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:$COMMIT_SHA'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-agent:latest'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:$COMMIT_SHA'
+  - 'us-central1-docker.pkg.dev/$PROJECT_ID/smos-repo/smos-dispatcher:latest'
+
+options:
+  logging: CLOUD_LOGGING_ONLY

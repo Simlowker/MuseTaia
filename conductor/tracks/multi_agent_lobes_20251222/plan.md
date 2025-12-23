@@ -11,7 +11,7 @@
     - **Tech:** Vertex AI Vector Search.
 - [x] Task: Conductor - User Manual Verification 'Perception Lobe' (Protocol in workflow.md) 89da3ac
 
-## Phase 2: High Cognition Lobe (The Brain)
+## Phase 2: High Cognition Lobe (The Brain) [checkpoint: db582eb]
 - [x] Task: Refactor RootAgent for ADK Workflow Management a3058a1
     - **Goal:** Standardize intent parsing and validation gate logic.
     - **Files:** `app/agents/root_agent.py` (update).
@@ -20,7 +20,7 @@
     - **Goal:** Guardian of long-term narrative and budget allocation logic.
     - **Files:** `app/agents/strategist.py`
     - **Tech:** Gemini 3 Pro, Context Cache.
-- [ ] Task: Conductor - User Manual Verification 'Brain Lobe' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Brain Lobe' (Protocol in workflow.md) db582eb
 
 ## Phase 3: Creative Studio Lobe (Production)
 - [ ] Task: Implement Narrative Architect & Visual Virtuoso Integration

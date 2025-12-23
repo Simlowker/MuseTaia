@@ -14,11 +14,11 @@
 - [ ] Task: Conductor - User Manual Verification 'Ledger & Economy' (Protocol in workflow.md)
 
 ## Phase 2: Cost Tracking (API Ledger)
-- [ ] Task: Implement Production Cost Estimator
+- [x] Task: Implement Production Cost Estimator
     - **Goal:** Calculate the estimated cost of agent calls (e.g., Gemini tokens, Imagen generations).
     - **Files:** `app/core/finance/cost_calculator.py`
     - **Tech:** Python logic based on model pricing.
-- [ ] Task: Integrate Cost Deduction in WorkflowEngine
+- [x] Task: Integrate Cost Deduction in WorkflowEngine
     - **Goal:** Automatically deduct the estimated cost from the Sovereign Wallet upon task completion.
     - **Files:** `app/core/workflow_engine.py` (update)
     - **Tests:** Verify wallet balance decreases after a production run.

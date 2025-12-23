@@ -16,6 +16,9 @@ from app.state.models import Mood
 from app.matrix.world_dna import WorldRegistry
 from app.matrix.world_assets import WorldAssetsManager
 from app.core.config import settings
+from app.core.services.ledger_service import LedgerService
+from app.core.finance.cost_calculator import CostCalculator
+from app.core.schemas.finance import TransactionType, TransactionCategory
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +36,8 @@ class WorkflowEngine:
         self.optimizer = PromptOptimizer()
         self.world_registry = WorldRegistry()
         self.world_assets = WorldAssetsManager(bucket_name=settings.GCS_BUCKET_NAME)
+        self.ledger_service = LedgerService()
+        self.cost_calculator = CostCalculator()
 
     def _create_mask_from_bbox(self, base_image_bytes: bytes, bbox_2d: List[int]) -> bytes:
         """Creates a binary mask image from a bounding box."""
@@ -65,7 +70,10 @@ class WorkflowEngine:
         subject_id: str,
         max_retries: int = 3
     ) -> Dict[str, Any]:
-        """Runs the full production pipeline with visual and spatial QA."""
+        """Runs the full production pipeline with visual and spatial QA.
+        
+        Sequence: Narrative -> Architect -> Optimize -> Visual -> Critic (Loop) -> Director -> EIC.
+        """
         
         # 1. Narrative Phase
         logger.info("Starting Narrative Phase...")
@@ -162,11 +170,28 @@ class WorkflowEngine:
             "layout": layout.model_dump()
         }
 
-        # 6. Staging Phase (EIC)
+        # 6. Cost Tracking
+        # Calculate approximate costs
+        total_cost = self.cost_calculator.estimate_image_cost("imagen-3.0-generate-002", 1) + \
+                     self.cost_calculator.estimate_video_cost("veo-3.1", 5.0)
+        
+        try:
+            self.ledger_service.record_transaction(
+                wallet_address=subject_id, # Using subject_id as wallet address for now
+                tx_type=TransactionType.EXPENSE,
+                category=TransactionCategory.API_COST,
+                amount=total_cost,
+                description=f"Production cost for: {script_data.title}"
+            )
+        except Exception as e:
+            logger.error(f"Failed to record production cost: {e}")
+
+        # 7. Staging Phase (EIC)
         logger.info("Staging for review...")
         review_path = self.eic_agent.stage_for_review(production_data, subject_id)
         
         production_data["review_path"] = review_path
+        production_data["production_cost"] = total_cost
         return production_data
 
     async def produce_video_content_async(

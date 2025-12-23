@@ -6,7 +6,7 @@
     - **Files:** `app/matrix/models.py` (update), `app/matrix/wardrobe_dna.py`
     - **Tech:** Pydantic.
     - **Tests:** Validate wardrobe items against the schema.
-- [ ] Task: Implement Stylist Assets Manager (GCS Integration)
+- [x] Task: Implement Stylist Assets Manager (GCS Integration)
     - **Goal:** Manage storage and retrieval of clothing and prop reference images.
     - **Files:** `app/matrix/wardrobe_assets.py`
     - **Tech:** Google Cloud Storage.

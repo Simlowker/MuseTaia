@@ -87,3 +87,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: High-Fidelity Optimization & Production Value (Quality v1)
 *Link: [./conductor/tracks/high_fidelity_optim_20251223/](./conductor/tracks/high_fidelity_optim_20251223/)*
+
+## [x] Track: High-Level Autonomy & Multimodal Voice (Final v1)
+*Link: [./conductor/tracks/final_autonomy_voice_20251223/](./conductor/tracks/final_autonomy_voice_20251223/)*

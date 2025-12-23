@@ -14,7 +14,7 @@ kubectl apply -f infrastructure/k8s/env-config.yaml
 kubectl apply -f infrastructure/k8s/deployment.yaml
 
 echo "⏳ Attente de l'initialisation du Golden Pod (DNA Loading)..."
-kubectl wait --for=condition=ready pod -l app=smos-agent --timeout=120s
+kubectl wait --for=condition=ready pod -l app=smos-backend --timeout=120s
 
 # 3. Déployer le Dispatcher Go (Gestionnaire du Burst Mode)
 # Note: Nous utilisons le déploiement standard pour le Dispatcher, implémenté en Go.

@@ -22,7 +22,7 @@
     - **Tech:** Gemini 3 Pro, Context Cache.
 - [x] Task: Conductor - User Manual Verification 'Brain Lobe' (Protocol in workflow.md) db582eb
 
-## Phase 3: Creative Studio Lobe (Production)
+## Phase 3: Creative Studio Lobe (Production) [checkpoint: 56c367b]
 - [x] Task: Implement Narrative Architect & Visual Virtuoso Integration 2f6d5d0
     - **Goal:** Refine script-to-image pipeline with ComfyUI Nodal API.
     - **Files:** `app/agents/narrative_architect.py`, `app/agents/visual_virtuoso.py`
@@ -31,7 +31,7 @@
     - **Goal:** Complete the lip-sync and cinematic animation hand-off.
     - **Files:** `app/agents/motion_engineer.py`
     - **Tech:** Veo 3.1.
-- [ ] Task: Conductor - User Manual Verification 'Creative Studio' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Creative Studio' (Protocol in workflow.md) 56c367b
 
 ## Phase 4: Governance Lobe (Forge Control)
 - [ ] Task: Finalize The Critic & Financial Accountant

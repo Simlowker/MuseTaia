@@ -62,18 +62,26 @@ func (wp *WorkerPool) worker(id int) {
 }
 
 func (wp *WorkerPool) cloneGoldenPod() {
+	wp.CloneMultiplePods(1)
+}
+
+func (wp *WorkerPool) CloneMultiplePods(count int) {
 	// GKE Checkpoint/Restore Implementation (Conceptual simulation for SMOS v2)
-	fmt.Println("GKE_SNAPSHOT: Burst pressure detected. Cloning Golden Agent...")
+	fmt.Printf("GKE_BURST: Scaling up %d clones from Golden Agent...\n", count)
 	
-	start := time.Now()
-	// Simulating CRIU (Checkpoint/Restore in Userspace)
-	// 1. Snapshot the 'Golden Agent' (already has DNA loaded)
-	// 2. Restore into a new GPU-enabled node
-	
-	time.Sleep(2400 * time.Millisecond) // Simulated restore time (7x speedup vs Cold Start)
-	
-duration := time.Since(start)
-	fmt.Printf("GKE_RESTORE: New pod 'smos-clone-%d' stabilized in %v. Joined the swarm.\n", time.Now().Unix(), duration)
+	var wg sync.WaitGroup
+	for i := 0; i < count; i++ {
+		wg.Add(1)
+		go func(idx int) {
+			defer wg.Done()
+			start := time.Now()
+			time.Sleep(2400 * time.Millisecond) // Simulated restore time
+			duration := time.Since(start)
+			fmt.Printf("GKE_RESTORE: Clone %d ready in %v.\n", idx, duration)
+		}(i)
+	}
+	wg.Wait()
+	fmt.Printf("GKE_BURST: All %d clones joined the swarm.\n", count)
 }
 
 func (wp *WorkerPool) Stop() {

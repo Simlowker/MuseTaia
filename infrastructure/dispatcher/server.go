@@ -31,7 +31,15 @@ func (s *DispatcherServer) HandleDispatch(w http.ResponseWriter, r *http.Request
 		job.ID = fmt.Sprintf("job-%d", time.Now().UnixNano())
 	}
 
+	// Logic: If VVS > 90, trigger 'Massive Parallelism' (Burst)
+	// (VVS would typically be passed in parameters or intent)
+	if time.Now().UnixNano()%2 == 0 { // Simulation: High priority detection
+		fmt.Printf("API: [BURST MODE] High priority detected. Triggering 5x parallel clones.\n")
+		go s.pool.CloneMultiplePods(5)
+	}
+
 	fmt.Printf("API: Received trigger request for Muse %s (Intent: %s)\n", job.MuseID, job.Intent)
+
 
 	// Dispatch to worker pool (High Concurrency Channel)
 	select {

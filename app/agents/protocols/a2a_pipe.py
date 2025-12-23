@@ -11,6 +11,7 @@ class A2AContext(BaseModel):
     task_id: str
     muse_id: str
     current_step: str
+    sandbox_dir: str = Field(..., description="Temporary scratchpad for task data (E2B-style)")
     data: Dict[str, Any] = Field(default_factory=dict)
     assets: List[str] = Field(default_factory=list) # GCS paths
 
@@ -21,13 +22,15 @@ class A2AContextPipe:
         self.muse_id = muse_id
 
     def create_initial_context(self, task_id: str, intent: str) -> A2AContext:
-        """Initializes the pipe."""
+        """Initializes the pipe with a unique sandbox."""
         return A2AContext(
             task_id=task_id,
             muse_id=self.muse_id,
             current_step="perception",
+            sandbox_dir=f"/tmp/smos/sandbox/{task_id}",
             data={"intent": intent}
         )
+
 
     def transition(self, context: A2AContext, next_step: str, update_data: Dict[str, Any]) -> A2AContext:
         """Updates and validates the context during a transition."""

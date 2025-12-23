@@ -31,6 +31,7 @@ class Scene(BaseModel):
     shot_type: ShotType = Field(ShotType.MEDIUM, description="Camera shot type")
     camera_movement: CameraMovement = Field(CameraMovement.STATIC, description="Camera movement")
     duration: float = Field(..., gt=0, description="Duration in seconds")
+    attention_boost: bool = Field(False, description="Force une rupture de motif dans cette scène")
 
 class AttentionDynamics(BaseModel):
     """Paramètres pour maximiser le ROI attentionnel."""

@@ -30,10 +30,11 @@ class VisualAgent:
         style_id: Optional[str] = None,
         location_id: Optional[str] = None,
         object_ids: Optional[List[str]] = None,
+        item_ids: Optional[List[str]] = None,
         aspect_ratio: str = "1:1",
         number_of_images: int = 1
     ) -> bytes:
-        """Generates an image based on a prompt and optional subject/style/world guidance.
+        """Generates an image based on a prompt and optional subject/style/world/wardrobe guidance.
 
         Args:
             prompt: The text description of the image.
@@ -41,6 +42,7 @@ class VisualAgent:
             style_id: The ID of a style asset to use for Style Guidance.
             location_id: The ID of the persistent location.
             object_ids: List of IDs of persistent objects to include.
+            item_ids: List of IDs of persistent wardrobe items.
             aspect_ratio: Aspect ratio (e.g., '1:1', '16:9').
             number_of_images: How many images to generate.
 
@@ -69,7 +71,6 @@ class VisualAgent:
         # 3. World Guidance (Locations & Objects)
         if location_id:
             try:
-                # Ensure location asset exists
                 self.assets_manager.download_asset(f"world/locations/{location_id}/reference.png")
                 enhanced_prompt += f" Location: {location_id}"
             except Exception:
@@ -80,6 +81,16 @@ class VisualAgent:
                 try:
                     self.assets_manager.download_asset(f"world/objects/{obj_id}/reference.png")
                     enhanced_prompt += f" Including Object: {obj_id}"
+                except Exception:
+                    pass
+
+        # 4. Wardrobe Guidance
+        if item_ids:
+            for item_id in item_ids:
+                try:
+                    # Fetching from the appropriate path
+                    self.assets_manager.download_asset(f"wardrobe/items/{item_id}/reference.png")
+                    enhanced_prompt += f" Wearing: {item_id}"
                 except Exception:
                     pass
 

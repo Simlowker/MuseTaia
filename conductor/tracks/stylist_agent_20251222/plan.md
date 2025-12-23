@@ -14,12 +14,12 @@
 - [ ] Task: Conductor - User Manual Verification 'Wardrobe DNA' (Protocol in workflow.md)
 
 ## Phase 2: StylistAgent - The Guardian of Look
-- [ ] Task: Implement StylistAgent (Gemini 3 Pro)
+- [x] Task: Implement StylistAgent (Gemini 3 Pro)
     - **Goal:** Select the appropriate outfit and props for a scene based on the script, location, and Muse's mood.
     - **Files:** `app/agents/stylist_agent.py`
     - **Tech:** Gemini 3 Pro.
     - **Tests:** Verify agent selects correct outfits for different narrative contexts.
-- [ ] Task: Implement Look-Reference Injection
+- [x] Task: Implement Look-Reference Injection
     - **Goal:** Update the VisualAgent to use wardrobe references in the generation prompt and configuration.
     - **Files:** `app/agents/visual_agent.py` (update)
     - **Tech:** Imagen 3 (Reference images).

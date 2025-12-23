@@ -31,7 +31,8 @@ def test_generate_image_basic(mock_genai, mock_assets_manager):
         prompt="A muse standing in a digital garden",
         subject_id="genesis",
         location_id="paris_studio",
-        object_ids=["blue_sofa"]
+        object_ids=["blue_sofa"],
+        item_ids=["neon_jacket"]
     )
     
     assert image_bytes == b"output_image"
@@ -40,10 +41,11 @@ def test_generate_image_basic(mock_genai, mock_assets_manager):
     assert "genesis" in prompt_used
     assert "paris_studio" in prompt_used
     assert "blue_sofa" in prompt_used
+    assert "neon_jacket" in prompt_used
     
     # Verify assets were fetched
-    # Should be called for subject face, location ref, and object ref
-    assert mock_assets_instance.download_asset.call_count >= 3
+    # Should be called for subject face, location ref, object ref, and wardrobe ref
+    assert mock_assets_instance.download_asset.call_count >= 4
 
 def test_initialization(mock_genai, mock_assets_manager):
 

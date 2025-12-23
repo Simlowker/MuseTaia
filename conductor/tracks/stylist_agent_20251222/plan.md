@@ -26,7 +26,7 @@
     - **Tests:** Verify API calls include wardrobe references.
 
 ## Phase 3: Visual Continuity QA
-- [ ] Task: Update The Critic for Outfit Consistency
+- [x] Task: Update The Critic for Outfit Consistency
     - **Goal:** Teach The Critic to verify if the generated outfit and props match the selected references.
     - **Files:** `app/agents/critic_agent.py` (update)
     - **Tech:** Gemini 3 Vision.

@@ -46,19 +46,21 @@ class CriticAgent:
         All other images are REFERENCES (Identity, Location, or Props).
         
         Your goal is to perform a surgical QA check. 
-        Verify that the character in the generated content matches the identity references, 
-        and the environment/props match the location/prop references.
+        Verify that:
+        1. IDENTITY: The character matches the identity references.
+        2. ENVIRONMENT: The background matches the location references.
+        3. LOOK: The outfit and props match the wardrobe references.
         
         Output a structured JSON response with:
         - is_consistent (boolean)
         - score (float 0-1)
         - issues (list of strings)
         - feedback (list of objects):
-            - category: 'lighting', 'identity', 'environment', 'anatomy', 'style'
+            - category: 'lighting', 'identity', 'environment', 'wardrobe', 'anatomy', 'style'
             - description: Detailed issue description.
             - severity: 0.0 to 1.0
             - action_type: 'regenerate', 'inpaint', or 'none'.
-            - target_area: e.g. 'face', 'sofa', 'background'.
+            - target_area: e.g. 'face', 'sofa', 'jacket', 'background'.
         - recommendations (string)
         """
 

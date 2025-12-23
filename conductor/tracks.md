@@ -69,3 +69,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Genesis Pipeline & Studio Automation (Creation v2)
 *Link: [./conductor/tracks/genesis_pipeline_20251223/](./conductor/tracks/genesis_pipeline_20251223/)*
+
+## [x] Track: Industrial Dispatcher & GKE Snapshots (Infrastructure v2)
+*Link: [./conductor/tracks/industrial_dispatcher_20251223/](./conductor/tracks/industrial_dispatcher_20251223/)*

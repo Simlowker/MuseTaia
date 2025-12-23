@@ -1,13 +1,17 @@
 """CriticAgent for visual consistency and quality assurance."""
 
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 import google.genai as genai
 from google.genai import types
 from app.core.config import settings
 from app.core.schemas.qa import ConsistencyReport
 
 class CriticAgent:
-    """The 'Critic' agent responsible for maintaining visual and brand identity."""
+    """The 'Critic' agent responsible for maintaining visual and brand identity.
+    
+    This agent represents the 'Governance Lobe'.
+    It enforces the '2% Deviation Rule' and provides surgical feedback for repairs.
+    """
 
     def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
         """Initializes The Critic.
@@ -46,6 +50,9 @@ class CriticAgent:
         All other images are REFERENCES (Identity, Location, or Props).
         
         Your goal is to perform a surgical QA check. 
+        STRICT REQUIREMENT: Enforce the '2% Deviation' rule. If any major feature (Face, Signature Outfit, Main Prop) 
+        differs significantly from references, it fails.
+        
         Verify that:
         1. IDENTITY: The character matches the identity references.
         2. ENVIRONMENT: The background matches the location references.
@@ -53,7 +60,7 @@ class CriticAgent:
         
         Output a structured JSON response with:
         - is_consistent (boolean)
-        - score (float 0-1)
+        - score (float 0-1) - Anything below 0.98 is considered a deviation failure.
         - issues (list of strings)
         - feedback (list of objects):
             - category: 'lighting', 'identity', 'environment', 'wardrobe', 'anatomy', 'style'

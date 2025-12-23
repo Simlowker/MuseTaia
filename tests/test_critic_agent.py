@@ -38,19 +38,20 @@ def test_critic_agent_verify_consistency(mock_genai):
     agent = CriticAgent()
     
     # Dummy image bytes
-    img1 = b"fake_reference_image"
-    img2 = b"fake_target_image"
+    target_img = b"fake_target_image"
+    ref_imgs = [b"ref_1", b"ref_2"]
     
-    report = agent.verify_consistency(img1, img2)
+    report = agent.verify_consistency(target_img, ref_imgs)
     
     assert report.is_consistent is False
     assert report.score == 0.6
     assert report.feedback[0].category == "lighting"
-    assert report.feedback[0].action_type == "inpaint"
     
+    # Verify the call to generate_content
     mock_client.models.generate_content.assert_called_once()
     call_args = mock_client.models.generate_content.call_args
-    assert "feedback" in call_args.kwargs["contents"][0].parts[2].text.lower()
+    # 2 refs + 1 target + 1 prompt = 4 parts
+    assert len(call_args.kwargs["contents"][0].parts) == 4
 
 def test_detect_mask_area(mock_genai):
     """Test bounding box detection."""

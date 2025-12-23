@@ -24,53 +24,55 @@ class CriticAgent:
 
     def verify_consistency(
         self,
-        reference_image_bytes: bytes,
         target_image_bytes: bytes,
-        criteria: str = "visual identity, colors, and character features"
+        reference_images: List[bytes],
+        criteria: str = "visual identity, colors, and spatial continuity"
     ) -> ConsistencyReport:
-        """Compares a target image against a reference image for consistency.
+        """Compares a target image against multiple references for identity and world consistency.
 
         Args:
-            reference_image_bytes: The original 'Signature Asset' image.
             target_image_bytes: The newly generated image to verify.
-            criteria: Specific aspects to focus on during verification.
+            reference_images: List of reference assets (Subject face, Location, Props).
+            criteria: Specific aspects to focus on.
 
         Returns:
-            ConsistencyReport: Detailed analysis of the consistency.
+            ConsistencyReport: Detailed analysis.
         """
         
         prompt = f"""
-        Analyze the two provided images for visual consistency based on the following criteria: {criteria}.
+        Analyze the provided images for visual consistency based on: {criteria}.
         
-        Image 1 is the reference (Signature Asset).
-        Image 2 is the generated content.
+        Last Image is the GENERATED content to verify.
+        All other images are REFERENCES (Identity, Location, or Props).
         
-        Your goal is to perform a surgical QA check.
+        Your goal is to perform a surgical QA check. 
+        Verify that the character in the generated content matches the identity references, 
+        and the environment/props match the location/prop references.
         
         Output a structured JSON response with:
-        - is_consistent (boolean): True if deviations are minor/acceptable.
-        - score (float 0-1): 1.0 is perfect match.
-        - issues (list of strings): Summary of problems.
+        - is_consistent (boolean)
+        - score (float 0-1)
+        - issues (list of strings)
         - feedback (list of objects):
-            - category: 'lighting', 'identity', 'anatomy', 'style'
+            - category: 'lighting', 'identity', 'environment', 'anatomy', 'style'
             - description: Detailed issue description.
             - severity: 0.0 to 1.0
-            - action_type: 'regenerate', 'inpaint', or 'none' if ok.
-            - target_area: e.g. 'face', 'left hand', 'background'.
-        - recommendations (string): High level advice.
+            - action_type: 'regenerate', 'inpaint', or 'none'.
+            - target_area: e.g. 'face', 'sofa', 'background'.
+        - recommendations (string)
         """
+
+        parts = []
+        for i, ref in enumerate(reference_images):
+            parts.append(types.Part.from_bytes(data=ref, mime_type="image/jpeg"))
+        
+        parts.append(types.Part.from_bytes(data=target_image_bytes, mime_type="image/jpeg"))
+        parts.append(types.Part.from_text(text=prompt))
 
         response = self.client.models.generate_content(
             model=self.model_name,
             contents=[
-                types.Content(
-                    role="user",
-                    parts=[
-                        types.Part.from_bytes(data=reference_image_bytes, mime_type="image/jpeg"),
-                        types.Part.from_bytes(data=target_image_bytes, mime_type="image/jpeg"),
-                        types.Part.from_text(text=prompt)
-                    ]
-                )
+                types.Content(role="user", parts=parts)
             ],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",
@@ -78,7 +80,6 @@ class CriticAgent:
             )
         )
 
-        # Parse the structured response
         return response.parsed
 
     def detect_mask_area(self, image_bytes: bytes, feature_description: str) -> Optional[List[int]]:

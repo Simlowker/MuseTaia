@@ -26,7 +26,7 @@
     - **Tests:** Verify API calls include both Subject and Environment references.
 
 ## Phase 3: Spatial QA & Continuity
-- [ ] Task: Update The Critic for Environmental Consistency
+- [x] Task: Update The Critic for Environmental Consistency
     - **Goal:** Teach The Critic to detect drift in backgrounds and recurring props.
     - **Files:** `app/agents/critic_agent.py` (update), `app/core/schemas/qa.py` (update)
     - **Tech:** Gemini 3 Vision.

@@ -34,7 +34,7 @@
 - [ ] Task: Conductor - User Manual Verification 'Real-time Brain' (Protocol in workflow.md)
 
 ## Phase 4: Low-Latency Studio Interaction
-- [ ] Task: End-to-End Voice Scenario Test
+- [x] Task: End-to-End Voice Scenario Test
     - **Goal:** Verify the full flow: "Human Voice -> RootAgent Tool Call (Visual) -> Critic Validation -> Voice Response".
     - **Files:** `tests/test_sovereign_talk_flow.py`
 - [ ] Task: Conductor - User Manual Verification 'Low-Latency Interaction' (Protocol in workflow.md)

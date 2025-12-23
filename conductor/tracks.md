@@ -99,6 +99,9 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Final Polish & Go Fix (2025-12-23)
 *Link: [./conductor/tracks/final_polish_20251223/](./conductor/tracks/final_polish_20251223/)*
+
+## [x] Track: Operational Readiness & Hardening (2025-12-23)
+*Link: [./conductor/tracks/operational_readiness_20251223/](./conductor/tracks/operational_readiness_20251223/)*
  J'ai finalisé les corrections de la track **"Final Polish & Go Fix"**.
 
 ### ✅ Résumé des dernières interventions :

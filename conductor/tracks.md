@@ -60,3 +60,6 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: TrendScout VVS & ROI Discovery (Perception v2)
 *Link: [./conductor/tracks/trend_scout_vvs_20251223/](./conductor/tracks/trend_scout_vvs_20251223/)*
+
+## [x] Track: Identity Persistence & ComfyScript (Visual v2)
+*Link: [./conductor/tracks/visual_identity_v2_20251223/](./conductor/tracks/visual_identity_v2_20251223/)*

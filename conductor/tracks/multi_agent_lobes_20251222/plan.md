@@ -1,6 +1,6 @@
 # Track Plan: Functional Lobe Architecture (SMOS Swarm v2)
 
-## Phase 1: Perception Lobe (The Scout Lobe)
+## Phase 1: Perception Lobe (The Scout Lobe) [checkpoint: 89da3ac]
 - [x] Task: Implement The TrendScout Tools 25771ce
     - **Goal:** Integrate social scraping and niche filtering.
     - **Files:** `app/agents/trend_scout.py`, `app/core/services/scraper.py`
@@ -9,7 +9,7 @@
     - **Goal:** Enable viral structure extraction and semantic retrieval.
     - **Files:** `app/agents/librarian.py`
     - **Tech:** Vertex AI Vector Search.
-- [ ] Task: Conductor - User Manual Verification 'Perception Lobe' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Perception Lobe' (Protocol in workflow.md) 89da3ac
 
 ## Phase 2: High Cognition Lobe (The Brain)
 - [ ] Task: Refactor RootAgent for ADK Workflow Management

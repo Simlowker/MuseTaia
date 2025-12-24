@@ -114,6 +114,9 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Pre-Flight Check & Final Harden (2025-12-23)
 *Link: [./conductor/tracks/pre_flight_harden_20251223/](./conductor/tracks/pre_flight_harden_20251223/)*
+
+## [x] Track: P0 Critical Remediation (2025-12-24)
+*Link: [./conductor/tracks/remediation_p0_20251224/](./conductor/tracks/remediation_p0_20251224/)*
  J'ai terminé l'ensemble des corrections de durcissement final.
 
 ### ✅ État Final du Projet :

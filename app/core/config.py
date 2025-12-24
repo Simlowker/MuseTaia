@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     """Application settings, loaded from environment variables or .env file."""
 
     PROJECT_ID: str = "placeholder-project-id"
-    LOCATION: str = "us-central1"
+    LOCATION: str = "global"
     GCS_BUCKET_NAME: str = "smos-assets"
     APIFY_TOKEN: Optional[str] = None
     GOOGLE_API_KEY: Optional[str] = None
@@ -25,10 +25,7 @@ class Settings(BaseSettings):
     @classmethod
     def validate_project_id(cls, v: str) -> str:
         if v == "placeholder-project-id":
-            import os
-            # If we are in production or any non-local env, fail
-            if os.getenv("ENVIRONMENT") == "production":
-                raise ValueError("PROJECT_ID must be set to a real GCP project ID in production.")
+             raise ValueError("PROJECT_ID must be set to a real GCP project ID. Check your .env file.")
         return v
 
     def get_allowed_origins(self) -> List[str]:

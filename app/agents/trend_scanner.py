@@ -5,6 +5,7 @@ from google.genai import types
 from app.core.config import settings
 from app.core.services.search_service import SearchService
 from app.core.schemas.trend import TrendReport, RelevanceScore
+from app.core.vertex_init import get_genai_client
 
 class TrendScanner:
     """Agent that perceives trends and evaluates their fit for the Muse."""
@@ -15,11 +16,7 @@ class TrendScanner:
         Args:
             model_name: The name of the Gemini model to use.
         """
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
         self.search_service = SearchService(model_name=model_name)
 

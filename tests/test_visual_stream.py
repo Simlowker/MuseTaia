@@ -6,13 +6,15 @@ from app.agents.handlers.visual_stream import VideoStreamHandler
 
 @pytest.fixture
 def mock_genai():
-    with patch("app.agents.handlers.visual_stream.genai") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.handlers.visual_stream.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 @pytest.mark.asyncio
 async def test_describe_frame(mock_genai):
     """Test that describe_frame correctly calls Gemini and returns text."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     
     mock_response = MagicMock()
     mock_response.text = "A person walking in a park."

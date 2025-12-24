@@ -1,15 +1,15 @@
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from app.core.config import settings
-from app.core.vertex_init import init_vertex_ai
+from app.core.vertex_init import get_genai_client
 
 def test_settings_load():
     assert settings.PROJECT_ID is not None
     assert settings.LOCATION is not None
 
-def test_init_vertex_ai():
-    with patch("google.cloud.aiplatform.init") as mock_init:
-        init_vertex_ai()
-        mock_init.assert_called_once_with(
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION,
-        )
+def test_get_genai_client():
+    with patch("google.genai.Client") as mock_client:
+        client = get_genai_client()
+        assert client is not None
+        # Subsequent calls return the same object
+        client2 = get_genai_client()
+        assert client is client2

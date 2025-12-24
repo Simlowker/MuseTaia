@@ -7,8 +7,10 @@ from app.core.schemas.trend import TrendReport, RelevanceScore, Sentiment, Inten
 
 @pytest.fixture
 def mock_genai():
-    with patch("app.agents.trend_scanner.genai") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.trend_scanner.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 @pytest.fixture
 def mock_search_service():
@@ -17,7 +19,7 @@ def mock_search_service():
 
 def test_analyze_hot_topic(mock_genai, mock_search_service):
     """Test analysis of a relevant topic resulting in an IntentObject."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     
     # Mock Search
     mock_search_service.search.return_value = "Paris Fashion Week is showcasing digital couture."
@@ -57,7 +59,7 @@ def test_analyze_hot_topic(mock_genai, mock_search_service):
 
 def test_analyze_blocked_topic(mock_genai, mock_search_service):
     """Test filtering of a blocked/controversial topic."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     
     # Mock Search
     mock_search_service.search.return_value = "A heated political debate is occurring."

@@ -59,20 +59,11 @@ class StrategistAgent:
         import json
         return json.loads(response.text)
 
-        def evaluate_roi(self, vvs_score: float, actual_cost: float) -> bool:
+    def evaluate_roi(self, vvs_score: float, actual_cost: float) -> bool:
+        """Post-production audit: Was the compute investment worth it?"""
+        # Simple heuristic: ROI = VVS / Cost
+        return (vvs_score / actual_cost) > 50.0
 
-            """Post-production audit: Was the compute investment worth it?"""
-
-            # Simple heuristic: ROI = VVS / Cost
-
-            return (vvs_score / actual_cost) > 50.0
-
-    
-
-        def evaluate_production_roi(self, vvs_score: float, actual_cost: float) -> bool:
-
-            """Alias for evaluate_roi for script compatibility."""
-
-            return self.evaluate_roi(vvs_score, actual_cost)
-
-    
+    def evaluate_production_roi(self, vvs_score: float, actual_cost: float) -> bool:
+        """Alias for evaluate_roi for script compatibility."""
+        return self.evaluate_roi(vvs_score, actual_cost)

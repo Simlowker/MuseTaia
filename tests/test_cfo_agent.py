@@ -9,8 +9,10 @@ from app.core.schemas.finance import Transaction, TransactionType, TransactionCa
 
 @pytest.fixture
 def mock_genai():
-    with patch("google.genai.Client") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.finance_agent.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 def test_cfo_circuit_breaker(mock_genai):
     """Tests that the circuit breaker triggers when hourly limit is exceeded."""

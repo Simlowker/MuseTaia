@@ -1,33 +1,34 @@
 """Tests for the ScraperService."""
 
 import pytest
+from unittest.mock import MagicMock, patch, AsyncMock
 from app.core.services.scraper import ScraperService
 
-def test_scraper_service_initialization():
+@pytest.mark.asyncio
+async def test_scraper_service_initialization():
     scraper = ScraperService()
     assert scraper is not None
 
-def test_scrape_platform_twitter():
+@pytest.mark.asyncio
+async def test_scrape_platform_reddit():
     scraper = ScraperService()
-    results = scraper.scrape_platform("twitter", "test")
-    assert len(results) > 0
-    assert "text" in results[0]
-    assert "author" in results[0]
+    with patch.object(scraper, 'scrape_reddit', new_callable=AsyncMock) as mock_reddit:
+        mock_reddit.return_value = [{"title": "test", "platform": "reddit"}]
+        results = await scraper.scrape_platform("reddit", "test")
+        assert len(results) > 0
+        assert results[0]["title"] == "test"
 
-def test_scrape_platform_instagram():
+@pytest.mark.asyncio
+async def test_scrape_platform_tiktok():
     scraper = ScraperService()
-    results = scraper.scrape_platform("instagram", "test")
-    assert len(results) > 0
-    assert "caption" in results[0]
+    with patch.object(scraper, 'scrape_tiktok', new_callable=AsyncMock) as mock_tiktok:
+        mock_tiktok.return_value = [{"title": "test", "platform": "tiktok"}]
+        results = await scraper.scrape_platform("tiktok", "test")
+        assert len(results) > 0
+        assert results[0]["title"] == "test"
 
-def test_scrape_platform_tiktok():
+@pytest.mark.asyncio
+async def test_scrape_platform_unknown():
     scraper = ScraperService()
-    results = scraper.scrape_platform("tiktok", "test")
-    assert len(results) > 0
-    assert "description" in results[0]
-
-def test_scrape_platform_unknown():
-    scraper = ScraperService()
-    results = scraper.scrape_platform("unknown", "test")
-    assert len(results) == 1
-    assert "text" in results[0]
+    results = await scraper.scrape_platform("unknown", "test")
+    assert len(results) == 0

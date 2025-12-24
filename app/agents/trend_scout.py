@@ -16,8 +16,9 @@ logger = logging.getLogger(__name__)
 class TrendScout:
     """Agent de perception proactif utilisant des données réelles et l'algorithme VVS."""
 
-    def __init__(self):
+    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
         self.client = get_genai_client()
+        self.model_name = model_name
         self.scraper = ScraperService()
         self.vvs_threshold = 50.0
 

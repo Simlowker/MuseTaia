@@ -1,14 +1,32 @@
 """RootAgent implementation using Google ADK / GenAI SDK."""
 
+import logging
+
 from typing import Optional, Dict, Any
+
 import google.genai as genai
+
+
+
 from google.genai import types
+
 from app.core.config import settings
+
 from app.state.models import Mood
+
 from app.state.db_access import StateManager
+
 from app.agents.protocols.master_sync import MasterSyncProtocol, CommandIntent
+
 from app.agents.orchestrator import Orchestrator, TaskGraph
+
 from app.core.vertex_init import get_genai_client
+
+
+
+logger = logging.getLogger(__name__)
+
+
 
 class HighLevelPlanner:
 
@@ -64,7 +82,49 @@ class HighLevelPlanner:
 
 
 
+    def ping(self) -> str:
+
+        """Sends a ping to the agent to verify connectivity."""
+
+        response = self.chat_session.send_message("Ping")
+
+        return response.text
+
+
+
+    def process_sensory_input(self, stimulus: str) -> str:
+
+        """Processes real-time sensory data and updates the internal thought state."""
+
+        prompt = f"SENSORY INPUT: '{stimulus}'. Update internal thought (1-2 sentences)."
+
+        response = self.chat_session.send_message(prompt)
+
+        reaction = response.text.strip()
+
+        
+
+        current_mood = self.state_manager.get_mood()
+
+        current_mood.current_thought = reaction
+
+        self.state_manager.update_mood(current_mood)
+
+        return reaction
+
+
+
+    def parse_and_route(self, command_text: str, source_override: str = None) -> CommandIntent:
+
+        """Parses a command and routes it through the Single-Master Protocol."""
+
+        return self.master_sync.parse_command(command_text, source_override)
+
+
+
     def execute_intent(self, intent: Any) -> TaskGraph:
+
+
 
         """HLP Role: Decomposes a high-level intent into a delegated Task Graph.
 

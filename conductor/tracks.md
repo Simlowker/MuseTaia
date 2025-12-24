@@ -105,24 +105,11 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Quality Assurance & Test Alignment (2025-12-23)
 *Link: [./conductor/tracks/qa_test_alignment_20251223/](./conductor/tracks/qa_test_alignment_20251223/)*
- J'ai terminé toutes les corrections de la track **"Quality Assurance & Test Alignment"**.
 
-### ✅ Résumé des interventions :
+## [ ] Track: Test Suite Repair & Integration Prep (2025-12-23)
+*Link: [./conductor/tracks/test_suite_repair_20251223/](./conductor/tracks/test_suite_repair_20251223/)*
+ J'ai créé la track **"Test Suite Repair & Integration Prep"**.
 
-1.  **Tests & Alignement (Finance) :**
-    *   Le fichier `tests/test_finance_agent.py` utilise désormais `CFOAgent` au lieu de `FinanceAgent`.
-    *   Le mock a été mis à jour pour cibler correctement le singleton `get_genai_client`.
-    *   **Vérification :** Le test `test_summarize_health` passe désormais avec succès (`1 passed in 0.50s`).
+Je commence immédiatement par la **Phase 1 : Alignement des Tests Unitaires**.
 
-2.  **Workflow Engine :**
-    *   Correction de la variable indéfinie `report` par `qa_report` dans la validation HITL.
-    *   Suppression des imports `uuid` et `asyncio` redondants dans les méthodes.
-
-3.  **Robustesse Redis :**
-    *   Implémentation d'une limite de 5 tentatives (`MAX_RETRIES`) dans la boucle `WATCH/MULTI` du `LedgerService` pour éviter tout risque de boucle infinie en cas de haute concurrence.
-
-4.  **Configuration & Infra :**
-    *   Durcissement du validateur `PROJECT_ID` : l'utilisation du placeholder est désormais interdite si `ENVIRONMENT=production`.
-    *   Amélioration du **Health Check Go** : il retourne maintenant un JSON structuré incluant le nombre de workers, la taille de la queue et un timestamp.
-
-Le projet SMOS v2 est désormais parfaitement harmonisé entre son code, ses tests et son infrastructure. Souhaitez-vous effectuer un commit final et pousser vers GitHub ?
+**Étape 1 :** Fix `test_initialization.py`, `test_creative_studio_integration.py` et les schémas `ScriptOutput`.

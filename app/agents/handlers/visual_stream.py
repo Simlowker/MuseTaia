@@ -5,6 +5,7 @@ from typing import Optional
 import google.genai as genai
 from google.genai import types
 from app.core.config import settings
+from app.core.vertex_init import get_genai_client
 
 logger = logging.getLogger(__name__)
 
@@ -17,11 +18,7 @@ class VideoStreamHandler:
         Args:
             model_name: The Gemini model to use for visual analysis.
         """
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
 
     async def describe_frame(self, frame_bytes: bytes, prompt: str = "Describe the main visual elements in this frame concisely.") -> str:

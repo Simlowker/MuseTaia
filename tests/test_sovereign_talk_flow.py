@@ -21,9 +21,12 @@ async def test_voice_to_tool_execution_flow():
     # 1. Setup Mocks
     mock_visual_output = {"status": "success", "message": "Image generated."}
     
-    with patch("google.genai.Client") as mock_genai_client, \
+    with patch("app.core.services.live_api.get_genai_client") as mock_get, \
          patch("app.core.services.live_api.SwarmToolbox") as mock_toolbox_class, \
          patch("app.agents.interactive_root.StateManager"):
+        
+        mock_genai_client = MagicMock()
+        mock_get.return_value = mock_genai_client
         
         # Configure Toolbox
         mock_toolbox = mock_toolbox_class.return_value
@@ -51,17 +54,17 @@ async def test_voice_to_tool_execution_flow():
         mock_part.text = "I've started generating that cyberpunk asset for you."
         mock_msg_confirm.server_content.model_turn.parts = [mock_part]
         
-        async def mock_receive():
+        async def mock_receive_iter():
             yield mock_msg_tool_call
             yield mock_msg_confirm
             
-        mock_session.receive = MagicMock()
-        mock_session.receive.side_effect = mock_receive
+        mock_session.receive = AsyncMock(return_value=mock_receive_iter())
         
         # Connect session
         mock_connect = MagicMock()
-        mock_connect.__aenter__.return_value = mock_session
-        mock_genai_client.return_value.live.connect.return_value = mock_connect
+        mock_connect.__aenter__ = AsyncMock(return_value=mock_session)
+        mock_connect.__aexit__ = AsyncMock()
+        mock_genai_client.live.connect.return_value = mock_connect
         
         # --- EXECUTION ---
         interactive_brain = InteractiveRootAgent()

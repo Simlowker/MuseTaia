@@ -4,13 +4,15 @@ import pytest
 from unittest.mock import MagicMock, patch
 from app.agents.narrative_architect import NarrativeArchitect
 from app.agents.visual_virtuoso import VisualVirtuoso
-from app.agents.narrative_agent import ScriptOutput
+from app.agents.narrative_agent import ScriptOutput, AttentionDynamics
 
 @pytest.fixture
 def mock_clients():
-    with patch("google.genai.Client") as mock_genai, \
+    with patch("app.agents.visual_agent.get_genai_client") as mock_get, \
          patch("app.core.services.comfy_api.requests") as mock_requests:
-        yield mock_genai, mock_requests
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client, mock_requests
 
 def test_narrative_architect_planning(mock_clients):
     architect = NarrativeArchitect()
@@ -18,7 +20,12 @@ def test_narrative_architect_planning(mock_clients):
         title="Sovereign Dawn",
         script="A new era begins...",
         caption="#sovereignty",
-        estimated_duration=5
+        estimated_duration=10,
+        attention_dynamics=AttentionDynamics(
+            hook_intensity=0.9,
+            pattern_interrupts=["glitch"],
+            tempo_curve=[0.5, 0.8]
+        )
     )
     
     nodes = architect.plan_production_nodes(script)
@@ -28,17 +35,21 @@ def test_narrative_architect_planning(mock_clients):
     assert nodes[2]["type"] == "motion_gen"
 
 def test_visual_virtuoso_nodal_execution(mock_clients):
-    mock_genai, mock_requests = mock_clients
+    mock_client, mock_requests = mock_clients
     
     # Mock ComfyUI response
     mock_response = MagicMock()
     mock_response.json.return_value = {"prompt_id": "test-123"}
     mock_requests.post.return_value = mock_response
     
-    virtuoso = VisualVirtuoso()
-    nodes = [{"type": "visual_gen", "prompt": "test"}]
-    
-    prompt_id = virtuoso.generate_nodal_workflow(nodes)
+    # Mock assets manager inside VisualAgent (VisualVirtuoso base)
+    with patch("app.agents.visual_virtuoso.IdentityLockedWorkflow.build_workflow") as mock_build:
+        mock_build.return_value = {}
+        virtuoso = VisualVirtuoso()
+        prompt_id = virtuoso.generate_identity_image(
+            prompt="test",
+            subject_id="muse-01"
+        )
     
     assert prompt_id == "test-123"
     assert mock_requests.post.called

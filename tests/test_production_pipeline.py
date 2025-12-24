@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import MagicMock, patch
-from app.agents.narrative_agent import NarrativeAgent, ScriptOutput
+from app.agents.narrative_agent import NarrativeAgent, ScriptOutput, AttentionDynamics
 from app.agents.visual_agent import VisualAgent
 from app.agents.director_agent import DirectorAgent
 from app.core.utils.prompt_optimizer import PromptOptimizer
@@ -10,8 +10,11 @@ from app.state.models import Mood
 
 @pytest.fixture
 def mock_genai():
-    with patch("google.genai.Client") as mock_client:
+    with patch("app.core.vertex_init.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
         yield mock_client
+
 
 @pytest.fixture
 def mock_assets_manager():
@@ -26,7 +29,12 @@ def test_full_production_chain(mock_genai, mock_assets_manager):
         title="Beach Day",
         script="[Visual: Walking on beach] Hello world",
         caption="Sun and sand #beach",
-        estimated_duration=5
+        estimated_duration=5,
+        attention_dynamics=AttentionDynamics(
+            hook_intensity=0.8,
+            pattern_interrupts=[],
+            tempo_curve=[0.5]
+        )
     )
     
     # 2. Setup Optimizer Mock

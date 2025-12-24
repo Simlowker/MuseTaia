@@ -23,7 +23,7 @@ def test_plan_execution_structure(mock_intent):
     graph = orchestrator.plan_execution(mock_intent)
     
     assert isinstance(graph, TaskGraph)
-    assert len(graph.nodes) == 3
+    assert len(graph.nodes) == 4
     
     # 1. Strategy Node
     assert graph.nodes[0].agent_type == "cso"
@@ -35,6 +35,10 @@ def test_plan_execution_structure(mock_intent):
     # 3. Sequential Pipe Node
     assert isinstance(graph.nodes[2], SequentialAgent)
     assert len(graph.nodes[2].pipeline) == 2
+
+    # 4. Learning Loop Node
+    assert isinstance(graph.nodes[3], ParallelAgent)
+    assert graph.nodes[3].agent_type == "learning_loop"
 
 def test_adk_pipeline_logic(mock_intent):
     """Tests that the plan includes specific ADK components."""

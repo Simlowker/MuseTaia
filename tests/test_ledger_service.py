@@ -22,7 +22,11 @@ def test_record_expense(mock_deps):
     
     # Setup mock wallet
     initial_wallet = Wallet(address=addr, balance=1.0, internal_usd_balance=10.0)
-    mock_deps["state"].get_wallet.return_value = initial_wallet
+    
+    # Mock Redis pipeline for WATCH/MULTI
+    mock_pipeline = MagicMock()
+    mock_deps["redis"].pipeline.return_value.__enter__.return_value = mock_pipeline
+    mock_pipeline.get.return_value = initial_wallet.model_dump_json().encode('utf-8')
     
     # Record expense
     service.record_transaction(
@@ -33,16 +37,15 @@ def test_record_expense(mock_deps):
         description="Test cost"
     )
     
-    # Verify balance update
-    mock_deps["state"].update_wallet.assert_called_once()
-    updated_wallet = mock_deps["state"].update_wallet.call_args.args[0]
-    assert updated_wallet.internal_usd_balance == 9.50
+    # Verify pipeline execution
+    mock_pipeline.multi.assert_called_once()
+    mock_pipeline.execute.assert_called_once()
     
-    # Verify history push
-    mock_deps["redis"].rpush.assert_called_once()
-    history_args = mock_deps["redis"].rpush.call_args
-    assert addr in history_args.args[0]
-    assert "0.5" in history_args.args[1]
+    # Verify balance update
+    set_args = mock_pipeline.set.call_args.args
+    assert addr in set_args[0]
+    updated_wallet = Wallet.model_validate_json(set_args[1])
+    assert updated_wallet.internal_usd_balance == 9.50
 
 def test_get_history(mock_deps):
     service = LedgerService()

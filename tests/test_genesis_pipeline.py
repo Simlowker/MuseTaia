@@ -7,8 +7,10 @@ from app.core.schemas.genesis import MuseProposal
 
 @pytest.fixture
 def mock_genai():
-    with patch("google.genai.Client") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.genesis_agent.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 def test_genesis_conceptualization(mock_genai):
     """Tests that GenesisAgent generates a valid proposal."""
@@ -24,7 +26,10 @@ def test_genesis_conceptualization(mock_genai):
             "identity": {
                 "name": "Aria", "origin": "Berlin", "age": 24, "niche": "Tech",
                 "personality_traits": ["brave"],
-                "moral_graph": {"ego": 0.5, "empathy": 0.5, "chaos": 0.5}
+                "moral_graph": {
+                    "ego": 0.5, "empathy": 0.5, "chaos": 0.5,
+                    "autonomy": 0.8, "sophistication": 0.7, "technophilia": 0.9
+                }
             },
             "visual_constancy": {
                 "physical_features": "Blue eyes",

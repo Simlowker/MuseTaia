@@ -5,7 +5,7 @@ import asyncio
 from unittest.mock import MagicMock, patch, AsyncMock
 from app.core.workflow_engine import WorkflowEngine
 from app.state.models import Mood, Wallet
-from app.core.schemas.qa import ConsistencyReport
+from app.core.schemas.qa import QAReport
 
 @pytest.fixture
 def mock_agents():
@@ -52,7 +52,9 @@ async def test_full_collaborative_workflow(mock_agents):
     mock_agents["world_assets"].download_asset.return_value = b"ref"
     mock_agents["wardrobe_assets"].download_asset.return_value = b"ref"
     mock_agents["visual"].generate_image.return_value = b"img"
-    mock_agents["critic"].verify_consistency.return_value = ConsistencyReport(is_consistent=True, score=0.99)
+    mock_agents["critic"].verify_consistency.return_value = QAReport(
+        is_consistent=True, identity_drift_score=0.99, clip_semantic_score=1.0, failures=[], final_decision="APPROVED"
+    )
     mock_agents["director"].generate_video.return_value = b"vid"
     mock_agents["eic"].stage_for_review.return_value = "path"
     

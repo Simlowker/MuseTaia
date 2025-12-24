@@ -51,10 +51,10 @@ class ContextCacheManager:
         try:
             cache = self.client.caches.create(
                 model=model_name,
-                config=types.CreateCacheConfig(
-                    contents=contents,
-                    ttl_seconds=ttl_days * 24 * 3600
-                )
+                config={
+                    "contents": contents,
+                    "ttl": f"{ttl_days * 24 * 3600}s"
+                }
             )
             logger.info(f"CACHE: Bible cache created: {cache.name}")
             return cache.name

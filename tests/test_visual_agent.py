@@ -6,8 +6,10 @@ from app.agents.visual_agent import VisualAgent
 
 @pytest.fixture
 def mock_genai():
-    with patch("app.agents.visual_agent.genai") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.visual_agent.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 @pytest.fixture
 def mock_assets_manager():
@@ -16,7 +18,7 @@ def mock_assets_manager():
 
 def test_generate_image_basic(mock_genai, mock_assets_manager):
     """Test basic image generation call."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     mock_response = MagicMock()
     mock_response.generated_images = [MagicMock(image_bytes=b"output_image")]
     mock_client.models.generate_images.return_value = mock_response
@@ -48,31 +50,16 @@ def test_generate_image_basic(mock_genai, mock_assets_manager):
     assert mock_assets_instance.download_asset.call_count >= 4
 
 def test_initialization(mock_genai, mock_assets_manager):
-
     """Test initialization of VisualAgent."""
-
     agent = VisualAgent(model_name="imagen-3.0-generate-001")
-
     assert agent.model_name == "imagen-3.0-generate-001"
-
-    mock_genai.Client.assert_called_once()
-
     mock_assets_manager.assert_called_once()
 
 
 
 def test_edit_image(mock_genai, mock_assets_manager):
-
-
-
     """Test image editing with inpainting."""
-
-
-
-    mock_client = mock_genai.Client.return_value
-
-
-
+    mock_client = mock_genai
     mock_response = MagicMock()
 
     mock_response.generated_images = [MagicMock(image_bytes=b"edited_image")]

@@ -7,13 +7,16 @@ from app.core.schemas.qa import QAReport
 
 @pytest.fixture
 def mock_genai():
-    with patch("google.genai.Client") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.critic_agent.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 def test_critic_2_percent_rule_approval(mock_genai):
     """Tests that a high similarity score results in APPROVAL."""
     critic = CriticAgent()
-    # Mock high similarity (0.99 > 0.75)
+    # Artifact detection returns no artifacts
+    mock_genai.models.generate_content.return_value.parsed = []
     with patch.object(critic.comparator, "calculate_face_similarity", return_value=0.99):
         report = critic.verify_consistency(b"target", b"ref")
         assert report.final_decision == "APPROVED"
@@ -22,6 +25,8 @@ def test_critic_2_percent_rule_approval(mock_genai):
 def test_critic_identity_drift_repair(mock_genai):
     """Tests that a moderate drift triggers REPAIR_REQUIRED."""
     critic = CriticAgent()
+    # Artifact detection returns no artifacts
+    mock_genai.models.generate_content.return_value.parsed = []
     # Mock moderate similarity (0.65 < 0.75)
     with patch.object(critic.comparator, "calculate_face_similarity", return_value=0.65):
         report = critic.verify_consistency(b"target", b"ref")

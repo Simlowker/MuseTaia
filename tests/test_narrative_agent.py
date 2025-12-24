@@ -2,24 +2,31 @@
 
 import pytest
 from unittest.mock import MagicMock, patch
-from app.agents.narrative_agent import NarrativeAgent, ScriptOutput
+from app.agents.narrative_agent import NarrativeAgent, ScriptOutput, AttentionDynamics
 from app.state.models import Mood
 
 @pytest.fixture
 def mock_genai():
-    with patch("app.agents.narrative_agent.genai") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.narrative_agent.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 def test_generate_script(mock_genai):
     """Test that the agent generates a script correctly."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     
     # Mock the structured response
     mock_output = ScriptOutput(
         title="Fashion Week Vlog",
         script="[Visual: Walking down street] VO: Today is the day...",
         caption="Paris vibes! #fashion",
-        estimated_duration=15
+        estimated_duration=15,
+        attention_dynamics=AttentionDynamics(
+            hook_intensity=0.9,
+            pattern_interrupts=["glitch"],
+            tempo_curve=[0.5, 0.8]
+        )
     )
     
     mock_response = MagicMock()
@@ -47,5 +54,4 @@ def test_generate_script(mock_genai):
 def test_initialization(mock_genai):
     """Test agent initialization."""
     agent = NarrativeAgent(model_name="gemini-3.0-pro")
-    mock_genai.Client.assert_called_once()
     assert agent.model_name == "gemini-3.0-pro"

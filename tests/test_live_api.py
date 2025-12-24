@@ -8,13 +8,15 @@ from app.core.services.live_api import LiveApiService
 
 @pytest.fixture
 def mock_genai():
-    with patch("app.core.services.live_api.genai") as mock_gen:
-        yield mock_gen
+    with patch("app.core.services.live_api.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 @pytest.mark.asyncio
 async def test_live_session_connection(mock_genai):
     """Test that the live session connects correctly with context and voice."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     
     # Mock the async context manager client.live.connect
     mock_session = AsyncMock()
@@ -41,7 +43,7 @@ async def test_live_session_connection(mock_genai):
 @pytest.mark.asyncio
 async def test_run_interaction_loop_with_tool_call(mock_genai):
     """Test the interaction loop with a tool call."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     mock_session = AsyncMock()
     
     # 1. Mock a tool call message
@@ -57,12 +59,13 @@ async def test_run_interaction_loop_with_tool_call(mock_genai):
     mock_msg_text = MagicMock()
     mock_msg_text.tool_call = None
     
-    async def mock_receive():
+    async def mock_receive_iter():
         yield mock_msg_tool
         yield mock_msg_text
     
-    mock_session.receive = MagicMock()
-    mock_session.receive.side_effect = mock_receive
+    # In the code: async for message in await session.receive()
+    # So session.receive() must be an AsyncMock returning our generator
+    mock_session.receive = AsyncMock(return_value=mock_receive_iter())
     
     mock_connect = MagicMock()
     mock_connect.__aenter__.return_value = mock_session

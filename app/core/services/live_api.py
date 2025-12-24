@@ -9,6 +9,7 @@ from google.genai import types
 from app.core.config import settings
 from app.agents.tools.swarm_tools import SwarmToolbox
 from app.matrix.context_cache import ContextCacheManager
+from app.core.vertex_init import get_genai_client
 
 logger = logging.getLogger(__name__)
 
@@ -17,11 +18,7 @@ class LiveApiService:
 
     def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
         """Initializes the LiveApiService."""
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
         self.toolbox = SwarmToolbox()
         self.cache_manager = ContextCacheManager()
@@ -120,7 +117,7 @@ class LiveApiService:
                     turn_complete=True
                 )
             
-            async for message in session.receive():
+            async for message in await session.receive():
                 # Handle tool calls automatically
                 if message.tool_call:
                     await self._handle_tool_call(session, message.tool_call)

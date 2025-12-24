@@ -4,21 +4,26 @@ import pytest
 from unittest.mock import MagicMock, patch, AsyncMock
 from app.core.workflow_engine import WorkflowEngine
 from app.state.models import Mood, Wallet
-from app.core.schemas.qa import ConsistencyReport, FeedbackItem
+from app.core.schemas.qa import QAReport, QAFailure
 
 @pytest.fixture
 def mock_agents():
-    with patch("app.core.workflow_engine.NarrativeAgent") as m_narrative, \
+    with patch("app.core.vertex_init.get_genai_client") as m_genai, \
+         patch("app.core.workflow_engine.NarrativeAgent") as m_narrative, \
          patch("app.core.workflow_engine.VisualAgent") as m_visual, \
          patch("app.core.workflow_engine.CriticAgent") as m_critic, \
          patch("app.core.workflow_engine.DirectorAgent") as m_director, \
          patch("app.core.workflow_engine.EICAgent") as m_eic, \
          patch("app.core.workflow_engine.ArchitectAgent") as m_architect, \
          patch("app.core.workflow_engine.StylistAgent") as m_stylist, \
+         patch("app.core.workflow_engine.CFOAgent") as m_cfo, \
          patch("app.core.workflow_engine.PromptOptimizer") as m_optimizer, \
          patch("app.core.workflow_engine.WorldAssetsManager") as m_world_assets, \
          patch("app.core.workflow_engine.WardrobeAssetsManager") as m_wardrobe_assets, \
-         patch("app.core.services.ledger_service.get_redis_client"):
+         patch("app.core.services.ledger_service.get_redis_client") as m_redis:
+        
+        # Ensure sovereign mode is ON by default to avoid hanging in loops
+        m_redis.return_value.get.return_value = b"true"
         
         yield {
             "narrative": m_narrative.return_value,
@@ -28,28 +33,36 @@ def mock_agents():
             "eic": m_eic.return_value,
             "architect": m_architect.return_value,
             "stylist": m_stylist.return_value,
+            "cfo": m_cfo.return_value,
             "optimizer": m_optimizer.return_value,
             "world_assets": m_world_assets.return_value,
-            "wardrobe_assets": m_wardrobe_assets.return_value
+            "wardrobe_assets": m_wardrobe_assets.return_value,
+            "redis": m_redis.return_value
         }
 
 @pytest.fixture
 def enough_budget():
-    with patch("app.core.services.ledger_service.StateManager.get_wallet") as m_get, \
-         patch("app.core.services.ledger_service.get_redis_client") as m_redis:
-        m_get.return_value = Wallet(address="any", balance=1.0, internal_usd_balance=100.0)
-        # Ensure sovereign mode is ON by default for tests
-        m_redis.return_value.get.return_value = b"true"
+    with patch("app.state.db_access.StateManager.get_wallet") as m_get, \
+         patch("app.core.services.ledger_service.LedgerService.get_transaction_history") as m_hist:
+        m_get.return_value = Wallet(address="any", balance=1.0, internal_usd_balance=1000.0)
+        m_hist.return_value = []
         yield m_get
 
 def test_workflow_insufficient_budget(mock_agents):
     """Verifies that the engine blocks production if the wallet is empty."""
     engine = WorkflowEngine()
+    
+    from app.core.schemas.finance import SolvencyCheck
+    mock_agents["cfo"].verify_solvency.return_value = SolvencyCheck(
+        is_authorized=False, projected_balance=-1.0, reasoning="Insufficient budget"
+    )
+    
     low_wallet = Wallet(address="genesis", balance=0, internal_usd_balance=0.01)
     
-    with patch("app.core.services.ledger_service.StateManager.get_wallet", return_value=low_wallet):
+    with patch("app.state.db_access.StateManager.get_wallet", return_value=low_wallet), \
+         patch("app.core.services.ledger_service.LedgerService.get_transaction_history", return_value=[]):
         mood = Mood(valence=0.5)
-        with pytest.raises(RuntimeError, match="Insufficient budget"):
+        with pytest.raises(RuntimeError, match="Financial blockade"):
             engine.produce_video_content("test", mood, "genesis")
             
     assert not mock_agents["narrative"].generate_content.called
@@ -57,6 +70,11 @@ def test_workflow_insufficient_budget(mock_agents):
 def test_workflow_full_swarm_orchestration(mock_agents, enough_budget):
     """Verifies the complete Narrative -> Architect -> Stylist -> Visual -> Critic -> Director flow."""
     engine = WorkflowEngine()
+    
+    from app.core.schemas.finance import SolvencyCheck
+    mock_agents["cfo"].verify_solvency.return_value = SolvencyCheck(
+        is_authorized=True, projected_balance=100.0, reasoning="OK"
+    )
     
     mock_agents["narrative"].generate_content.return_value = MagicMock(title="T", script="S", caption="C")
     
@@ -74,7 +92,9 @@ def test_workflow_full_swarm_orchestration(mock_agents, enough_budget):
     mock_agents["world_assets"].download_asset.return_value = b"asset"
     mock_agents["wardrobe_assets"].download_asset.return_value = b"wardrobe"
     mock_agents["visual"].generate_image.return_value = b"image"
-    mock_agents["critic"].verify_consistency.return_value = ConsistencyReport(is_consistent=True, score=0.9)
+    mock_agents["critic"].verify_consistency.return_value = QAReport(
+        is_consistent=True, identity_drift_score=0.9, clip_semantic_score=1.0, failures=[], final_decision="APPROVED"
+    )
     mock_agents["director"].generate_video.return_value = b"video"
     mock_agents["eic"].stage_for_review.return_value = "path"
     
@@ -90,6 +110,11 @@ def test_workflow_full_swarm_orchestration(mock_agents, enough_budget):
 def test_workflow_repair_loop(mock_agents, enough_budget):
     """Verifies the inpainting repair loop logic."""
     engine = WorkflowEngine()
+    
+    from app.core.schemas.finance import SolvencyCheck
+    mock_agents["cfo"].verify_solvency.return_value = SolvencyCheck(
+        is_authorized=True, projected_balance=100.0, reasoning="OK"
+    )
     
     mock_agents["narrative"].generate_content.return_value = MagicMock(title="T", script="S", caption="C")
     mock_agents["optimizer"].optimize.return_value = "P"
@@ -109,14 +134,14 @@ def test_workflow_repair_loop(mock_agents, enough_budget):
     mock_agents["visual"].edit_image.return_value = b"repaired_image"
     
     # Critic: 1. Reject with Feedback, 2. Accept, 3+ Fallback Accept
-    feedback = FeedbackItem(
-        category="identity", description="Fix face", severity=0.8, 
-        action_type="inpaint", target_area="face"
+    failure = QAFailure(
+        area="face", description="Fix face", severity=0.8, 
+        action_type="inpaint"
     )
     mock_agents["critic"].verify_consistency.side_effect = [
-        ConsistencyReport(is_consistent=False, score=0.5, feedback=[feedback]),
-        ConsistencyReport(is_consistent=True, score=0.99),
-        ConsistencyReport(is_consistent=True, score=0.99)
+        QAReport(is_consistent=False, identity_drift_score=0.5, clip_semantic_score=1.0, failures=[failure], final_decision="REPAIR_REQUIRED"),
+        QAReport(is_consistent=True, identity_drift_score=0.99, clip_semantic_score=1.0, failures=[], final_decision="APPROVED"),
+        QAReport(is_consistent=True, identity_drift_score=0.99, clip_semantic_score=1.0, failures=[], final_decision="APPROVED")
     ]
     mock_agents["critic"].detect_mask_area.return_value = [100, 100, 200, 200]
     
@@ -135,6 +160,11 @@ def test_workflow_max_retries_failure(mock_agents, enough_budget):
     """Verifies that the engine proceeds with best effort after max retries."""
     engine = WorkflowEngine()
     
+    from app.core.schemas.finance import SolvencyCheck
+    mock_agents["cfo"].verify_solvency.return_value = SolvencyCheck(
+        is_authorized=True, projected_balance=100.0, reasoning="OK"
+    )
+    
     mock_agents["narrative"].generate_content.return_value = MagicMock(title="T", script="S", caption="C")
     from app.core.schemas.world import SceneLayout
     mock_agents["architect"].plan_scene_layout.return_value = SceneLayout(location_id="loc", selected_objects=[], scene_description="d")
@@ -147,7 +177,9 @@ def test_workflow_max_retries_failure(mock_agents, enough_budget):
     mock_agents["director"].generate_video.return_value = b"video"
     mock_agents["eic"].stage_for_review.return_value = "path"
     
-    mock_agents["critic"].verify_consistency.return_value = ConsistencyReport(is_consistent=False, score=0.1, issues=["Fail"])
+    mock_agents["critic"].verify_consistency.return_value = QAReport(
+        is_consistent=False, identity_drift_score=0.1, clip_semantic_score=1.0, failures=[], final_decision="REPAIR_REQUIRED"
+    )
     
     mood = Mood(valence=0.5)
     result = engine.produce_video_content("test", mood, "genesis", max_retries=3)

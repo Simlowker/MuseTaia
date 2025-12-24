@@ -34,7 +34,7 @@ def test_muse_dna_model_validation():
 def test_load_genesis_dna(mock_cache_manager_cls):
     """Tests that the DNALoader correctly interacts with the cache manager."""
     mock_manager = mock_cache_manager_cls.return_value
-    mock_manager.create_cache.return_value = "cache/resource/123"
+    mock_manager.create_bible_cache.return_value = "cache/resource/123"
     
     loader = DNALoader(cache_manager=mock_manager)
     
@@ -49,10 +49,10 @@ def test_load_genesis_dna(mock_cache_manager_cls):
     resource_name = loader.load_dna(dna_data)
     
     assert resource_name == "cache/resource/123"
-    # Verify that create_cache was called
-    mock_manager.create_cache.assert_called_once()
-    _, kwargs = mock_manager.create_cache.call_args
-    content_arg = kwargs.get("content")
+    # Verify that create_bible_cache was called
+    mock_manager.create_bible_cache.assert_called_once()
+    _, kwargs = mock_manager.create_bible_cache.call_args
+    content_arg = kwargs.get("system_instruction")
     assert content_arg is not None
     assert "Genesis Muse" in content_arg
     assert "Mysterious" in content_arg

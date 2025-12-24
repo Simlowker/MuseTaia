@@ -20,17 +20,20 @@ async def test_live_stimulus_to_production_trigger():
     
     # Patch infrastructure
     with patch("google.cloud.storage.Client"), \
-         patch("google.genai.Client") as mock_genai_client, \
+         patch("app.agents.root_agent.get_genai_client") as mock_get, \
          patch("app.agents.handlers.visual_stream.VideoStreamHandler.describe_frame", new_callable=AsyncMock) as mock_describe, \
          patch("app.core.workflow_engine.WorkflowEngine.produce_video_content") as mock_produce, \
          patch("app.agents.root_agent.StateManager") as mock_sm:
         
         # Configure Mocks
+        mock_genai_client = MagicMock()
+        mock_get.return_value = mock_genai_client
         mock_describe.return_value = mock_frame_description
         
         mock_chat = MagicMock()
-        mock_chat.send_message.return_value.text = mock_reaction
-        mock_genai_client.return_value.chats.create.return_value = mock_chat
+        # Mock the chain correctly
+        mock_chat.send_message.return_value.text.strip.return_value = mock_reaction
+        mock_genai_client.chats.create.return_value = mock_chat
         
         # Setup state
         mock_sm.return_value.get_mood.return_value = Mood()

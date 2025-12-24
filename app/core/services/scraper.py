@@ -75,3 +75,14 @@ class ScraperService:
         except Exception as e:
             logger.error(f"APIFY: TikTok scrape failed: {e}")
             return []
+
+    async def scrape_platform(self, platform: str, query: str) -> List[Dict[str, Any]]:
+        """Backward compatible generic scraping method."""
+        if platform == "reddit":
+            return await self.scrape_reddit(query)
+        elif platform == "tiktok":
+            return await self.scrape_tiktok(query)
+        else:
+            logger.warning(f"SCRAPER: Unknown platform {platform}")
+            return []
+            

@@ -6,11 +6,13 @@ from app.agents.motion_engineer import MotionEngineer
 
 @pytest.fixture
 def mock_genai():
-    with patch("google.genai.Client") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.director_agent.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 def test_motion_engineer_handoff(mock_genai):
-    mock_client = mock_genai.return_value
+    mock_client = mock_genai
     mock_operation = MagicMock()
     mock_response = MagicMock()
     mock_video = MagicMock()

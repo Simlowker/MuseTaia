@@ -6,12 +6,14 @@ from app.core.utils.prompt_optimizer import PromptOptimizer
 
 @pytest.fixture
 def mock_genai():
-    with patch("app.core.utils.prompt_optimizer.genai") as mock_gen:
-        yield mock_gen
+    with patch("app.core.utils.prompt_optimizer.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 def test_optimize_prompt(mock_genai):
     """Test that PromptOptimizer expands a simple prompt."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     mock_response = MagicMock()
     mock_response.text = "Cinematic wide shot of a muse walking on a tropical beach at golden hour, photorealistic, 8k."
     mock_client.models.generate_content.return_value = mock_response

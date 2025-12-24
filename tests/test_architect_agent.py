@@ -9,8 +9,10 @@ from app.core.schemas.world import SceneLayout
 
 @pytest.fixture
 def mock_genai():
-    with patch("app.agents.architect_agent.genai") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.architect_agent.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 @pytest.fixture
 def world_registry():
@@ -26,7 +28,7 @@ def world_registry():
 
 def test_plan_scene_layout(mock_genai, world_registry):
     """Test that the agent selects the correct location based on intent."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     
     # Mock Response
     mock_layout = SceneLayout(

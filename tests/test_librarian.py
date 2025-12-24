@@ -6,7 +6,9 @@ from app.agents.librarian import Librarian
 
 @pytest.fixture
 def mock_genai_client():
-    with patch("google.genai.Client") as mock_client:
+    with patch("app.agents.librarian.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
         yield mock_client
 
 def test_librarian_initialization(mock_genai_client):

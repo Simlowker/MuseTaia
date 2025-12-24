@@ -38,6 +38,7 @@ class SignatureAssetsManager:
         Args:
             bucket_name: The name of the GCS bucket to use.
         """
+        self.bucket_name = bucket_name
         try:
             self.client = storage.Client()
             self.bucket = self.client.bucket(bucket_name)

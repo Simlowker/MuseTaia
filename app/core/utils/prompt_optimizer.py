@@ -1,8 +1,8 @@
 """Utility for optimizing and expanding prompts for image generation."""
 
-import google.genai as genai
 from google.genai import types
 from app.core.config import settings
+from app.core.vertex_init import get_genai_client
 
 OPTIMIZER_SYSTEM_INSTRUCTION = """You are a Prompt Engineering expert for Imagen 3.
 Your task is to take a simple scene description and expand it into a highly detailed, technical, and photorealistic prompt.
@@ -26,11 +26,7 @@ class PromptOptimizer:
         Args:
             model_name: The Gemini model to use for rewriting.
         """
-        self.client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        self.client = get_genai_client()
         self.model_name = model_name
 
     def optimize(self, simple_prompt: str) -> str:

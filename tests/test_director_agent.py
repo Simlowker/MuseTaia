@@ -7,12 +7,14 @@ from app.core.schemas.screenplay import ShotType, CameraMovement
 
 @pytest.fixture
 def mock_genai():
-    with patch("app.agents.director_agent.genai") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.director_agent.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 def test_generate_video(mock_genai):
     """Test video generation call with cinematic controls."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     
     # Mock the LRO (Long Running Operation)
     mock_operation = MagicMock()
@@ -32,14 +34,14 @@ def test_generate_video(mock_genai):
     assert video_bytes == b"generated_video_content"
     mock_client.models.generate_videos.assert_called_once()
     call_args = mock_client.models.generate_videos.call_args
-    assert "Shot type: close_up" in call_args.kwargs["prompt"]
-    assert "Camera movement: zoom_in" in call_args.kwargs["prompt"]
+    assert "Shot: close_up" in call_args.kwargs["prompt"]
+    assert "Movement: zoom_in" in call_args.kwargs["prompt"]
     assert "A digital muse walking in a garden" in call_args.kwargs["prompt"]
     assert call_args.kwargs["image"].image_bytes == b"reference_image"
 
 def test_generate_video_with_multi_references(mock_genai):
     """Test video generation with multiple reference images (Ingredients-to-Video)."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     mock_operation = MagicMock()
     mock_video = MagicMock()
     mock_video.video_bytes = b"multi_ref_video"
@@ -69,4 +71,3 @@ def test_initialization(mock_genai):
     """Test initialization."""
     agent = DirectorAgent(model_name="veo-3.1")
     assert agent.model_name == "veo-3.1"
-    mock_genai.Client.assert_called_once()

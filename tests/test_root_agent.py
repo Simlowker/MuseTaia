@@ -7,25 +7,25 @@ from app.agents.protocols.master_sync import MasterSource
 
 @pytest.fixture
 def mock_genai():
-    with patch("app.agents.root_agent.genai") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.root_agent.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 def test_root_agent_initialization(mock_genai):
     """Tests that the RootAgent initializes correctly with the model."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     mock_chat = mock_client.chats.create.return_value
     
     agent = RootAgent(model_name="gemini-3.0-flash-preview")
     
-    # Check that the GenAI client was initialized
-    mock_genai.Client.assert_called_once()
     # Check that a chat was created
     mock_client.chats.create.assert_called_once()
     assert agent.chat_session == mock_chat
 
 def test_root_agent_ping(mock_genai):
     """Tests the basic ping functionality."""
-    mock_chat = mock_genai.Client.return_value.chats.create.return_value
+    mock_chat = mock_genai.chats.create.return_value
     # Mock the response from the agent
     mock_response = MagicMock()
     mock_response.text = "Pong"
@@ -39,7 +39,7 @@ def test_root_agent_ping(mock_genai):
 
 def test_root_agent_sensory_reaction(mock_genai):
     """Test that RootAgent reacts to sensory input and updates state."""
-    mock_chat = mock_genai.Client.return_value.chats.create.return_value
+    mock_chat = mock_genai.chats.create.return_value
     mock_response = MagicMock()
     mock_response.text = "I should look into that fashion trend."
     mock_chat.send_message.return_value = mock_response

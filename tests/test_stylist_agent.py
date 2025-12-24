@@ -11,8 +11,10 @@ from app.state.models import Mood
 
 @pytest.fixture
 def mock_genai():
-    with patch("app.agents.stylist_agent.genai") as mock_gen:
-        yield mock_gen
+    with patch("app.agents.stylist_agent.get_genai_client") as mock_get:
+        mock_client = MagicMock()
+        mock_get.return_value = mock_client
+        yield mock_client
 
 @pytest.fixture
 def wardrobe_registry():
@@ -27,7 +29,7 @@ def wardrobe_registry():
 
 def test_select_look(mock_genai, wardrobe_registry):
     """Test that the agent selects an outfit correctly."""
-    mock_client = mock_genai.Client.return_value
+    mock_client = mock_genai
     
     # Mock Response
     mock_selection = LookSelection(

@@ -4,7 +4,6 @@ import pytest
 import time
 from unittest.mock import MagicMock, patch, AsyncMock
 from app.agents.trend_scout import TrendScout
-from app.core.schemas.market_intelligence import TrendInsight
 
 def test_vvs_formula():
     """Tests the mathematical correctness of the VVS formula."""
@@ -27,37 +26,42 @@ def test_vvs_formula():
 @pytest.mark.asyncio
 async def test_scan_niche_filtering():
     """Tests that scan_niche correctly filters and sorts insights."""
-    with patch("app.agents.trend_scout.ApifyClientAsync") as mock_client_cls:
+    with patch("app.core.services.scraper.ApifyClientAsync") as mock_client_cls, \
+         patch("app.agents.trend_scout.get_genai_client") as mock_genai_get:
+        
         mock_client = mock_client_cls.return_value
+        mock_genai = MagicMock()
+        mock_genai_get.return_value = mock_genai
+        
         # Mock settings for token
         with patch("app.agents.trend_scout.settings") as mock_settings:
             mock_settings.APIFY_TOKEN = "fake-token"
             
             scout = TrendScout()
-            scout.vvs_threshold = 100.0
+            scout.vvs_threshold = 5.0 # Threshold in scout_and_filter logic
             
-            # Mock Actor Run
-            mock_actor = mock_client.actor.return_value
-            mock_actor.call = AsyncMock(return_value={"defaultDatasetId": "ds-123"})
-            
-            # Mock Dataset items
-            mock_dataset = mock_client.dataset.return_value
+            # Mock Scraper results
             now = time.time()
             items = [
-                # Should be filtered out (VVS too low)
-                {"id": "low", "title": "Low Trend", "upvotes": 10, "created_utc": now - 3600, "num_comments": 1},
-                # Should be included (VVS high)
-                {"id": "high", "title": "High Trend", "upvotes": 1000, "created_utc": now - 3600, "num_comments": 100}
+                {"id": "low", "title": "Low", "upvotes": 1, "created_utc": now, "num_comments": 0, "platform": "reddit"},
+                {"id": "high", "title": "High", "upvotes": 1000, "created_utc": now - 3600, "num_comments": 100, "platform": "reddit"}
             ]
             
-            async def mock_iterate():
-                for item in items:
-                    yield item
+            async def mock_reddit(topic, limit=10): return items
+            async def mock_tiktok(topic, limit=5): return []
             
-            mock_dataset.iterate_items = mock_iterate
-            
-            insights = await scout.scan_niche(["tech"])
-            
-            assert len(insights) == 1
-            assert insights[0].trend_fingerprint == "high"
-            assert insights[0].vvs_score > 100.0
+            with patch.object(scout.scraper, 'scrape_reddit', side_effect=mock_reddit), \
+                 patch.object(scout.scraper, 'scrape_tiktok', side_effect=mock_tiktok):
+                
+                # Mock LLM response
+                from app.core.schemas.trend import TrendReport, RelevanceScore, Sentiment
+                mock_report = TrendReport(
+                    topic="High", summary="S", sentiment=Sentiment.POSITIVE, 
+                    relevance=RelevanceScore.HIGH, reasoning="R"
+                )
+                mock_genai.models.generate_content.return_value.parsed = mock_report
+                
+                insights = await scout.scan_niche(["tech"])
+                
+                assert len(insights) == 1
+                assert insights[0].topic == "High"

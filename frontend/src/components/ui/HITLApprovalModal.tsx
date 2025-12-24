@@ -1,107 +1,69 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Proposal } from '../../types/smos';
-import { SMOSApi } from '../../services/api';
-import { useSSE } from '../../hooks/use-sse';
-import { AlertCircle, Check, X, DollarSign, Target } from 'lucide-react';
+import { useSystem } from '../../contexts/system-context';
+import { X, Check, AlertTriangle } from 'lucide-react';
 
 export function HITLApprovalModal() {
-    const [proposals, setProposals] = useState<Proposal[]>([]);
-    const { subscribe } = useSSE(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/stream/muse-status`);
+  const { pendingProposal, approveProposal, rejectProposal } = useSystem();
 
-    useEffect(() => {
-        // Initial fetch
-        SMOSApi.getProposals().then(setProposals).catch(console.error);
+  if (!pendingProposal) return null;
 
-        // Listen for new proposals
-        const unsub = subscribe('NEW_PROPOSAL', (payload: Proposal) => {
-            setProposals(prev => [...prev, payload]);
-        });
-
-        return unsub;
-    }, [subscribe]);
-
-    const handleApprove = async (id: string) => {
-        try {
-            await SMOSApi.approveProposal(id);
-            setProposals(prev => prev.filter(p => p.id !== id));
-        } catch (e) {
-            console.error('Approval failed', e);
-        }
-    };
-
-    const handleReject = async (id: string) => {
-        try {
-            await SMOSApi.rejectProposal(id);
-            setProposals(prev => prev.filter(p => p.id !== id));
-        } catch (e) {
-            console.error('Rejection failed', e);
-        }
-    };
-
-    if (!Array.isArray(proposals) || proposals.length === 0) return null;
-
-    const current = proposals[0];
-    if (!current) return null;
-
-    return (
-        <AnimatePresence>
-            <div className="fixed inset-0 z-[100] flex items-center justify-center bg-void/80 backdrop-blur-xl">
-                <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                    className="w-full max-w-md bg-onyx border border-gold/30 rounded-2xl p-6 shadow-[0_0_50px_rgba(212,175,55,0.15)]"
-                >
-                    <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center text-gold">
-                            <AlertCircle size={24} />
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold text-white uppercase tracking-tighter">Human-In-The-Loop</h2>
-                            <p className="text-[10px] text-gold font-bold uppercase tracking-widest">Awaiting Sovereignty Approval</p>
-                        </div>
-                    </div>
-
-                    <div className="space-y-4 mb-8">
-                        <div className="p-4 bg-glass-bg border border-glass-border rounded-xl">
-                            <p className="text-sm text-white/80 italic">"{current.description}"</p>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-glass-bg p-3 rounded-xl border border-glass-border">
-                                <div className="flex items-center gap-2 text-[10px] text-white/40 uppercase mb-1">
-                                    <DollarSign size={12} /> Est. Cost
-                                </div>
-                                <div className="text-lg font-bold text-emerald">${current.cost_estimate.toFixed(2)}</div>
-                            </div>
-                            <div className="bg-glass-bg p-3 rounded-xl border border-glass-border">
-                                <div className="flex items-center gap-2 text-[10px] text-white/40 uppercase mb-1">
-                                    <Target size={12} /> Confidence
-                                </div>
-                                <div className="text-lg font-bold text-cyan">{(current.confidence * 100).toFixed(0)}%</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="flex gap-4">
-                        <button
-                            onClick={() => handleReject(current.id)}
-                            className="flex-1 py-3 rounded-xl border border-ruby/30 text-ruby hover:bg-ruby/10 transition-colors font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2"
-                        >
-                            <X size={16} /> Discard
-                        </button>
-                        <button
-                            onClick={() => handleApprove(current.id)}
-                            className="flex-1 py-3 rounded-xl bg-gold text-void hover:bg-gold/90 transition-colors font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2"
-                        >
-                            <Check size={16} /> Authorize
-                        </button>
-                    </div>
-                </motion.div>
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="w-full max-w-md bg-obsidian border border-glass-border rounded-2xl p-6 shadow-2xl"
+        >
+          {/* Header */}
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 bg-amber/10 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-amber" />
             </div>
-        </AnimatePresence>
-    );
+            <div>
+              <h2 className="text-sm font-bold text-white uppercase tracking-widest">
+                Approval Required
+              </h2>
+              <p className="text-[10px] text-white/40">{pendingProposal.type}</p>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="mb-6">
+            <h3 className="text-white font-medium mb-2">{pendingProposal.title}</h3>
+            <p className="text-sm text-white/60 leading-relaxed">
+              {pendingProposal.description}
+            </p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3">
+            <button
+              onClick={() => rejectProposal(pendingProposal.id)}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/70 text-sm font-medium transition-colors"
+            >
+              <X className="w-4 h-4" />
+              Reject
+            </button>
+            <button
+              onClick={() => approveProposal(pendingProposal.id)}
+              className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-gold hover:bg-gold/90 rounded-xl text-black text-sm font-bold transition-colors"
+            >
+              <Check className="w-4 h-4" />
+              Approve
+            </button>
+          </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
+  );
 }

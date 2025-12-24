@@ -9,10 +9,6 @@ export const metadata: Metadata = {
   description: "Autonomous Sovereign Muse Operating System",
 };
 
-import { NeuralProvider } from "@/context/NeuralContext";
-import { MoodProvider } from "@/context/MoodContext";
-import { TrendProvider } from "@/context/TrendContext";
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -20,14 +16,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.className} antialiased bg-void text-foreground overflow-hidden`}>
-        <MoodProvider>
-          <NeuralProvider>
-            <TrendProvider>
-              {children}
-            </TrendProvider>
-          </NeuralProvider>
-        </MoodProvider>
+      <body className={`${inter.className} antialiased`}>
+        {children}
       </body>
     </html>
   );

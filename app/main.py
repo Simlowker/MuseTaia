@@ -174,29 +174,35 @@ async def trend_scout_daemon():
                 if insight.vvs_score > scout.vvs_threshold:
                     logger.info(f"DAEMON: High-VVS Trend detected ({insight.vvs_score}): {insight.topic}")
                     
-                    # 3. CFO GATE: Verify Solvency
-                    subject_id = "muse-01"
-                    est_cost = calc.estimate_video_cost("veo-3.1", 5.0)
-                    
-                    wallet = engine.ledger_service.state_manager.get_wallet(subject_id)
-                    history = engine.ledger_service.get_transaction_history(subject_id)
-                    
-                    if not wallet:
-                        logger.warning(f"DAEMON: No wallet for {subject_id}, skipping.")
-                        continue
+                    # 3. CFO GATE & Production Trigger for ALL active Muses
+                    muses = assets.list_muses()
+                    if not muses:
+                        logger.warning("DAEMON: No active Muses found in GCS. Using fallback 'muse-01'.")
+                        muses = ["muse-01"]
 
-                    solvency = cfo.verify_solvency(wallet, history, est_cost)
-                    
-                    if not solvency.is_authorized:
-                        logger.warning(f"DAEMON: Financial block for trend '{insight.topic}': {solvency.reasoning}")
-                        continue
+                    for subject_id in muses:
+                        logger.info(f"DAEMON: Triggering production for Muse: {subject_id}")
+                        
+                        est_cost = calc.estimate_video_cost("veo-3.1", 5.0)
+                        wallet = engine.ledger_service.state_manager.get_wallet(subject_id)
+                        history = engine.ledger_service.get_transaction_history(subject_id)
+                        
+                        if not wallet:
+                            logger.warning(f"DAEMON: No wallet for {subject_id}, skipping.")
+                            continue
 
-                    # 4. Trigger Production Loop
-                    await engine.produce_video_content_async(
-                        intent=insight.suggested_intent,
-                        mood=Mood(), # Default neutral mood
-                        subject_id=subject_id
-                    )
+                        solvency = cfo.verify_solvency(wallet, history, est_cost)
+                        
+                        if not solvency.is_authorized:
+                            logger.warning(f"DAEMON: Financial block for Muse '{subject_id}' on trend '{insight.topic}': {solvency.reasoning}")
+                            continue
+
+                        # 4. Trigger Production Loop
+                        await engine.produce_video_content_async(
+                            intent=insight.suggested_intent,
+                            mood=Mood(), # Default neutral mood
+                            subject_id=subject_id
+                        )
                     
         except Exception as e:
             logger.error(f"DAEMON: TrendScout loop failed: {e}")

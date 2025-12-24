@@ -96,6 +96,35 @@ class SignatureAssetsManager:
         blobs = self.client.list_blobs(self.bucket_name, prefix=prefix)
         return [blob.name for blob in blobs]
 
+    def list_muses(self) -> List[str]:
+        """Lists all active Muse IDs based on GCS directory structure."""
+        # We look for all objects with 'muses/' prefix and extract unique first-level subdirs
+        blobs = self.client.list_blobs(self.bucket_name, prefix="muses/", delimiter="/")
+        
+        # When delimiter is used, blobs with the same prefix are grouped in 'prefixes'
+        # The SDK returns these in the iterator or via a specific property depending on version
+        # For google-cloud-storage, they are in blobs.prefixes
+        muses = set()
+        
+        # Consume the iterator to populate prefixes
+        for _ in blobs: pass
+        
+        if hasattr(blobs, 'prefixes'):
+            for p in blobs.prefixes:
+                # p is like 'muses/aria/'
+                muse_id = p.strip("/").split("/")[-1]
+                muses.add(muse_id)
+        
+        # Fallback if prefixes not working as expected (iterative extraction)
+        if not muses:
+            all_blobs = self.list_assets(prefix="muses/")
+            for b in all_blobs:
+                parts = b.split("/")
+                if len(parts) > 1:
+                    muses.add(parts[1])
+                    
+        return sorted(list(muses))
+
     def download_asset(self, asset_name: str) -> bytes:
         """Downloads the binary data of an asset.
 

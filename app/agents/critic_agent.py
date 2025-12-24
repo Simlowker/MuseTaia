@@ -144,12 +144,42 @@ class CriticAgent:
             return []
 
 
-    def verify_vocal_consistency(self, audio_bytes: bytes, vocal_dna: str) -> float:
-        """Audits the generated audio against the Muse's vocal anchor."""
-        logger.info(f"CRITIC_AUDIO: Verifying timbre match for {vocal_dna}")
-        # In production, this uses a Siamese Neural Network to compare 
-        # speaker embeddings.
-        return 0.92 # Simulated match score
+    def verify_vocal_consistency(self, audio_bytes: bytes, vocal_anchor_bytes: bytes) -> float:
+        """Audits the generated audio against the Muse's vocal anchor using Gemini."""
+        logger.info("CRITIC_AUDIO: Verifying timbre match via Gemini Audio...")
+        
+        prompt = """
+        Compare the timbre and vocal identity of these two audio samples.
+        Audio 1: The canonical reference (anchor).
+        Audio 2: The generated content.
+        
+        Are they the same person? Provide a similarity score from 0.0 to 1.0.
+        Return ONLY a JSON object with 'similarity_score'.
+        """
+        
+        try:
+            response = self.client.models.generate_content(
+                model="gemini-1.5-flash", # Flash supports audio/video well
+                contents=[
+                    types.Content(
+                        role="user",
+                        parts=[
+                            types.Part.from_bytes(data=vocal_anchor_bytes, mime_type="audio/mp3"),
+                            types.Part.from_bytes(data=audio_bytes, mime_type="audio/mp3"),
+                            types.Part.from_text(text=prompt)
+                        ]
+                    )
+                ],
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json"
+                )
+            )
+            import json
+            data = json.loads(response.text)
+            return data.get("similarity_score", 0.9)
+        except Exception as e:
+            logger.error(f"CRITIC_AUDIO: Vocal verification failed: {e}")
+            return 0.5 # Penalty for error
 
     def score_video_quality(self, video_bytes: bytes, prompt: str) -> float:
         """Implements VideoScore2-style evaluation using Gemini Vision.

@@ -1,0 +1,25 @@
+{
+    "3": {
+        "class_type": "CheckpointLoaderSimple",
+        "inputs": {
+            "ckpt_name": "sd_xl_base_1.0.safetensors"
+        }
+    },
+    "6": {
+        "class_type": "CLIPTextEncode",
+        "inputs": {
+            "text": "{prompt}",
+            "clip": [
+                "3",
+                1
+            ]
+        }
+    },
+    "10": {
+        "class_type": "DepthAnythingV2",
+        "inputs": {
+            "strength": "{depth_strength}",
+            "blur": "{blur_radius}"
+        }
+    }
+}

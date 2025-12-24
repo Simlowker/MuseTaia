@@ -73,18 +73,28 @@ class WorkflowEngine:
         
         affective_params = self._get_affective_depth_params(mood)
         
-        # Conceptual workflow JSON with Affective Depth mapping
-        workflow = {
-            "3": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": "sd_xl_base_1.0.safetensors"}},
-            "6": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt, "clip": ["3", 1]}},
-            "10": {
-                "class_type": "DepthAnythingV2", 
-                "inputs": {
-                    "strength": affective_params["depth_strength"],
-                    "blur": affective_params["blur_radius"]
-                }
+        # Load external workflow template
+        import json
+        import os
+        workflow_path = os.path.join("app", "core", "workflows", "default_render.json")
+        try:
+            with open(workflow_path, "r") as f:
+                workflow_str = f.read()
+            
+            # Dynamic injection of parameters into the JSON template
+            workflow_str = workflow_str.replace("{prompt}", prompt)
+            workflow_str = workflow_str.replace("{depth_strength}", str(affective_params["depth_strength"]))
+            workflow_str = workflow_str.replace("{blur_radius}", str(affective_params["blur_radius"]))
+            
+            workflow = json.loads(workflow_str)
+        except Exception as e:
+            logger.error(f"COMFY_UI: Failed to load workflow from {workflow_path}: {e}. Falling back to basic dict.")
+            # Basic fallback if file missing
+            workflow = {
+                "3": {"class_type": "CheckpointLoaderSimple", "inputs": {"ckpt_name": "sd_xl_base_1.0.safetensors"}},
+                "6": {"class_type": "CLIPTextEncode", "inputs": {"text": prompt, "clip": ["3", 1]}}
             }
-        }
+
         prompt_id = self.comfy_client.queue_prompt(workflow)
         return self.comfy_client.get_output_data(prompt_id) or b""
 

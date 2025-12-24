@@ -1,31 +1,56 @@
-# SMOS v2 Technical Stack (Industrial & Sovereign)
+# SMOS v2 - Technical Stack & Infrastructure
 
-## 🧠 Lobe de Haute Cognition (The Brain)
-- **Framework:** Google ADK (Agent Development Kit).
-- **Core LLM:** Gemini 3.0 Pro & Flash (Vertex AI).
-- **Memory:** Vertex AI Context Caching (1M+ tokens) + Redis (Shared State).
-- **Orchestration:** TaskGraphRunner (Sequential & Parallel nodes).
+**Status:** Golden Build (Production Ready)
+**Date:** December 23, 2025
 
-## 🛰️ Lobe de Perception (The Scout)
-- **Trend Discovery:** TrendScout with Viral Velocity Score (VVS) algorithm.
-- **Data Source:** Reddit/TikTok via ApifyClientAsync.
-- **Grounding:** Google Search Grounding (Vertex AI).
+---
 
-## 🎨 Lobe de Création (The Creative Studio)
-- **Identity Lock:** PuLID + IP-Adapter FaceID via ComfyScript.
-- **Image Gen:** Imagen 3 (Vertex AI).
-- **Video Gen:** Veo 3.1 (Google DeepMind).
-- **Audio Gen:** Google Cloud Text-to-Speech (Studio Voices).
-- **Sync:** LipSync Pipeline (LivePortrait/SadTalker on GKE GPU).
+## 1. Core Frameworks & Languages
 
-## ⚖️ Lobe de Gouvernance (Forge Control)
-- **Financial Officer:** CFOAgent with constitutional Circuit Breakers.
-- **Quality Assurance:** The Critic (2% Deviation Rule via Biometric Comparison).
-- **Ledger:** Transaction history stored in Redis.
+*   **Python 3.12+:** Primary language for AI Agents and Logic.
+    *   *Reasoning:* Rich ecosystem for AI/ML (Pydantic, FastAPI, Google GenAI SDK).
+*   **Go (Golang) 1.23+:** Infrastructure Dispatcher & High-Concurrency Networking.
+    *   *Reasoning:* Low latency, efficient concurrency for handling thousands of job triggers.
+*   **TypeScript / Next.js 15:** Frontend "Vitrine" and Dashboard.
+    *   *Reasoning:* Reactive UI, Server-Side Rendering for SEO, strong typing.
 
-## 🏗️ Infrastructure (The Magic Factory)
-- **Orchestrator:** Google Kubernetes Engine (GKE).
-- **Acceleration:** GKE Pod Snapshots (CRIU) for 2.4s boot time.
-- **Compute:** NVIDIA L4 GPU Node Pools.
-- **Storage:** Google Cloud Storage (GCS) with GCS FUSE mounting.
-- **Dispatcher:** High-concurrency Golang Dispatcher.
+## 2. Artificial Intelligence (The "Matrix")
+
+*   **Google Gemini 3.0 Pro/Flash:** The cognitive engine (HLP, Narrative, Critic).
+    *   *Role:* Reasoning, Context Caching, Multimodal Analysis.
+*   **Google Imagen 3:** High-fidelity image generation.
+    *   *Role:* Visual Virtuoso, Texture generation.
+*   **Google Veo 3.1:** Cinematic video generation.
+    *   *Role:* Director Agent (Motion).
+*   **Vertex AI Context Caching:** Long-term memory persistence.
+    *   *Role:* Storing the "Style Bible" and DNA with 7-day TTL to reduce latency and cost.
+
+## 3. Infrastructure (The "Magic Factory")
+
+*   **Google Kubernetes Engine (GKE) Autopilot:** Container orchestration.
+    *   *Feature:* **Containerd Snapshots & CRIU**. Allows "Warm Start" of Python agents (cloning initialized memory) for <500ms cold starts.
+*   **Google Artifact Registry:** Secure Docker image storage.
+*   **Google Cloud Storage (GCS) FUSE:** Mounting heavy model weights and assets directly into Pods as a file system.
+*   **Redis (Cloud Memorystore):** Real-time State Database (StateDB).
+    *   *Role:* Shared memory for Agents (Mood, Wallet), Pub/Sub for SSE.
+    *   *Resilience:* Configured with connection pooling and exponential backoff retries.
+
+## 4. External Services
+
+*   **Apify:** Social Media Scraping (Reddit, TikTok).
+    *   *Role:* Providing real-world signals for the Trend Scout.
+*   **ComfyUI (Self-Hosted on GKE):** Nodal image processing pipeline (optional advanced flow).
+    *   *Role:* Fine-grained control over Inpainting/Outpainting and Identity preservation (PuLID).
+
+## 5. Security & Governance
+
+*   **Google Secret Manager:** Secure storage of API Keys and Tokens.
+*   **Identity Aware Proxy (IAP):** Zero-trust access control for the Vitrine.
+*   **CORS:** Restrictive policy allowing only whitelisted frontend domains.
+*   **CFO Circuit Breaker:** Hard-coded financial limits preventing runaway API spending.
+
+## 6. Testing Strategy
+
+*   **Pytest:** Test runner.
+*   **Unit Tests:** Mocked external services (Singleton `get_genai_client`).
+*   **Integration Tests:** Real calls to Vertex AI/Redis (marked with `@pytest.mark.integration`).

@@ -1,7 +1,7 @@
 "use client";
 
-import NerveCenterLayout from "@/components/layouts/nerve-center";
+import { LuxeDashboard } from '@/components/dashboard/LuxeDashboard';
 
 export default function Home() {
-  return <NerveCenterLayout>{null}</NerveCenterLayout>;
+  return <LuxeDashboard />;
 }

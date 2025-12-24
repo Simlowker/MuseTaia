@@ -126,6 +126,9 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: Frontend S-Tier Upgrade (2025-12-24)
 *Link: [./conductor/tracks/frontend_stier_upgrade_20251224/](./conductor/tracks/frontend_stier_upgrade_20251224/)*
+
+## [x] Track: Frontend Luxe Minimalism Integration (2025-12-24)
+*Link: [./conductor/tracks/frontend_luxe_minimalism_20251224/](./conductor/tracks/frontend_luxe_minimalism_20251224/)*
  J'ai terminé l'ensemble des corrections de durcissement final.
 
 ### ✅ État Final du Projet :

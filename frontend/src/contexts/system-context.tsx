@@ -37,6 +37,7 @@ export interface Production {
   progress: number;
   current_stage: string;
   cost_usd: number;
+  thumbnail_url?: string;
 }
 
 export interface PipelineNode {
@@ -67,7 +68,7 @@ export interface TimelineEvent {
 interface SystemContextType {
   // Connection
   isConnected: boolean;
-  
+
   // State
   mood: MoodState | null;
   wallet: WalletState | null;
@@ -75,12 +76,12 @@ interface SystemContextType {
   activeProduction: Production | null;
   pipeline: PipelineNode[];
   timelineEvents: TimelineEvent[];
-  
+
   // HITL
   pendingProposal: HITLProposal | null;
   approveProposal: (id: string) => void;
   rejectProposal: (id: string) => void;
-  
+
   // Actions
   refreshState: () => void;
 }
@@ -96,7 +97,7 @@ const MOCK_MOOD: MoodState = {
   arousal: 0.4,
   dominance: 0.7,
   current_state: 'CONFIDENT',
-  current_thought: 'Analyzing emerging trends in sustainable fashion...',
+  current_thought: "Analyzing 'Slow Living' trend for potential content...",
 };
 
 const MOCK_WALLET: WalletState = {
@@ -107,9 +108,9 @@ const MOCK_WALLET: WalletState = {
 };
 
 const MOCK_TRENDS: TrendSignal[] = [
-  { id: '1', title: 'Cyber-Baroque Aesthetics', vvs_score: 87.3, platform: 'tiktok', category: 'Design', status: 'analyzing' },
-  { id: '2', title: 'Mycelium Materials', vvs_score: 72.1, platform: 'reddit', category: 'Materials', status: 'detected' },
-  { id: '3', title: 'Neo-Brutalist Interiors', vvs_score: 68.5, platform: 'instagram', category: 'Architecture', status: 'detected' },
+  { id: '1', title: 'Cyber-Baroque Aesthetics', vvs_score: 87.3, platform: 'TikTok', category: 'Design', status: 'analyzing' },
+  { id: '2', title: 'Mycelium Materials', vvs_score: 72.1, platform: 'Reddit', category: 'Materials', status: 'detected' },
+  { id: '3', title: 'Neo-Brutalist Interiors', vvs_score: 68.5, platform: 'Instagram', category: 'Architecture', status: 'detected' },
 ];
 
 const MOCK_PIPELINE: PipelineNode[] = [
@@ -161,7 +162,7 @@ export function SystemProvider({ children }: { children: React.ReactNode }) {
 
     const connect = () => {
       try {
-        eventSource = new EventSource('http://localhost:8000/stream/muse-status');
+        eventSource = new EventSource('http://localhost:8080/stream/muse-status');
 
         eventSource.onopen = () => {
           console.log('[SSE] Connected to backend');
@@ -171,7 +172,7 @@ export function SystemProvider({ children }: { children: React.ReactNode }) {
         eventSource.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            
+
             switch (data.type) {
               case 'MOOD_UPDATE':
                 setMood(data.metadata);

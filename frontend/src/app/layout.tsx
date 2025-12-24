@@ -1,25 +1,17 @@
 import type { Metadata } from "next";
-import { Inter, JetBrains_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
-import { NeuralProvider } from "@/context/NeuralContext";
+import "@/styles/luxe-theme.css";
+import { SystemProvider } from "@/contexts/system-context";
 import { MoodProvider } from "@/context/MoodContext";
+import { NeuralProvider } from "@/context/NeuralContext";
 import { TrendProvider } from "@/context/TrendContext";
-import SmoothScroll from "@/components/providers/SmoothScroll";
-import { AmbientBackground } from "@/components/vfx/AmbientBackground";
 
-const inter = Inter({ 
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
-
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-mono",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "SMOS v2 | Living Dashboard",
-  description: "Autonomous Sovereign Muse Operating System",
+  title: "SMOS v2 | Sovereign Muse",
+  description: "Autonomous Digital Muse Operating System",
 };
 
 export default function RootLayout({
@@ -28,20 +20,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body className={`${inter.variable} ${jetbrains.variable} font-sans antialiased bg-void text-foreground overflow-hidden`}>
-        <SmoothScroll>
+    <html lang="en">
+      <body className={`${inter.className} antialiased`}>
+        <SystemProvider>
           <MoodProvider>
             <NeuralProvider>
               <TrendProvider>
-                <AmbientBackground />
-                <div className="relative z-10">
-                  {children}
-                </div>
+                {children}
               </TrendProvider>
             </NeuralProvider>
           </MoodProvider>
-        </SmoothScroll>
+        </SystemProvider>
       </body>
     </html>
   );

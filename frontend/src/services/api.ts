@@ -1,12 +1,12 @@
-import { 
-    Mood, Wallet, TrendReport, Signal, 
-    Production, AgentStatus, PipelineState, Proposal 
+import {
+    Mood, Wallet, TrendReport, Signal,
+    Production, AgentStatus, PipelineState, Proposal
 } from '../types/smos';
 
 export type MoodState = Mood;
 export type WalletState = Wallet;
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export const SMOSApi = {
     // State
@@ -67,7 +67,7 @@ export const SMOSApi = {
 
     // SSE Stream Factory
     connectStream: (): EventSource => {
-        return new EventSource(`${API_BASE}/events/stream`);
+        return new EventSource(`${API_BASE}/stream/muse-status`);
     }
 };
 

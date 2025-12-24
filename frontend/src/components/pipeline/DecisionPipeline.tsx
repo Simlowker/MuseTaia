@@ -1,32 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { PipelineState } from '../../types/smos';
-import { SMOSApi } from '../../services/api';
-import { useSSE } from '../../hooks/use-sse';
+import { useSystem } from '../../contexts/system-context';
 import { ArrowRight, ShieldCheck, Brain, Zap, Search, Users } from 'lucide-react';
 
 export function DecisionPipeline() {
-    const [pipeline, setPipeline] = useState<PipelineState | null>(null);
-    const { subscribe } = useSSE('http://localhost:8000/events/stream');
-
-    useEffect(() => {
-        SMOSApi.getPipeline().then(setPipeline).catch(console.error);
-
-        const unsub = subscribe('PIPELINE_UPDATE', (payload: PipelineState) => {
-            setPipeline(payload);
-        });
-
-        return unsub;
-    }, [subscribe]);
+    const { pipeline } = useSystem();
 
     const stages = [
-        { key: 'trend', label: 'TREND', icon: Search },
-        { key: 'strategist', label: 'STRATEGIST', icon: Brain },
-        { key: 'cfo', label: 'CFO GATE', icon: ShieldCheck },
-        { key: 'hlp', label: 'HLP', icon: Zap },
-        { key: 'swarm', label: 'SWARM', icon: Users },
+        { key: 'PERCEPTION', label: 'TREND', icon: Search },
+        { key: 'STRATEGIST', label: 'STRATEGIST', icon: Brain },
+        { key: 'CFO GATE', label: 'CFO GATE', icon: ShieldCheck },
+        { key: 'HLP', label: 'HLP', icon: Zap },
+        { key: 'SWARM', label: 'SWARM', icon: Users },
     ];
 
     return (
@@ -37,15 +24,16 @@ export function DecisionPipeline() {
                 
                 <div className="flex justify-between items-center">
                     {stages.map((stage, i) => {
-                        const isActive = pipeline?.active_stage === stage.key;
-                        const isComplete = pipeline?.gates[stage.key as keyof PipelineState['gates']] || isActive; // Logic simplified for visual flow
+                        const nodeData = pipeline.find(p => p.stage === stage.key);
+                        const isActive = nodeData?.status === 'active';
+                        const isComplete = nodeData?.status === 'complete';
                         
                         return (
                             <div key={stage.key} className="flex flex-col items-center gap-3 bg-void px-2">
                                 <motion.div
                                     animate={isActive ? { 
                                         scale: [1, 1.1, 1],
-                                        boxShadow: ["0 0 0px var(--sovereign-gold)", "0 0 20px var(--sovereign-gold)", "0 0 0px var(--sovereign-gold)"]
+                                        boxShadow: ["0 0 0px #D4AF37", "0 0 20px #D4AF37", "0 0 0px #D4AF37"]
                                     } : {}}
                                     transition={{ duration: 2, repeat: Infinity }}
                                     className={`w-12 h-12 rounded-full flex items-center justify-center border-2 transition-colors relative z-10 ${
@@ -81,18 +69,18 @@ export function DecisionPipeline() {
             </div>
 
             {/* Status Message */}
-            <div className="mt-8 text-center">
+            <div className="mt-8 text-center min-h-[20px]">
                  <AnimatePresence mode="wait">
-                    {pipeline?.active_stage ? (
+                    {pipeline.find(p => p.status === 'active')?.message ? (
                         <motion.div
-                            key={pipeline.active_stage}
+                            key={pipeline.find(p => p.status === 'active')?.stage}
                             initial={{ opacity: 0, y: 5 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -5 }}
                             className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-gold/20 bg-gold/5 text-gold text-[10px] uppercase tracking-widest"
                         >
                             <span className="w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
-                            Current Decision Node: {pipeline.active_stage}
+                            {pipeline.find(p => p.status === 'active')?.message}
                         </motion.div>
                     ) : (
                         <div className="text-white/20 text-[10px] uppercase tracking-widest">System Idle</div>

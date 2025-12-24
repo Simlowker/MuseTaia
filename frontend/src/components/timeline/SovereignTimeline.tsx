@@ -1,37 +1,17 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSystem } from '../../contexts/system-context';
-import { useSSE } from '../../hooks/use-sse';
-import { Wallet, ShieldAlert, Activity, Clock, History } from 'lucide-react';
-
-interface TimelineEvent {
-    id: string;
-    timestamp: string;
-    type: 'scan' | 'analyze' | 'decide' | 'create' | 'qa' | 'publish';
-    label: string;
-}
+import { Wallet, ShieldAlert, History } from 'lucide-react';
 
 export function SovereignTimeline() {
-    const { wallet, isStreamConnected } = useSystem();
-    const [events, setEvents] = useState<TimelineEvent[]>([
-        { id: '1', timestamp: '10:00', type: 'scan', label: 'SCAN' },
-        { id: '2', timestamp: '10:15', type: 'decide', label: 'ROI OK' },
-        { id: '3', timestamp: '10:45', type: 'create', label: 'SCRIPT' },
-    ]);
+    const { wallet, timelineEvents, isConnected } = useSystem();
 
-    // Mock adding events for liveness
-    useEffect(() => {
-        const interval = setInterval(() => {
-             // Logic to fetch or receive events would go here
-        }, 10000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const getEventColor = (type: TimelineEvent['type']) => {
+    const getEventColor = (type: string) => {
         switch(type) {
             case 'scan': return 'bg-cyan shadow-cyan/50';
+            case 'analyze': return 'bg-gold shadow-gold/50';
             case 'decide': return 'bg-emerald shadow-emerald/50';
             case 'create': return 'bg-ruby shadow-ruby/50';
             default: return 'bg-white/20';
@@ -57,7 +37,7 @@ export function SovereignTimeline() {
                     
                     {/* Events */}
                     <div className="flex justify-between w-full max-w-xl relative z-10">
-                        {events.map((event) => (
+                        {timelineEvents.map((event) => (
                             <div key={event.id} className="group relative">
                                 <div className={`w-2 h-2 rounded-full ring-4 ring-obsidian ${getEventColor(event.type)}`} />
                                 <div className="absolute bottom-4 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity bg-glass-bg border border-glass-border px-2 py-1 rounded text-[8px] whitespace-nowrap backdrop-blur-md pointer-events-none">
@@ -68,7 +48,7 @@ export function SovereignTimeline() {
                         ))}
                         {/* Current Head */}
                         <div className="relative">
-                            <div className="w-3 h-3 rounded-full bg-gold ring-4 ring-obsidian animate-pulse shadow-[0_0_10px_var(--sovereign-gold)]" />
+                            <div className="w-3 h-3 rounded-full bg-gold ring-4 ring-obsidian animate-pulse shadow-[0_0_10px_#D4AF37]" />
                             <div className="absolute top-4 left-1/2 -translate-x-1/2 text-[8px] text-gold font-bold tracking-widest uppercase">NOW</div>
                         </div>
                     </div>
@@ -111,9 +91,9 @@ export function SovereignTimeline() {
 
                 {/* System Status */}
                 <div className="flex flex-col items-center justify-center pl-4 border-l border-white/5">
-                    <div className={`w-2 h-2 rounded-full ${isStreamConnected ? 'bg-emerald shadow-[0_0_8px_var(--success-emerald)]' : 'bg-ruby'}`} />
+                    <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald shadow-[0_0_8px_#00FF88]' : 'bg-ruby'}`} />
                     <span className="text-[8px] text-white/20 uppercase mt-1 tracking-widest">
-                        {isStreamConnected ? 'SYNC' : 'LOST'}
+                        {isConnected ? 'SYNC' : 'LOST'}
                     </span>
                 </div>
             </div>

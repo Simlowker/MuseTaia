@@ -23,10 +23,11 @@ export const NeuralProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [status, setStatus] = useState<'connected' | 'disconnected' | 'connecting'>('connecting');
 
   useEffect(() => {
-    const eventSource = new EventSource("http://localhost:8000/stream/muse-status");
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const eventSource = new EventSource(`${API_URL}/stream/muse-status`);
 
     eventSource.onopen = () => setStatus('connected');
-    
+
     eventSource.onmessage = (event) => {
       const newEvent: SwarmEvent = JSON.parse(event.data);
       setLastEvent(newEvent);

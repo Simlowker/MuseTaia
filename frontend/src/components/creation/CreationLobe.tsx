@@ -1,35 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Production } from '../../types/smos';
-import { SMOSApi } from '../../services/api';
-import { useSSE } from '../../hooks/use-sse';
+import { useSystem } from '../../contexts/system-context';
 import { Palette, Play, Clock, DollarSign, FileText, Image as ImageIcon, Video, CheckCircle2 } from 'lucide-react';
 
 export function CreationLobe() {
-    const [productions, setProductions] = useState<Production[]>([]);
-    const { subscribe } = useSSE('http://localhost:8000/events/stream');
-
-    useEffect(() => {
-        SMOSApi.getActiveProductions().then(setProductions).catch(console.error);
-
-        const unsub = subscribe('PRODUCTION_UPDATE', (payload: Production) => {
-            setProductions(prev => {
-                const index = prev.findIndex(p => p.id === payload.id);
-                if (index >= 0) {
-                    const next = [...prev];
-                    next[index] = payload;
-                    return next;
-                }
-                return [payload, ...prev].slice(0, 1); // Focus on single active production for detailed view
-            });
-        });
-
-        return unsub;
-    }, [subscribe]);
-
-    const activeProduction = productions[0];
+    const { activeProduction } = useSystem();
 
     return (
         <div className="flex flex-col h-full space-y-6">
@@ -40,8 +17,8 @@ export function CreationLobe() {
                     Creation Lobe
                 </h2>
                 <div className="flex items-center gap-2 text-[9px] text-white/40">
-                    <span className="w-2 h-2 rounded-full bg-ruby animate-pulse" />
-                    STUDIO ACTIVE
+                    <span className={`w-2 h-2 rounded-full ${activeProduction ? 'bg-ruby animate-pulse' : 'bg-white/10'}`} />
+                    STUDIO {activeProduction ? 'ACTIVE' : 'IDLE'}
                 </div>
             </div>
 
@@ -49,16 +26,12 @@ export function CreationLobe() {
                 <div className="flex flex-col gap-6">
                     {/* Main Preview Area */}
                     <div className="relative aspect-video bg-black/50 rounded-lg border border-glass-border overflow-hidden group">
-                        {activeProduction.thumbnail_url ? (
-                            <img src={activeProduction.thumbnail_url} alt="Preview" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
-                        ) : (
-                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white/20 gap-2">
-                                <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center">
-                                    <Play size={20} className="ml-1" />
-                                </div>
-                                <span className="text-[10px] uppercase tracking-widest">Rendering Preview...</span>
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white/20 gap-2">
+                            <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center">
+                                <Play size={20} className="ml-1" />
                             </div>
-                        )}
+                            <span className="text-[10px] uppercase tracking-widest">Rendering Preview...</span>
+                        </div>
                         
                         {/* Overlay Stats */}
                         <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/90 to-transparent flex justify-between items-end">
@@ -69,13 +42,9 @@ export function CreationLobe() {
                                 </div>
                             </div>
                             <div className="text-right text-[10px] text-white/60">
-                                <div className="flex items-center gap-1 justify-end">
-                                    <Clock size={10} />
-                                    {Math.ceil((activeProduction.eta_seconds || 0) / 60)}m remaining
-                                </div>
                                 <div className="flex items-center gap-1 justify-end text-emerald">
                                     <DollarSign size={10} />
-                                    $0.12 est.
+                                    ${activeProduction.cost_usd.toFixed(2)} est.
                                 </div>
                             </div>
                         </div>
@@ -87,22 +56,22 @@ export function CreationLobe() {
                         <PipelineStep 
                             label="Scripting" 
                             icon={FileText} 
-                            status={getStepStatus('scripting', activeProduction.status)} 
+                            status={getStepStatus('scripting', activeProduction.current_stage)} 
                         />
                         <PipelineStep 
                             label="Visualization" 
                             icon={ImageIcon} 
-                            status={getStepStatus('visualizing', activeProduction.status)} 
+                            status={getStepStatus('visualizing', activeProduction.current_stage)} 
                         />
                         <PipelineStep 
                             label="Motion Synthesis" 
                             icon={Video} 
-                            status={getStepStatus('rendering', activeProduction.status)} 
+                            status={getStepStatus('rendering', activeProduction.current_stage)} 
                         />
                         <PipelineStep 
                             label="Quality Assurance" 
                             icon={CheckCircle2} 
-                            status={getStepStatus('qa', activeProduction.status)} 
+                            status={getStepStatus('qa', activeProduction.current_stage)} 
                         />
                     </div>
                 </div>
@@ -135,10 +104,10 @@ function PipelineStep({ label, icon: Icon, status }: { label: string, icon: any,
     );
 }
 
-function getStepStatus(step: string, currentStatus: string): 'pending' | 'active' | 'complete' {
-    const order = ['planning', 'scripting', 'visualizing', 'rendering', 'qa', 'published'];
+function getStepStatus(step: string, currentStage: string): 'pending' | 'active' | 'complete' {
+    const order = ['planning', 'scripting', 'visualizing', 'rendering', 'qa', 'complete'];
     const stepIdx = order.indexOf(step);
-    const currentIdx = order.indexOf(currentStatus);
+    const currentIdx = order.indexOf(currentStage.toLowerCase());
 
     if (currentIdx > stepIdx) return 'complete';
     if (currentIdx === stepIdx) return 'active';

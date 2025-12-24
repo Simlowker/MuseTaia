@@ -1,31 +1,19 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSystem } from '../../contexts/system-context';
-import { useSSE } from '../../hooks/use-sse';
 
 export function ConsciousnessCore() {
     const { mood } = useSystem();
-    const [thought, setThought] = useState<string>("");
-    const { subscribe } = useSSE('http://localhost:8000/events/stream');
-
-    useEffect(() => {
-        const unsub = subscribe('THOUGHT_STREAM', (payload: {text: string}) => {
-            setThought(payload.text);
-            // Clear thought after 5 seconds
-            setTimeout(() => setThought(""), 5000);
-        });
-        return unsub;
-    }, [subscribe]);
 
     // Derived color based on mood
     const getMoodColor = () => {
-        if (!mood) return 'var(--sovereign-gold)';
-        if (mood.valence > 0.5) return 'var(--success-emerald)';
-        if (mood.valence < -0.5) return 'var(--danger-ruby)';
-        if (mood.arousal > 0.6) return 'var(--neural-cyan)';
-        return 'var(--sovereign-gold)';
+        if (!mood) return '#D4AF37'; // gold
+        if (mood.valence > 0.5) return '#00FF88'; // emerald
+        if (mood.valence < -0.5) return '#FF3366'; // ruby
+        if (mood.arousal > 0.6) return '#00D4FF'; // cyan
+        return '#D4AF37';
     };
 
     const moodColor = getMoodColor();
@@ -36,16 +24,16 @@ export function ConsciousnessCore() {
             {/* THOUGHT BUBBLE */}
             <div className="h-24 flex items-center justify-center w-full">
                 <AnimatePresence mode="wait">
-                    {thought ? (
+                    {mood?.current_thought ? (
                         <motion.div
-                            key={thought}
+                            key={mood.current_thought}
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: -10, scale: 0.95 }}
                             className="relative bg-glass-bg border border-glass-border px-6 py-4 rounded-2xl max-w-sm text-center backdrop-blur-md"
                         >
                             <div className="text-white/90 text-sm font-light italic leading-relaxed">
-                                "{thought}"
+                                "{mood.current_thought}"
                             </div>
                             {/* Speech Bubble Tail */}
                             <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-glass-bg border-r border-b border-glass-border rotate-45" />
@@ -100,9 +88,9 @@ export function ConsciousnessCore() {
 
             {/* MOOD BARS */}
             <div className="w-full space-y-3 px-8">
-                <MoodBar label="Valence" value={mood?.valence || 0} color="var(--success-emerald)" negColor="var(--danger-ruby)" />
-                <MoodBar label="Arousal" value={mood?.arousal || 0} color="var(--neural-cyan)" />
-                <MoodBar label="Dominance" value={mood?.dominance || 0} color="var(--sovereign-gold)" />
+                <MoodBar label="Valence" value={mood?.valence || 0} color="#00FF88" negColor="#FF3366" />
+                <MoodBar label="Arousal" value={mood?.arousal || 0} color="#00D4FF" />
+                <MoodBar label="Dominance" value={mood?.dominance || 0} color="#D4AF37" />
             </div>
         </div>
     );

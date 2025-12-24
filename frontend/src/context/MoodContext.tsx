@@ -38,7 +38,8 @@ export const MoodProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setMood('reflection');
       }
     } catch (error) {
-      console.error('Failed to sync mood from backend:', error);
+      // Backend might be offline, be silent or warn gently
+      // console.warn('Mood sync skipped (backend offline?)'); 
     }
   };
 

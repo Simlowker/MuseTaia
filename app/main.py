@@ -40,12 +40,21 @@ app.add_middleware(
 )
 
 # --- API MODELS ---
+from app.api.routers import perception, state, finance, swarm, studio, hitl
+
+# --- API MODELS ---
 class GenesisRequest(BaseModel):
     proposal_id: str
     draft_dna: GenesisDNA
     image_data_b64: Optional[str] = None # Simulating preview image data
 
 # --- API ENDPOINTS ---
+app.include_router(perception)
+app.include_router(state)
+app.include_router(finance)
+app.include_router(swarm)
+app.include_router(studio)
+app.include_router(hitl)
 
 @app.get("/")
 async def root():
@@ -78,7 +87,7 @@ async def stream_status(request: Request):
                     break
                 
                 # Get message with timeout to allow heartbeat
-                message = pubsub.get_message(ignore_subscribe_none=True, timeout=1.0)
+                message = pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
                 if message:
                     yield f"data: {message['data'].decode('utf-8')}\n\n"
                 else:

@@ -22,7 +22,8 @@ const sourceColors: Record<string, string> = {
 };
 
 export function TrendCard({ title, subtitle, imageUrl, source, score, status, onClick }: TrendCardProps) {
-  const sourceStyle = sourceColors[source.toLowerCase()] || sourceColors.default;
+  const safeSource = (source || 'default').toLowerCase();
+  const sourceStyle = sourceColors[safeSource] || sourceColors.default;
   
   return (
     <motion.div

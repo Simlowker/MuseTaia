@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Mic } from 'lucide-react';
 import { useSystem } from '@/contexts/system-context';
@@ -11,11 +11,9 @@ import { ActiveThought } from './ActiveThought';
 import { CreativeSwarm } from './CreativeSwarm';
 import { MuseAvatar } from './MuseAvatar';
 
-// Placeholder images (replace with real ones or GCS URLs)
 const PLACEHOLDER_AVATAR = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face";
 const PLACEHOLDER_PREVIEW = "https://images.unsplash.com/photo-1591085686350-798c0f9faa7f?w=400&h=300&fit=crop";
 
-// Mock trend images mapping
 const trendImages: Record<string, string> = {
   'Cyber-Baroque Aesthetics': 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop',
   'Mycelium Materials': 'https://images.unsplash.com/photo-1530836369250-ef72a3f5cda8?w=300&h=200&fit=crop',
@@ -24,42 +22,43 @@ const trendImages: Record<string, string> = {
 };
 
 export function LuxeDashboard() {
-  const { mood, wallet, trends, activeProduction, isConnected } = useSystem();
+  const system = useSystem();
   const [isListening, setIsListening] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  // Derive mood for avatar
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || !system) {
+    return (
+      <div className="min-h-screen w-full flex items-center justify-center bg-[#E8DCC4] text-stone-800 font-mono animate-pulse">
+        CONNECTING TO MUSE CORE...
+      </div>
+    );
+  }
+
+  const { mood, wallet, trends, activeProduction, isConnected } = system;
+
   const avatarMood = mood?.valence && mood.valence > 0.3 
     ? 'positive' 
     : mood?.valence && mood.valence < -0.3 
       ? 'negative' 
       : 'neutral';
 
-  // Current thought
   const currentThought = mood?.current_thought || "System initializing...";
-
-  if (!mood) {
-    return (
-        <div className="min-h-screen w-full flex items-center justify-center bg-black text-gold font-mono animate-pulse">
-            INITIALIZING SOVEREIGN MUSE OS...
-        </div>
-    );
-  }
 
   return (
     <div 
-      className="min-h-screen w-full p-6 relative overflow-hidden"
+      className="min-h-screen w-full p-6 relative"
       style={{
         background: 'linear-gradient(135deg, #E8DCC4 0%, #D4C4A8 30%, #C9B896 60%, #BEA882 100%)'
       }}
     >
-      {/* Ambient Light Effects */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-amber-200/30 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-orange-100/40 rounded-full blur-3xl pointer-events-none" />
       
-      {/* Main Container */}
       <div className="relative z-10 max-w-7xl mx-auto h-[calc(100vh-48px)] flex flex-col">
-        
-        {/* Header */}
         <header className="flex justify-between items-center mb-4">
           <div className="flex items-center gap-3">
             <motion.div 
@@ -87,25 +86,20 @@ export function LuxeDashboard() {
           </div>
         </header>
         
-        {/* Main Glass Panel */}
         <GlassPanel className="flex-1 p-6 overflow-hidden">
-          
-          {/* Grid Layout */}
           <div className="grid grid-cols-12 gap-6 h-full">
-            
-            {/* LEFT: Niche Trends Feed */}
             <div className="col-span-3 flex flex-col min-h-0">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-sm font-bold text-stone-700 tracking-wide uppercase">
                   Niche Trends Feed
                 </h2>
                 <span className="text-xs text-stone-400">
-                  {trends.length} signals
+                  {(trends || []).length} signals
                 </span>
               </div>
               
               <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-                {trends.length > 0 ? (
+                {(trends || []).length > 0 ? (
                   trends.map((trend) => (
                     <TrendCard
                       key={trend.id}
@@ -125,10 +119,7 @@ export function LuxeDashboard() {
               </div>
             </div>
             
-            {/* CENTER: Avatar & Consciousness */}
             <div className="col-span-6 flex flex-col min-h-0">
-              
-              {/* Avatar Area */}
               <div className="flex-1 flex items-center justify-center">
                 <MuseAvatar 
                   imageUrl={PLACEHOLDER_AVATAR}
@@ -137,18 +128,15 @@ export function LuxeDashboard() {
                 />
               </div>
               
-              {/* Active Thought */}
               <div className="mb-4">
                 <ActiveThought thought={currentThought} />
               </div>
               
-              {/* Waveform */}
               <GlassPanel variant="dark" className="p-4">
                 <Waveform color="#D4AF37" speed={0.05} />
               </GlassPanel>
             </div>
             
-            {/* RIGHT: Creative Swarm */}
             <div className="col-span-3 min-h-0">
               <CreativeSwarm
                 agentName="VisualAgent"
@@ -160,12 +148,9 @@ export function LuxeDashboard() {
                 onRetry={() => console.log('Retry!')}
               />
             </div>
-            
           </div>
-          
         </GlassPanel>
         
-        {/* Microphone Button */}
         <div className="flex justify-center mt-4">
           <motion.button 
             whileHover={{ scale: 1.05 }}
@@ -180,7 +165,6 @@ export function LuxeDashboard() {
             <Mic className={`w-6 h-6 ${isListening ? 'text-white' : 'text-stone-600'}`} />
           </motion.button>
         </div>
-        
       </div>
     </div>
   );

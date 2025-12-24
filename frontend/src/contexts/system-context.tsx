@@ -132,29 +132,14 @@ const MOCK_TIMELINE: TimelineEvent[] = [
 // ============================================================================
 
 export function SystemProvider({ children }: { children: React.ReactNode }) {
-  const [isConnected, setIsConnected] = useState(false);
-  const [mood, setMood] = useState<MoodState | null>(null);
-  const [wallet, setWallet] = useState<WalletState | null>(null);
-  const [trends, setTrends] = useState<TrendSignal[]>([]);
+  const [isConnected, setIsConnected] = useState(true);
+  const [mood, setMood] = useState<MoodState | null>(MOCK_MOOD);
+  const [wallet, setWallet] = useState<WalletState | null>(MOCK_WALLET);
+  const [trends, setTrends] = useState<TrendSignal[]>(MOCK_TRENDS);
   const [activeProduction, setActiveProduction] = useState<Production | null>(null);
-  const [pipeline, setPipeline] = useState<PipelineNode[]>([]);
-  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>([]);
+  const [pipeline, setPipeline] = useState<PipelineNode[]>(MOCK_PIPELINE);
+  const [timelineEvents, setTimelineEvents] = useState<TimelineEvent[]>(MOCK_TIMELINE);
   const [pendingProposal, setPendingProposal] = useState<HITLProposal | null>(null);
-
-  // Initialize with mock data
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setMood(MOCK_MOOD);
-      setWallet(MOCK_WALLET);
-      setTrends(MOCK_TRENDS);
-      setPipeline(MOCK_PIPELINE);
-      setTimelineEvents(MOCK_TIMELINE);
-      setIsConnected(true);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // SSE Connection (try real backend, fallback to mock)
   useEffect(() => {

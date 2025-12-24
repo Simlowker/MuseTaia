@@ -1,13 +1,10 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import "@/styles/luxe-theme.css";
 import { SystemProvider } from "@/contexts/system-context";
 import { MoodProvider } from "@/context/MoodContext";
 import { NeuralProvider } from "@/context/NeuralContext";
 import { TrendProvider } from "@/context/TrendContext";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "SMOS v2 | Sovereign Muse",
@@ -21,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} antialiased`}>
+      <body className="antialiased font-sans">
         <SystemProvider>
           <MoodProvider>
             <NeuralProvider>

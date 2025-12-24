@@ -8,6 +8,7 @@ import google.genai as genai
 from google.cloud import storage
 import redis
 from app.core.config import settings
+from app.core.vertex_init import get_genai_client
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -31,11 +32,7 @@ def check_env_vars():
 def check_gcp_access():
     """Verifies GCP authentication and Vertex AI connectivity."""
     try:
-        client = genai.Client(
-            vertexai=True,
-            project=settings.PROJECT_ID,
-            location=settings.LOCATION
-        )
+        client = get_genai_client()
         # Test Gemini access with a simple request
         client.models.generate_content(
             model="gemini-3.0-flash-preview",

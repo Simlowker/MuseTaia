@@ -156,11 +156,13 @@ async def trend_scout_daemon():
     from app.agents.trend_scout import TrendScout
     from app.core.workflow_engine import WorkflowEngine
     from app.core.finance.cost_calculator import CostCalculator
+    from app.matrix.assets_manager import SignatureAssetsManager
     
     scout = TrendScout()
     engine = WorkflowEngine()
     cfo = CFOAgent()
     calc = CostCalculator()
+    assets = SignatureAssetsManager(bucket_name=settings.GCS_BUCKET_NAME)
     
     logger.info("DAEMON: TrendScout sentinel active.")
     

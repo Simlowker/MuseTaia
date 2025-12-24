@@ -18,8 +18,8 @@ export const AmbientBackground = () => {
     // Low Arousal -> Slow, blurred
 
     const getGradient = () => {
-        if (mood === 'authority') return 'radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.15), transparent 60%)'; // Gold
-        if (mood === 'reflection') return 'radial-gradient(circle at 50% 50%, rgba(20, 40, 60, 0.2), transparent 70%)'; // Deep Blue
+        if (mood?.current_state === 'AUTHORITY') return 'radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.15), transparent 60%)'; // Gold
+        if (mood?.current_state === 'REFLECTION') return 'radial-gradient(circle at 50% 50%, rgba(20, 40, 60, 0.2), transparent 70%)'; // Deep Blue
         return 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.05), transparent 60%)'; // Neutral
     };
 

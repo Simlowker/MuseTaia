@@ -1,53 +1,40 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
-
-interface SwarmEvent {
-  type: string;
-  message: string;
-  metadata: any;
-  timestamp: string;
-}
+import React, { createContext, useContext, useState, useEffect } from 'react';
 
 interface NeuralContextType {
-  events: SwarmEvent[];
-  lastEvent: SwarmEvent | null;
-  status: 'connected' | 'disconnected' | 'connecting';
+  status: 'connected' | 'disconnected' | 'processing';
+  lastPing: number;
+  lastEvent: { message: string, type: string, metadata?: any } | null;
+  events: any[];
 }
 
 const NeuralContext = createContext<NeuralContextType | undefined>(undefined);
 
-export const NeuralProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [events, setEvents] = useState<SwarmEvent[]>([]);
-  const [lastEvent, setLastEvent] = useState<SwarmEvent | null>(null);
-  const [status, setStatus] = useState<'connected' | 'disconnected' | 'connecting'>('connecting');
+export function NeuralProvider({ children }: { children: React.ReactNode }) {
+  const [status, setStatus] = useState<'connected' | 'disconnected' | 'processing'>('connected');
+  const [lastPing, setLastPing] = useState(Date.now());
+  const [lastEvent, setLastEvent] = useState<{ message: string, type: string, metadata?: any } | null>(null);
 
+  // Simulate heartbeat
   useEffect(() => {
-    const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
-    const eventSource = new EventSource(`${API_URL}/stream/muse-status`);
-
-    eventSource.onopen = () => setStatus('connected');
-
-    eventSource.onmessage = (event) => {
-      const newEvent: SwarmEvent = JSON.parse(event.data);
-      setLastEvent(newEvent);
-      setEvents((prev) => [newEvent, ...prev].slice(0, 100));
-    };
-
-    eventSource.onerror = () => setStatus('disconnected');
-
-    return () => eventSource.close();
+    const interval = setInterval(() => {
+      setLastPing(Date.now());
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <NeuralContext.Provider value={{ events, lastEvent, status }}>
+    <NeuralContext.Provider value={{ status, lastPing, lastEvent, events: [] }}>
       {children}
     </NeuralContext.Provider>
   );
-};
+}
 
-export const useNeural = () => {
+export function useNeural() {
   const context = useContext(NeuralContext);
-  if (!context) throw new Error("useNeural must be used within a NeuralProvider");
+  if (context === undefined) {
+    throw new Error('useNeural must be used within a NeuralProvider');
+  }
   return context;
-};
+}

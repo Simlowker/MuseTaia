@@ -37,6 +37,14 @@ export function LuxeDashboard() {
   // Current thought
   const currentThought = mood?.current_thought || "System initializing...";
 
+  if (!mood) {
+    return (
+        <div className="min-h-screen w-full flex items-center justify-center bg-black text-gold font-mono animate-pulse">
+            INITIALIZING SOVEREIGN MUSE OS...
+        </div>
+    );
+  }
+
   return (
     <div 
       className="min-h-screen w-full p-6 relative overflow-hidden"

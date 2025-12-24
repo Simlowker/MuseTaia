@@ -162,7 +162,7 @@ export function SystemProvider({ children }: { children: React.ReactNode }) {
 
     const connect = () => {
       try {
-        eventSource = new EventSource('http://localhost:8080/stream/muse-status');
+        eventSource = new EventSource('http://localhost:8000/stream/muse-status');
 
         eventSource.onopen = () => {
           console.log('[SSE] Connected to backend');

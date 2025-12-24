@@ -9,7 +9,7 @@ import { AlertCircle, Check, X, DollarSign, Target } from 'lucide-react';
 
 export function HITLApprovalModal() {
     const [proposals, setProposals] = useState<Proposal[]>([]);
-    const { subscribe } = useSSE('http://localhost:8000/events/stream');
+    const { subscribe } = useSSE(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/stream/muse-status`);
 
     useEffect(() => {
         // Initial fetch
@@ -87,13 +87,13 @@ export function HITLApprovalModal() {
                     </div>
 
                     <div className="flex gap-4">
-                        <button 
+                        <button
                             onClick={() => handleReject(current.id)}
                             className="flex-1 py-3 rounded-xl border border-ruby/30 text-ruby hover:bg-ruby/10 transition-colors font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2"
                         >
                             <X size={16} /> Discard
                         </button>
-                        <button 
+                        <button
                             onClick={() => handleApprove(current.id)}
                             className="flex-1 py-3 rounded-xl bg-gold text-void hover:bg-gold/90 transition-colors font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2"
                         >

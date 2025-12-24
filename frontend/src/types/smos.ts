@@ -14,9 +14,15 @@ export interface Wallet {
     currency: string;
 }
 
+export interface ViralVelocity {
+    score: number;
+    acceleration: string;
+    engagement_rate: number;
+}
+
 export interface TrendReport {
     topic: string;
-    vvs: number;
+    vvs: ViralVelocity;
     platform: string;
     timestamp: string;
 }
@@ -46,6 +52,7 @@ export interface AgentStatus {
 export interface PipelineState {
     active_stage: string;
     gates: {
+        trend: boolean;
         strategist: boolean;
         cfo: boolean;
         hlp: boolean;

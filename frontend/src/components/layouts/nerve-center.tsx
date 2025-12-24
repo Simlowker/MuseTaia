@@ -2,16 +2,14 @@
 
 import React from 'react';
 import { SystemProvider } from '../../contexts/system-context';
-import { PerceptionLobe } from '../dashboard/PerceptionLobe';
-import { ConsciousnessCore } from '../dashboard/ConsciousnessCore';
-import { CreationLobe } from '../dashboard/CreationLobe';
-import { DecisionPipeline } from '../dashboard/DecisionPipeline';
-
-import { SovereignTimeline } from '../dashboard/SovereignTimeline';
-import { WalletWidget } from '../dashboard/WalletWidget';
-import { HITLApprovalModal } from '../dashboard/HITLApprovalModal';
-import { MoodAura } from '../dashboard/MoodAura';
-import { SynapseLines } from '../dashboard/SynapseLines';
+import { PerceptionLobe } from '../perception/PerceptionLobe';
+import { ConsciousnessCore } from '../consciousness/ConsciousnessCore';
+import { CreationLobe } from '../creation/CreationLobe';
+import { DecisionPipeline } from '../pipeline/DecisionPipeline';
+import { SovereignTimeline } from '../timeline/SovereignTimeline';
+import { HITLApprovalModal } from '../ui/HITLApprovalModal';
+import { MoodAura } from '../consciousness/MoodAura';
+import { SynapseLines } from '../ui/SynapseLines';
 
 export default function NerveCenterLayout({
   children,
@@ -36,7 +34,7 @@ export default function NerveCenterLayout({
         </header>
 
         {/* MAIN CONTENT GRID (3 LOBES) */}
-        <main className="grid grid-cols-[300px_1fr_350px] gap-0 relative">
+        <main className="grid grid-cols-[300px_1fr_360px] gap-0 relative">
           <SynapseLines />
           
           {/* PERCEPTION LOBE (Left) */}
@@ -54,7 +52,7 @@ export default function NerveCenterLayout({
                    <ConsciousnessCore />
                    
                    {/* Decision Pipeline Overlay */}
-                   <div className="mt-auto pb-4 w-full flex justify-center">
+                   <div className="mt-12 w-full flex justify-center">
                       <DecisionPipeline />
                    </div>
                </div>
@@ -70,9 +68,8 @@ export default function NerveCenterLayout({
         </main>
 
         {/* TIMELINE (Bottom) */}
-        <footer className="border-t border-glass-border bg-obsidian z-50 flex items-center justify-between px-6">
+        <footer className="border-t border-glass-border bg-obsidian z-50">
            <SovereignTimeline />
-           <WalletWidget />
         </footer>
       </div>
     </SystemProvider>

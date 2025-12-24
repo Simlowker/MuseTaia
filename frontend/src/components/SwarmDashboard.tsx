@@ -14,10 +14,10 @@ const SwarmDashboard: React.FC = () => {
   const [status, setStatus] = useState<string>("Disconnected");
 
   useEffect(() => {
-    const eventSource = new EventSource("http://localhost:8000/stream/muse-status");
+    const eventSource = new EventSource(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'}/stream/muse-status`);
 
     eventSource.onopen = () => setStatus("Connected to Neural Stream");
-    
+
     eventSource.onmessage = (event) => {
       const newEvent: SwarmEvent = JSON.parse(event.data);
       setEvents((prev) => [newEvent, ...prev].slice(0, 50)); // Keep last 50

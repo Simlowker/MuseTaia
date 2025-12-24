@@ -117,6 +117,9 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ## [x] Track: P0 Critical Remediation (2025-12-24)
 *Link: [./conductor/tracks/remediation_p0_20251224/](./conductor/tracks/remediation_p0_20251224/)*
+
+## [x] Track: The Living Dashboard (Frontend v2)
+*Link: [./conductor/tracks/frontend_living_dashboard_20251224/](./conductor/tracks/frontend_living_dashboard_20251224/)*
  J'ai terminé l'ensemble des corrections de durcissement final.
 
 ### ✅ État Final du Projet :

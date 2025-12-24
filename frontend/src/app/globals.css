@@ -3,24 +3,29 @@
 @tailwind utilities;
 
 :root {
-  /* Core Palette */
-  --deep-onyx: #050505;
+  /* Core Palette - Sovereign Noir */
+  --void: #000000;
+  --onyx: #0A0A0A;
+  --obsidian: #1A1A1A;
+
+  /* Accents */
   --sovereign-gold: #D4AF37;
-  --sovereign-gold-dim: #AA8C2C;
-  --subliminal-blue: #1A1A2E;
-  --subliminal-amber: #3E2723;
+  --neural-cyan: #00D4FF;
+  --alert-amber: #FF9500;
+  --success-emerald: #00FF88;
+  --danger-ruby: #FF3366;
 
   /* Glassmorphism */
-  --glass-surface: rgba(255, 255, 255, 0.03);
-  --glass-surface-highlight: rgba(212, 175, 55, 0.05);
-  --glass-border: rgba(212, 175, 55, 0.15);
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-glow: rgba(212, 175, 55, 0.1);
   --glass-blur: 12px;
 
   /* Typography */
   --font-luxe: 'Inter', system-ui, sans-serif;
-  /* Pure sans-serif for cinematic feel */
 
-  --background: var(--deep-onyx);
+  /* Defaults */
+  --background: var(--void);
   --foreground: #ededed;
 }
 
@@ -65,4 +70,19 @@ a:hover {
   html {
     color-scheme: dark;
   }
+}
+
+/* Custom Utilities */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.mask-image-gradient-b {
+  mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
 }

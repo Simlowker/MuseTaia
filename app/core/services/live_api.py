@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class LiveApiService:
     """Wrapper for Gemini Multimodal Live API via WebSockets."""
 
-    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
+    def __init__(self, model_name: str = "gemini-3-flash-preview"):
         """Initializes the LiveApiService."""
         self.client = get_genai_client()
         self.model_name = model_name

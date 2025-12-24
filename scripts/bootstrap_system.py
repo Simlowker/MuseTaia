@@ -51,11 +51,12 @@ def bootstrap():
     logger.info("Checking Google Cloud Storage access...")
     try:
         from google.cloud import storage
-        client = storage.Client()
+        # Explicitly pass project to avoid ADC warning/error if env var is missing
+        client = storage.Client(project=settings.PROJECT_ID)
         buckets = list(client.list_buckets(max_results=1))
-        logger.info(f"SUCCESS: GCP Storage access verified.")
+        logger.info(f"SUCCESS: GCP Storage access verified for project '{settings.PROJECT_ID}'.")
     except Exception as e:
-        logger.warning(f"CAUTION: GCP Storage check failed (Check your ADC credentials): {e}")
+        logger.warning(f"CAUTION: GCP Storage check failed: {e}")
 
     logger.info("Bootstrap complete. System is ready for backend launch.")
 

@@ -13,7 +13,7 @@ def mock_genai_client():
 
 def test_librarian_initialization(mock_genai_client):
     librarian = Librarian()
-    assert librarian.model_name == "gemini-3.0-flash-preview"
+    assert librarian.model_name == "gemini-3-flash-preview"
 
 def test_extract_viral_structure(mock_genai_client):
     librarian = Librarian()

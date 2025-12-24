@@ -13,7 +13,7 @@ def mock_genai_client():
 
 def test_strategist_initialization(mock_genai_client):
     strategist = StrategistAgent()
-    assert strategist.model_name == "gemini-3.0-pro"
+    assert strategist.model_name == "gemini-3-pro-preview"
 
 def test_define_strategy(mock_genai_client):
     strategist = StrategistAgent()

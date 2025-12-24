@@ -53,5 +53,5 @@ def test_generate_script(mock_genai):
 
 def test_initialization(mock_genai):
     """Test agent initialization."""
-    agent = NarrativeAgent(model_name="gemini-3.0-pro")
-    assert agent.model_name == "gemini-3.0-pro"
+    agent = NarrativeAgent(model_name="gemini-3-pro-preview")
+    assert agent.model_name == "gemini-3-pro-preview"

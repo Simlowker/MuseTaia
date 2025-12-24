@@ -17,7 +17,7 @@ class VideoScoreService:
     - Temporal Consistency
     """
 
-    def __init__(self, model_name: str = "gemini-3.0-pro-preview"):
+    def __init__(self, model_name: str = "gemini-3-pro-preview-preview"):
         self.client = genai.Client(
             vertexai=True,
             project=settings.PROJECT_ID,

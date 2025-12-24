@@ -35,7 +35,7 @@ def check_gcp_access():
         client = get_genai_client()
         # Test Gemini access with a simple request
         client.models.generate_content(
-            model="gemini-3.0-flash-preview",
+            model="gemini-3-flash-preview",
             contents="Ping"
         )
         logger.info("SUCCESS: Vertex AI (Gemini) access verified.")

@@ -16,7 +16,7 @@ class RevenueOptimizer:
     based on predicted monetization.
     """
 
-    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
+    def __init__(self, model_name: str = "gemini-3-flash-preview"):
         self.client = genai.Client(
             vertexai=True,
             project=settings.PROJECT_ID,

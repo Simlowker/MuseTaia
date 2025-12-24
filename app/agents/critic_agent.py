@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class CriticAgent:
     """Agent de gouvernance visuelle appliquant la règle des 2% de dérive."""
 
-    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
+    def __init__(self, model_name: str = "gemini-3-flash-preview"):
         """Initializes The Critic."""
         self.client = get_genai_client()
         self.model_name = model_name
@@ -123,7 +123,7 @@ class CriticAgent:
         
         try:
             response = self.client.models.generate_content(
-                model="gemini-3.0-flash-preview", # Flash is excellent for fast vision QA
+                model="gemini-3-flash-preview", # Flash is excellent for fast vision QA
                 contents=[
                     types.Content(
                         role="user",

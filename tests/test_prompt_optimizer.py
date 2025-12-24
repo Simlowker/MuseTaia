@@ -28,5 +28,5 @@ def test_optimize_prompt(mock_genai):
     
 def test_initialization(mock_genai):
     """Test initialization."""
-    optimizer = PromptOptimizer(model_name="gemini-3.0-flash-preview")
-    assert optimizer.model_name == "gemini-3.0-flash-preview"
+    optimizer = PromptOptimizer(model_name="gemini-3-flash-preview")
+    assert optimizer.model_name == "gemini-3-flash-preview"

@@ -19,7 +19,7 @@ class StrategistAgent:
     3. Delegation (Choosing which Workers to use).
     """
 
-    def __init__(self, model_name: str = "gemini-3.0-pro"):
+    def __init__(self, model_name: str = "gemini-3-pro-preview"):
         self.client = get_genai_client()
         self.model_name = model_name
         self.state_manager = StateManager()

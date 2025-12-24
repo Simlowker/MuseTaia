@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 class VideoStreamHandler:
     """Processes video frames to provide real-time visual perception for the Muse."""
 
-    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
+    def __init__(self, model_name: str = "gemini-3-flash-preview"):
         """Initializes the VideoStreamHandler.
 
         Args:

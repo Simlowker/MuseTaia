@@ -14,7 +14,7 @@ def mock_genai_client():
 
 def test_trend_scout_initialization(mock_genai_client):
     scout = TrendScout()
-    assert scout.model_name == "gemini-3.0-flash-preview"
+    assert scout.model_name == "gemini-3-flash-preview"
     assert scout.scraper is not None
 
 @pytest.mark.asyncio

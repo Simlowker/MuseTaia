@@ -7,11 +7,11 @@ logger = logging.getLogger(__name__)
 
 # Approximate pricing per 1k tokens or per generation (Internal USD units)
 MODEL_PRICING = {
-    "gemini-3.0-pro-preview": {
+    "gemini-3-pro-preview-preview": {
         "input_1k": 0.00125,
         "output_1k": 0.00375
     },
-    "gemini-3.0-flash-preview": {
+    "gemini-3-flash-preview": {
         "input_1k": 0.0001,
         "output_1k": 0.0003
     },

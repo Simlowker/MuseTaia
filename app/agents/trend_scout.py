@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class TrendScout:
     """Agent de perception proactif utilisant des données réelles et l'algorithme VVS."""
 
-    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
+    def __init__(self, model_name: str = "gemini-3-flash-preview"):
         self.client = get_genai_client()
         self.model_name = model_name
         self.scraper = ScraperService()
@@ -68,7 +68,7 @@ class TrendScout:
         """
 
         response = self.client.models.generate_content(
-            model="gemini-3.0-flash-preview",
+            model="gemini-3-flash-preview",
             contents=[types.Content(role="user", parts=[types.Part.from_text(text=prompt)])],
             config=types.GenerateContentConfig(
                 response_mime_type="application/json",

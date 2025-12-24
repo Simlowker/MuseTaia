@@ -14,7 +14,7 @@ class GenesisAgent:
     personalities and visual anchors for new digital entities.
     """
 
-    def __init__(self, model_name: str = "gemini-3.0-pro"):
+    def __init__(self, model_name: str = "gemini-3-pro-preview"):
         self.client = get_genai_client()
         self.model_name = model_name
 

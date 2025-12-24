@@ -20,7 +20,7 @@ Follow these rules:
 class PromptOptimizer:
     """Uses Gemini to transform simple descriptions into optimized image generation prompts."""
 
-    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
+    def __init__(self, model_name: str = "gemini-3-flash-preview"):
         """Initializes the PromptOptimizer.
 
         Args:

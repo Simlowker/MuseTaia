@@ -2,6 +2,7 @@
 
 from typing import List, Optional
 from google.cloud import storage
+from app.core.config import settings
 
 class MockBlob:
     def __init__(self, name):
@@ -32,6 +33,7 @@ class MockStorageClient:
 class SignatureAssetsManager:
     """Manages the upload, retrieval, and listing of Muse Signature Assets."""
 
+
     def __init__(self, bucket_name: str):
         """Initializes the manager with a GCS bucket name.
 
@@ -40,7 +42,7 @@ class SignatureAssetsManager:
         """
         self.bucket_name = bucket_name
         try:
-            self.client = storage.Client()
+            self.client = storage.Client(project=settings.PROJECT_ID)
             self.bucket = self.client.bucket(bucket_name)
         except Exception as e:
             print(f"WARNING: GCS Client initialization failed ({e}). Using Mock Client.")

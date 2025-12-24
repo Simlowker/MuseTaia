@@ -30,7 +30,7 @@ class ScriptOutput(BaseModel):
 class NarrativeAgent(BaseWorker):
     """The Screenwriter agent responsible for high-fidelity narrative production."""
 
-    def __init__(self, agent_id: str = "narrative_01", model_name: str = "gemini-3.0-pro"):
+    def __init__(self, agent_id: str = "narrative_01", model_name: str = "gemini-3-pro-preview"):
         """Initializes the NarrativeAgent."""
         super().__init__(agent_id=agent_id, agent_type="narrative")
         self.client = get_genai_client()

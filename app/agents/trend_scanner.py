@@ -10,7 +10,7 @@ from app.core.vertex_init import get_genai_client
 class TrendScanner:
     """Agent that perceives trends and evaluates their fit for the Muse."""
 
-    def __init__(self, model_name: str = "gemini-3.0-flash-preview"):
+    def __init__(self, model_name: str = "gemini-3-flash-preview"):
         """Initializes the TrendScanner.
 
         Args:

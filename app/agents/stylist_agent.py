@@ -13,7 +13,7 @@ from app.core.vertex_init import get_genai_client
 class StylistAgent:
     """The Guardian of Look agent responsible for wardrobe and props."""
 
-    def __init__(self, model_name: str = "gemini-3.0-pro-preview"):
+    def __init__(self, model_name: str = "gemini-3-pro-preview-preview"):
         self.client = get_genai_client()
         self.model_name = model_name
 

@@ -1,7 +1,8 @@
-"use client";
-
-import { LuxeDashboard } from '@/components/dashboard/LuxeDashboard';
-
 export default function Home() {
-  return <LuxeDashboard />;
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center p-24">
+      <h1 className="text-4xl font-bold">SMOS v2 - Reset Complete</h1>
+      <p className="mt-4 text-xl">Ready for new instructions.</p>
+    </div>
+  );
 }
